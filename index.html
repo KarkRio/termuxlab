@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TermuxLab Academy — Do Zero ao Avançado</title>
+<meta name="description" content="Plataforma completa para aprender Termux com lições interativas, terminal real simulado, quizzes, desafios e muito mais.">
+<meta name="theme-color" content="#00FF41">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Supabase JS Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ════════════════════════════════════════════════
+   CONFIG — Edita aqui as tuas chaves do Supabase
+   Cria projeto grátis em supabase.com
+════════════════════════════════════════════════ */
+
+:root{
+  --bg:#050D05;--bg2:#091409;--bg3:#0D1C0D;--bg4:#112111;--bg5:#172717;
+  --g:#00FF41;--gd:#00CC34;--gdim:rgba(0,255,65,.08);--gdim2:rgba(0,255,65,.14);
+  --gglow:0 0 16px rgba(0,255,65,.45),0 0 48px rgba(0,255,65,.12);
+  --y:#FFD700;--ydim:rgba(255,215,0,.1);--yglow:0 0 16px rgba(255,215,0,.4);
+  --c:#00D4FF;--cdim:rgba(0,212,255,.1);--cglow:0 0 16px rgba(0,212,255,.4);
+  --r:#FF4444;--rdim:rgba(255,68,68,.1);--pu:#A855F7;--pudim:rgba(168,85,247,.1);
+  --or:#FF8C00;--gr:#10F5A0;
+  --t1:#E8FFE8;--t2:#7AAB7A;--t3:#3D6040;--t4:#243D24;
+  --bd:rgba(0,255,65,.07);--bd2:rgba(0,255,65,.15);--bd3:rgba(0,255,65,.28);
+  --sh:0 8px 32px rgba(0,0,0,.8);
+  --ff:'JetBrains Mono',monospace;--fi:'Inter',sans-serif;
+  --hh:60px;--sw:300px;
+  --tr:all .22s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--ff);background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden;min-height:100vh}
+body.sb-open,body.lv-open{overflow:hidden}
+/* CRT scanlines */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,255,65,.01) 3px,rgba(0,255,65,.01) 4px);pointer-events:none;z-index:0}
+a{text-decoration:none;color:var(--g)}
+button{cursor:pointer;font-family:var(--ff);border:none;outline:none;background:none}
+input,select,textarea{font-family:var(--ff);outline:none;transition:var(--tr)}
+ul{list-style:none}
+img{max-width:100%;display:block}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--g);border-radius:2px}
+.hidden{display:none!important}
+.container{max-width:1300px;margin:0 auto;padding:0 20px}
+
+/* ── PROGRESS BAR ── */
+#pbar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--g),var(--c));z-index:9999;width:0;transition:width .3s}
+
+/* ── TOAST ── */
+#toasts{position:fixed;bottom:18px;right:18px;z-index:9998;display:flex;flex-direction:column-reverse;gap:7px;max-width:320px}
+.toast{background:var(--bg3);border:1px solid var(--g);border-left:3px solid var(--g);padding:11px 14px;font-size:.76rem;display:flex;align-items:center;gap:8px;box-shadow:var(--gglow);animation:tIn .25s ease;pointer-events:all}
+.toast.err{border-color:var(--r);border-left-color:var(--r)}.toast.warn{border-color:var(--y);border-left-color:var(--y)}.toast.info{border-color:var(--c);border-left-color:var(--c)}
+.toast.out{animation:tOut .22s ease forwards}
+@keyframes tIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes tOut{to{opacity:0;transform:translateX(28px)}}
+
+/* ── HEADER ── */
+header{position:fixed;top:0;left:0;right:0;height:var(--hh);background:rgba(5,13,5,.96);backdrop-filter:blur(18px);border-bottom:1px solid var(--bd2);z-index:500;transition:var(--tr)}
+header.sc{box-shadow:var(--gglow)}
+.hd{display:flex;align-items:center;height:100%;gap:10px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.1rem;color:var(--g);text-shadow:var(--gglow);flex-shrink:0;cursor:pointer;letter-spacing:.3px}
+.logo-b{width:30px;height:30px;border:2px solid var(--g);display:flex;align-items:center;justify-content:center;font-size:.82rem;box-shadow:var(--gglow)}
+.blink{animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hd-nav{display:flex;gap:1px;flex:1;justify-content:center}
+.hn{padding:6px 13px;font-size:.72rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid transparent;transition:var(--tr)}
+.hn:hover{color:var(--t2)}.hn.on{color:var(--g);border-bottom-color:var(--g)}
+.hd-r{display:flex;align-items:center;gap:7px;margin-left:auto;flex-shrink:0}
+.s-wrap{position:relative}
+.s-inp{background:rgba(0,255,65,.04);border:1px solid var(--bd2);color:var(--t1);padding:5px 11px 5px 28px;font-size:.72rem;width:145px;transition:var(--tr)}
+.s-inp:focus{width:195px;border-color:var(--g);box-shadow:0 0 0 2px var(--gdim)}
+.s-inp::placeholder{color:var(--t3)}
+.si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:.68rem;pointer-events:none}
+.hbtn{width:30px;height:30px;border:1px solid var(--bd2);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:var(--tr)}
+.hbtn:hover{border-color:var(--g);color:var(--g);box-shadow:var(--gglow)}
+.xp-d{display:flex;align-items:center;gap:5px;padding:3px 10px;border:1px solid var(--y);font-size:.68rem;color:var(--y);font-weight:700}
+.user-d{display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--bd2);font-size:.72rem;color:var(--t2);cursor:pointer;transition:var(--tr)}
+.user-d:hover{border-color:var(--g);color:var(--g)}
+.user-av{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--c));display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--bg);font-weight:800}
+.hdiv{width:1px;height:16px;background:var(--bd2)}
+
+/* ── HERO ── */
+#hero{margin-top:var(--hh);padding:52px 0 40px;position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;top:-80px;left:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(0,255,65,.05) 0%,transparent 65%);pointer-events:none}
+.hero-g{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;position:relative;z-index:1}
+.h-tag{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--g);padding:3px 11px;font-size:.64rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:14px;box-shadow:var(--gglow)}
+.dot{width:5px;height:5px;background:var(--g);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,255,65,.6)}50%{box-shadow:0 0 0 5px rgba(0,255,65,0)}}
+.h1{font-size:clamp(1.7rem,3vw,2.9rem);font-weight:800;line-height:1.06;margin-bottom:12px}
+.hl{color:var(--g);text-shadow:var(--gglow)}
+.hs{font-size:.86rem;color:var(--t2);margin-bottom:22px;line-height:1.75;font-family:var(--fi);max-width:420px}
+.hacts{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:24px}
+.btn-g{display:inline-flex;align-items:center;gap:6px;background:var(--g);color:var(--bg);padding:9px 20px;font-family:var(--ff);font-weight:700;font-size:.76rem;letter-spacing:.5px;text-transform:uppercase;transition:var(--tr)}
+.btn-g:hover{background:#fff;box-shadow:0 0 25px rgba(255,255,255,.3);transform:translateY(-1px)}
+.btn-o{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--g);padding:8px 20px;border:1px solid var(--g);font-family:var(--ff);font-weight:700;font-size:.76rem;letter-spacing:.5px;text-transform:uppercase;transition:var(--tr)}
+.btn-o:hover{background:var(--gdim);transform:translateY(-1px)}
+.h-stats{display:flex;gap:0;padding-top:18px;border-top:1px solid var(--bd)}
+.hst{padding:0 18px 0 0;border-right:1px solid var(--bd)}
+.hst:last-child{border:none;padding-left:18px}.hst:first-child{padding-left:0}
+.hst-n{font-size:1.5rem;font-weight:800;color:var(--g);text-shadow:var(--gglow);line-height:1}
+.hst-l{font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+/* HERO TERMINAL */
+.term-win{border:1px solid var(--bd2);background:var(--bg2);box-shadow:var(--gglow)}
+.tbar{background:var(--bg3);border-bottom:1px solid var(--bd);padding:7px 12px;display:flex;align-items:center;gap:7px}
+.td{width:9px;height:9px;border-radius:50%}
+.tdr{background:#FF5F56}.tdy{background:#FFBD2E}.tdg{background:#27C93F}
+.tt{font-size:.62rem;color:var(--t3);margin:0 auto;letter-spacing:.5px}
+.term-b{padding:14px;height:255px;overflow-y:auto;font-size:.75rem;line-height:1.9}
+.tc{color:var(--g)}.tp{color:var(--c)}.tu{color:var(--y)}.to{color:var(--t2)}.thi{color:var(--t1)}.te{color:var(--r)}
+.tcur{display:inline-block;width:7px;height:12px;background:var(--g);animation:blink 1s infinite;vertical-align:middle;margin-left:2px}
+
+/* ── MAIN LAYOUT ── */
+#main{padding:0 0 70px;position:relative;z-index:1}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;padding-top:30px;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.sec-t{font-size:.95rem;font-weight:800;color:var(--g);display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px;text-shadow:var(--gglow)}
+.sec-t::before{content:'> ';color:var(--t3)}
+
+/* ── PATH CARDS ── */
+.path-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:13px}
+.pc{background:var(--bg2);border:1px solid var(--bd);padding:20px;position:relative;overflow:hidden;transition:var(--tr);cursor:pointer}
+.pc::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.pc.p0::before{background:var(--g)}.pc.p1::before{background:var(--c)}.pc.p2::before{background:var(--y)}.pc.p3::before{background:var(--pu)}.pc.p4::before{background:var(--or)}
+.pc:hover{border-color:var(--bd3);transform:translateY(-3px);box-shadow:var(--gglow)}
+.pc-ico{font-size:1.4rem;margin-bottom:10px}
+.pc-n{font-size:.95rem;font-weight:800;margin-bottom:5px}
+.pc-d{font-size:.75rem;color:var(--t2);line-height:1.6;margin-bottom:12px;font-family:var(--fi)}
+.pc-meta{display:flex;gap:10px;font-size:.64rem;color:var(--t3);margin-bottom:10px}
+.pc-mi{display:flex;align-items:center;gap:3px}
+.pc-bar{height:3px;background:var(--bd);overflow:hidden}
+.pc-fill{height:100%;transition:width .5s ease}
+.p0 .pc-fill{background:var(--g)}.p1 .pc-fill{background:var(--c)}.p2 .pc-fill{background:var(--y)}.p3 .pc-fill{background:var(--pu)}.p4 .pc-fill{background:var(--or)}
+.pc-pct{font-size:.62rem;color:var(--t3);margin-top:4px;display:flex;justify-content:space-between}
+
+/* ── LESSON VIEW FULLSCREEN ── */
+#lv{position:fixed;inset:0;background:var(--bg);z-index:600;display:none;flex-direction:row}
+#lv.open{display:flex}
+/* Sidebar */
+.lv-sb{width:var(--sw);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;transition:var(--tr)}
+.lv-sb-top{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px;flex-shrink:0}
+.bk-btn{width:30px;height:30px;border:1px solid var(--bd2);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0;transition:var(--tr)}
+.bk-btn:hover{border-color:var(--g);color:var(--g)}
+.lv-pn{font-size:.8rem;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv-prog-w{padding:10px 14px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.lv-prog-lbl{display:flex;justify-content:space-between;font-size:.62rem;color:var(--t3);margin-bottom:4px}
+.lv-bar{height:2px;background:var(--bd);overflow:hidden}
+.lv-fill{height:100%;background:var(--g);transition:width .4s}
+.lv-list{flex:1;overflow-y:auto;padding:6px 0}
+.ll-btn{width:100%;text-align:left;padding:9px 14px;display:flex;gap:9px;align-items:flex-start;transition:var(--tr);border-left:2px solid transparent}
+.ll-btn:hover{background:rgba(0,255,65,.04)}
+.ll-btn.cur{background:rgba(0,255,65,.07);border-left-color:var(--g)}
+.ll-btn.done .lln{background:var(--g);color:var(--bg);border-color:var(--g)}
+.lln{width:20px;height:20px;border:1px solid var(--bd2);color:var(--t3);font-size:.62rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:var(--tr)}
+.ll-inf{flex:1;min-width:0}
+.ll-t{font-size:.74rem;color:var(--t2);line-height:1.3;transition:var(--tr)}
+.ll-btn.cur .ll-t,.ll-btn:hover .ll-t{color:var(--g)}
+.ll-m{font-size:.6rem;color:var(--t3);margin-top:2px;display:flex;gap:5px}
+/* Content */
+.lv-ct{flex:1;overflow-y:auto;padding:28px 34px}
+/* Right panel */
+.lv-rp{width:270px;flex-shrink:0;border-left:1px solid var(--bd);overflow-y:auto;background:var(--bg2);padding:14px}
+
+/* ── LESSON CONTENT ── */
+.lc-crumb{font-size:.62rem;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.lc-h{font-size:1.55rem;font-weight:800;line-height:1.1;margin-bottom:8px}
+.lc-meta{display:flex;gap:12px;font-size:.66rem;color:var(--t3);flex-wrap:wrap;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--bd)}
+.lc-mi{display:flex;align-items:center;gap:3px}
+.dini{color:#10F5A0}.dmed{color:var(--y)}.dadv{color:var(--r)}
+/* Lesson body */
+.lc-body{font-family:var(--fi);font-size:.87rem;color:var(--t2);line-height:1.85}
+.lc-body h2{font-family:var(--ff);font-size:.98rem;color:var(--g);margin:22px 0 9px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:7px}
+.lc-body h2::before{content:'## ';color:var(--t4);font-size:.72rem}
+.lc-body h3{font-family:var(--ff);font-size:.88rem;color:var(--c);margin:16px 0 7px}
+.lc-body p{margin-bottom:11px;color:var(--t2)}
+.lc-body ul,.lc-body ol{padding-left:0;margin-bottom:11px}
+.lc-body li{color:var(--t2);margin-bottom:4px;padding-left:16px;position:relative;font-family:var(--fi);font-size:.85rem}
+.lc-body li::before{content:'→';color:var(--g);position:absolute;left:0;font-family:var(--ff);font-size:.68rem;top:4px}
+.lc-body ol li{counter-increment:lst}
+.lc-body ol li::before{content:counter(lst)'.';color:var(--y)}
+.lc-body strong{color:var(--t1)}
+.lc-body em{color:var(--y);font-style:normal}
+.lc-body code{background:var(--bg);border:1px solid var(--bd2);padding:1px 5px;font-size:.8em;color:var(--g);font-family:var(--ff)}
+/* Boxes */
+.cb{background:var(--bg);border:1px solid var(--bd2);margin:13px 0;overflow:hidden}
+.cb-hd{background:var(--bg3);padding:5px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)}
+.cb-lbl{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:5px}
+.cb-acts{display:flex;gap:5px}
+.cba{padding:2px 8px;border:1px solid var(--bd2);color:var(--t3);font-size:.58rem;font-family:var(--ff);text-transform:uppercase;transition:var(--tr)}
+.cba:hover{border-color:var(--g);color:var(--g)}
+.cba.run{border-color:rgba(0,255,65,.3);color:var(--g);background:rgba(0,255,65,.06)}
+.cba.run:hover{background:rgba(0,255,65,.14)}
+.cb-code{padding:11px 13px;font-size:.76rem;color:var(--g);white-space:pre;overflow-x:auto;font-family:var(--ff);line-height:1.7}
+.cb-out{padding:9px 13px;border-top:1px solid var(--bd);font-size:.72rem;color:var(--t2);background:rgba(0,0,0,.3);display:none;white-space:pre-wrap;font-family:var(--ff);line-height:1.7;animation:fIn .2s ease}
+.cb-out.show{display:block}
+/* Info boxes */
+.ib{padding:11px 14px;margin:12px 0;border-left:3px solid;font-size:.82rem}
+.ib.tip{border-color:var(--g);background:rgba(0,255,65,.05)}.ib.warn{border-color:var(--y);background:rgba(255,215,0,.05)}.ib.danger{border-color:var(--r);background:rgba(255,68,68,.05)}.ib.info{border-color:var(--c);background:rgba(0,212,255,.05)}
+.ib-h{font-family:var(--ff);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.ib.tip .ib-h{color:var(--g)}.ib.warn .ib-h{color:var(--y)}.ib.danger .ib-h{color:var(--r)}.ib.info .ib-h{color:var(--c)}
+.ib p{color:var(--t2);font-size:.82rem;margin:0;font-family:var(--fi)}
+
+/* ── QUIZ ── */
+.qz{background:var(--bg3);border:1px solid var(--bd2);padding:16px;margin:16px 0}
+.qz-top{font-size:.62rem;color:var(--g);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.qz-q{font-size:.87rem;font-weight:700;margin-bottom:12px;font-family:var(--ff)}
+.qz-opts{display:flex;flex-direction:column;gap:6px}
+.qz-opt{padding:8px 12px;border:1px solid var(--bd2);color:var(--t2);font-size:.79rem;text-align:left;transition:var(--tr);font-family:var(--fi);display:flex;align-items:center;gap:8px;background:transparent}
+.qz-opt:hover:not(:disabled){border-color:var(--g);color:var(--g);background:var(--gdim)}
+.qz-opt.ok{border-color:var(--g);background:rgba(0,255,65,.1);color:var(--g)}
+.qz-opt.nk{border-color:var(--r);background:rgba(255,68,68,.08);color:var(--r)}
+.qz-opt:disabled{cursor:not-allowed}
+.qz-exp{margin-top:9px;font-size:.76rem;padding:8px 11px;font-family:var(--fi)}
+.qz-exp.ok{background:rgba(0,255,65,.06);border-left:2px solid var(--g);color:var(--g)}
+.qz-exp.nk{background:rgba(255,68,68,.06);border-left:2px solid var(--r);color:var(--r)}
+
+/* ── CHALLENGE ── */
+.ch-box{background:var(--bg3);border:1px solid var(--bd2);padding:16px;margin:16px 0}
+.ch-top{font-size:.62rem;color:var(--y);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ch-title{font-size:.88rem;font-weight:700;margin-bottom:6px;font-family:var(--ff);color:var(--t1)}
+.ch-desc{font-size:.8rem;color:var(--t2);margin-bottom:12px;font-family:var(--fi);line-height:1.65}
+.ch-obj{margin-bottom:12px}
+.ch-oi{display:flex;align-items:center;gap:8px;font-size:.76rem;padding:5px 0;border-bottom:1px solid var(--bd)}
+.ch-oi:last-child{border:none}
+.ch-oi-dot{width:14px;height:14px;border:1px solid var(--bd2);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.55rem;transition:var(--tr)}
+.ch-oi-dot.ok{background:var(--g);border-color:var(--g);color:var(--bg)}
+.ch-oi-txt{color:var(--t2);font-family:var(--fi)}
+.ch-term{margin-top:10px}
+
+/* ── MINI TERMINAL (sidebar) ── */
+.mt{background:var(--bg);border:1px solid var(--bd2)}
+.mt-b{height:130px;overflow-y:auto;padding:9px 11px;font-size:.72rem;line-height:1.8}
+.mt-ir{border-top:1px solid var(--bd);padding:6px 11px;display:flex;align-items:center;gap:6px;background:var(--bg2)}
+.mt-pr{color:var(--g);font-size:.72rem;flex-shrink:0}
+.mt-in{flex:1;background:transparent;border:none;color:var(--t1);font-size:.72rem;font-family:var(--ff)}
+.mt-in:focus{outline:none}
+
+/* ── RIGHT PANEL WIDGETS ── */
+.rpw{background:var(--bg3);border:1px solid var(--bd);padding:12px;margin-bottom:12px}
+.rpw-t{font-size:.66rem;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.rpw-t::before{content:'//';color:var(--t4);font-size:.58rem}
+.cs-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bd);gap:8px}
+.cs-item:last-child{border:none}
+.cs-cmd{font-size:.68rem;color:var(--g)}
+.cs-desc{font-size:.62rem;color:var(--t3);text-align:right}
+.cs-cp{width:18px;height:18px;border:1px solid var(--bd);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:.52rem;flex-shrink:0;transition:var(--tr);cursor:pointer}
+.cs-cp:hover{border-color:var(--g);color:var(--g)}
+.note-ta{width:100%;background:var(--bg);border:1px solid var(--bd);color:var(--t1);padding:8px;font-size:.72rem;font-family:var(--ff);resize:vertical;min-height:80px;line-height:1.5}
+.note-ta::placeholder{color:var(--t4)}
+.note-ta:focus{border-color:var(--g)}
+.note-sv{width:100%;padding:5px;border:1px solid var(--g);color:var(--g);font-size:.68rem;font-family:var(--ff);font-weight:700;text-transform:uppercase;transition:var(--tr);margin-top:5px}
+.note-sv:hover{background:var(--g);color:var(--bg)}
+
+/* ── LESSON NAV ── */
+.lc-nav{display:flex;justify-content:space-between;align-items:center;padding-top:22px;margin-top:22px;border-top:1px solid var(--bd);flex-wrap:wrap;gap:8px}
+.lnb{display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--bd2);color:var(--t2);font-size:.74rem;font-family:var(--ff);transition:var(--tr)}
+.lnb:hover{border-color:var(--g);color:var(--g)}
+.lnb:disabled{opacity:.35;cursor:not-allowed}
+.lnb.done-btn{background:var(--g);color:var(--bg);border-color:var(--g);font-weight:700}
+.lnb.done-btn:hover{background:#fff}
+.lnb.done-btn.already{background:rgba(0,255,65,.12);color:var(--g);border-color:var(--g)}
+
+/* ── SANDBOX ── */
+#sandbox{position:fixed;inset:0;background:var(--bg);z-index:700;display:none;flex-direction:column}
+#sandbox.open{display:flex}
+.sb-hd{height:50px;background:var(--bg2);border-bottom:1px solid var(--bd2);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0}
+.sb-title{font-size:.88rem;font-weight:700;color:var(--g);text-shadow:var(--gglow);display:flex;align-items:center;gap:8px}
+.sb-out{flex:1;overflow-y:auto;padding:16px;font-size:.79rem;line-height:1.85;color:var(--t2);font-family:var(--ff);white-space:pre-wrap;cursor:text}
+.sb-inp-r{display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--bd);flex-shrink:0}
+.sb-pr{color:var(--g);font-size:.79rem;flex-shrink:0;white-space:nowrap}
+.sb-inp{flex:1;background:transparent;border:none;color:var(--t1);font-size:.79rem;font-family:var(--ff)}
+.sb-inp:focus{outline:none}
+.sb-qk{padding:7px 16px;border-top:1px solid var(--bd);background:var(--bg2);display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex-shrink:0}
+.sb-q{padding:3px 9px;border:1px solid var(--bd2);color:var(--t3);font-size:.65rem;font-family:var(--ff);transition:var(--tr)}
+.sb-q:hover{border-color:var(--g);color:var(--g)}
+
+/* ── AUTH MODAL ── */
+.ov{position:fixed;inset:0;background:rgba(5,13,5,.94);backdrop-filter:blur(10px);z-index:800;display:none;align-items:center;justify-content:center;padding:16px}
+.ov.open{display:flex;animation:fIn .22s ease}
+@keyframes fIn{from{opacity:0}to{opacity:1}}
+.mod{background:var(--bg2);border:1px solid var(--bd2);max-width:440px;width:100%;animation:sUp .28s ease;box-shadow:0 20px 60px rgba(0,0,0,.85);position:relative}
+@keyframes sUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mod-x{position:absolute;top:10px;right:10px;width:28px;height:28px;border:1px solid var(--bd2);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:var(--tr)}
+.mod-x:hover{border-color:var(--r);color:var(--r)}
+.mod-top{padding:20px 20px 0;border-bottom:1px solid var(--bd)}
+.mod-title{font-size:1.1rem;font-weight:800;color:var(--g);text-shadow:var(--gglow);margin-bottom:4px}
+.mod-sub{font-size:.75rem;color:var(--t3);margin-bottom:14px;font-family:var(--fi)}
+.mod-body{padding:18px 20px}
+.fg{margin-bottom:12px}
+.fl{display:block;font-size:.66rem;font-weight:700;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.fl::before{content:'> ';color:var(--t4)}
+.fi{width:100%;background:rgba(0,255,65,.04);border:1px solid var(--bd2);color:var(--t1);padding:8px 11px;font-size:.8rem;font-family:var(--ff)}
+.fi:focus{border-color:var(--g);box-shadow:0 0 0 2px var(--gdim)}
+.fi::placeholder{color:var(--t4)}
+.mod-err{font-size:.74rem;color:var(--r);margin-bottom:10px;padding:6px 9px;border-left:2px solid var(--r);background:rgba(255,68,68,.06);display:none}
+.mod-err.show{display:block}
+.mod-foot{font-size:.72rem;color:var(--t3);text-align:center;margin-top:10px}
+.mod-foot a{color:var(--g);cursor:pointer}
+/* Tabs in mod */
+.auth-tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:16px}
+.auth-tab{flex:1;padding:8px;font-size:.74rem;font-weight:700;color:var(--t3);text-transform:uppercase;border-bottom:2px solid transparent;transition:var(--tr)}
+.auth-tab.on{color:var(--g);border-bottom-color:var(--g)}
+
+/* ── PROGRESS PAGE ── */
+.xp-panel{background:var(--bg2);border:1px solid var(--bd);padding:24px;text-align:center;margin-bottom:18px}
+.xp-big{font-size:3.2rem;font-weight:800;color:var(--y);text-shadow:var(--yglow);line-height:1}
+.xp-sub{font-size:.68rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.xp-lv{font-size:.78rem;color:var(--t2);margin-top:8px}
+.xp-lbar{height:5px;background:var(--bd);overflow:hidden;margin-top:8px;border-radius:2px}
+.xp-lfill{height:100%;background:linear-gradient(90deg,var(--y),var(--or));transition:width .8s ease}
+
+/* ── ACHIEVEMENTS ── */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px}
+.ag{background:var(--bg2);border:1px solid var(--bd);padding:14px;text-align:center;transition:var(--tr);opacity:.3;filter:grayscale(1)}
+.ag.earned{opacity:1;filter:none;border-color:var(--y);box-shadow:0 0 14px rgba(255,215,0,.12)}
+.ag:hover{transform:translateY(-2px)}
+.ag-ico{font-size:1.7rem;margin-bottom:7px}
+.ag-n{font-size:.74rem;font-weight:700;color:var(--y);margin-bottom:2px}
+.ag-d{font-size:.62rem;color:var(--t3);font-family:var(--fi)}
+
+/* ── LEADERBOARD ── */
+.lb-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.lb-table th{color:var(--t3);font-size:.62rem;text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;border-bottom:1px solid var(--bd2);text-align:left}
+.lb-table td{padding:8px 10px;border-bottom:1px solid var(--bd);color:var(--t2);font-family:var(--fi)}
+.lb-table tr:hover td{background:rgba(0,255,65,.03)}
+.lb-rank{color:var(--g);font-weight:700;font-family:var(--ff)}
+.lb-xp{color:var(--y);font-weight:700;font-family:var(--ff)}
+.lb-me td{background:rgba(0,255,65,.05);color:var(--g)}
+
+/* ── SEARCH RESULTS ── */
+.sr-drop{position:absolute;top:100%;left:0;right:0;background:var(--bg3);border:1px solid var(--bd2);border-top:none;max-height:260px;overflow-y:auto;z-index:200;display:none}
+.sr-item{padding:8px 12px;cursor:pointer;display:flex;gap:9px;align-items:center;transition:var(--tr);border-bottom:1px solid var(--bd)}
+.sr-item:hover{background:rgba(0,255,65,.06)}
+.sr-item:last-child{border:none}
+.sr-cat{font-size:.6rem;color:var(--t3);flex-shrink:0;text-transform:uppercase}
+.sr-ttl{font-size:.76rem;color:var(--t1)}
+.sr-sub{font-size:.66rem;color:var(--t3);font-family:var(--fi)}
+
+/* ── HOME RECENT + POPULAR ── */
+.recent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:11px}
+.rc{background:var(--bg2);border:1px solid var(--bd);padding:14px;transition:var(--tr);cursor:pointer}
+.rc:hover{border-color:var(--bd3);background:rgba(0,255,65,.03);transform:translateY(-2px)}
+.rc-cat{font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.rc-t{font-size:.82rem;font-weight:700;margin-bottom:4px;color:var(--t1)}
+.rc-m{font-size:.66rem;color:var(--t3);display:flex;gap:8px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){.lv-rp{display:none}}
+@media(max-width:768px){
+  .hero-g{grid-template-columns:1fr}.term-win{display:none}
+  .lv-sb{width:240px}.h1{font-size:1.65rem}
+  .lc-h{font-size:1.2rem}.lv-ct{padding:16px 18px}
+}
+@media(max-width:580px){
+  .hd-nav .hn{padding:5px 7px;font-size:.65rem}
+  .container{padding:0 12px}
+  .path-grid{grid-template-columns:1fr}
+  .lv-sb{position:absolute;left:-100%;z-index:10;height:100%}
+  .lv-sb.open{left:0}
+}
+</style>
+</head>
+<body>
+<!-- CONFIG SUPABASE — preenche com os teus dados -->
+<script>
+const SUPABASE_URL = ''; // ex: https://xyzxyz.supabase.co
+const SUPABASE_ANON_KEY = ''; // a tua chave anon pública
+// Se ficares vazio, usa apenas localStorage (funciona offline)
+</script>
+
+<div id="pbar"></div>
+<div id="toasts"></div>
+
+<!-- ═══ HEADER ═══ -->
+<header id="hdr">
+  <div class="container hd">
+    <div class="logo" onclick="goPage('home')">
+      <div class="logo-b"><i class="fas fa-terminal"></i></div>
+      TermuxLab<span class="blink">_</span>
+    </div>
+    <nav class="hd-nav">
+      <button class="hn on" data-p="home">Home</button>
+      <button class="hn" data-p="trilhas">Trilhas</button>
+      <button class="hn" data-p="progresso">Progresso</button>
+      <button class="hn" data-p="ranking">Ranking</button>
+    </nav>
+    <div class="hd-r">
+      <div class="s-wrap" style="position:relative">
+        <i class="fas fa-search si"></i>
+        <input class="s-inp" id="srch" placeholder="buscar lição...">
+        <div class="sr-drop" id="sr-drop"></div>
+      </div>
+      <div class="xp-d"><i class="fas fa-bolt"></i><span id="xp-hd">0</span> XP</div>
+      <div class="hdiv"></div>
+      <button class="hbtn" id="sb-open-btn" title="Terminal Sandbox"><i class="fas fa-terminal"></i></button>
+      <button class="hbtn" id="auth-btn" title="Conta"><i class="fas fa-user"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-g">
+      <div>
+        <div class="h-tag"><span class="dot"></span>Academia do Terminal</div>
+        <h1 class="h1">Aprende <span class="hl">Termux</span><br>de A a Z, em português</h1>
+        <p class="hs">30+ lições interativas, terminal simulado, quizzes com XP, desafios práticos e progresso na nuvem. Transforma o teu Android num laboratório Linux.</p>
+        <div class="hacts">
+          <button class="btn-g" onclick="startLearning()"><i class="fas fa-play"></i> Começar agora</button>
+          <button class="btn-o" onclick="openSandbox()"><i class="fas fa-terminal"></i> Abrir terminal</button>
+        </div>
+        <div class="h-stats">
+          <div class="hst"><div class="hst-n" id="hs-les">33</div><div class="hst-l">Lições</div></div>
+          <div class="hst"><div class="hst-n">5</div><div class="hst-l">Trilhas</div></div>
+          <div class="hst"><div class="hst-n">60+</div><div class="hst-l">Comandos</div></div>
+          <div class="hst"><div class="hst-n">∞</div><div class="hst-l">Grátis</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="term-win">
+          <div class="tbar"><div class="td tdr"></div><div class="td tdy"></div><div class="td tdg"></div><div class="tt">kark@termuxlab:~</div></div>
+          <div class="term-b" id="anim-t"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MAIN ═══ -->
+<main id="main">
+  <div class="container">
+
+    <!-- HOME PAGE -->
+    <div id="pg-home">
+      <div class="sec-hd"><div class="sec-t">Trilhas de Aprendizagem</div><button class="btn-o" style="font-size:.7rem;padding:5px 14px" onclick="goPage('trilhas')">Ver todas</button></div>
+      <div class="path-grid" id="path-grid"></div>
+      <div class="sec-hd" style="margin-top:6px"><div class="sec-t">Conquistas Recentes</div></div>
+      <div class="ach-grid" id="ach-home"></div>
+      <div class="sec-hd"><div class="sec-t">Começar por aqui</div></div>
+      <div class="recent-grid" id="start-grid"></div>
+    </div>
+
+    <!-- TRILHAS PAGE -->
+    <div id="pg-trilhas" style="display:none">
+      <div id="all-paths-ct"></div>
+    </div>
+
+    <!-- PROGRESS PAGE -->
+    <div id="pg-progresso" style="display:none">
+      <div class="xp-panel">
+        <div style="font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Experiência Total</div>
+        <div class="xp-big" id="xp-big">0</div>
+        <div class="xp-sub">pontos XP</div>
+        <div class="xp-lv" id="xp-lv">Nível 1 — Script Kiddie</div>
+        <div class="xp-lbar"><div class="xp-lfill" id="xp-lfill" style="width:0%"></div></div>
+      </div>
+      <div class="sec-hd"><div class="sec-t">Progresso por Trilha</div></div>
+      <div class="path-grid" id="prog-paths"></div>
+      <div class="sec-hd"><div class="sec-t">Conquistas</div></div>
+      <div class="ach-grid" id="ach-prog"></div>
+    </div>
+
+    <!-- RANKING PAGE -->
+    <div id="pg-ranking" style="display:none">
+      <div class="sec-hd"><div class="sec-t">Ranking Global</div></div>
+      <div style="background:var(--bg2);border:1px solid var(--bd);overflow:hidden">
+        <table class="lb-table" id="lb-table">
+          <thead><tr><th>#</th><th>Utilizador</th><th>Nível</th><th>XP</th><th>Lições</th></tr></thead>
+          <tbody id="lb-body"></tbody>
+        </table>
+      </div>
+      <div style="font-size:.7rem;color:var(--t3);margin-top:10px;font-family:var(--fi)">O ranking sincroniza com o Supabase quando configurado. Sem Supabase, só mostra os teus dados locais.</div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ═══ LESSON VIEW ═══ -->
+<div id="lv">
+  <div class="lv-sb" id="lv-sb">
+    <div class="lv-sb-top">
+      <button class="bk-btn" onclick="closeLV()"><i class="fas fa-arrow-left"></i></button>
+      <div class="lv-pn" id="lv-pn">Trilha</div>
+      <button class="hbtn" id="lv-mb-toggle" title="Menu" style="display:none"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="lv-prog-w">
+      <div class="lv-prog-lbl"><span>Progresso</span><span id="lv-pct">0%</span></div>
+      <div class="lv-bar"><div class="lv-fill" id="lv-fill"></div></div>
+    </div>
+    <div class="lv-list" id="lv-list"></div>
+  </div>
+  <div class="lv-ct" id="lv-ct"><!-- lesson injected here --></div>
+  <div class="lv-rp" id="lv-rp">
+    <div class="rpw">
+      <div class="rpw-t">Referência Rápida</div>
+      <div id="rp-cs"></div>
+    </div>
+    <div class="rpw">
+      <div class="rpw-t">Minhas Notas</div>
+      <textarea class="note-ta" id="note-ta" placeholder="Escreve notas sobre esta lição..."></textarea>
+      <button class="note-sv" onclick="saveNote()"><i class="fas fa-save"></i> Guardar</button>
+    </div>
+    <div class="rpw">
+      <div class="rpw-t">Mini Terminal</div>
+      <div class="mt" id="rp-term">
+        <div class="tbar"><div class="td tdr"></div><div class="td tdy"></div><div class="td tdg"></div><div class="tt">terminal</div></div>
+        <div class="mt-b" id="mt-out"></div>
+        <div class="mt-ir"><span class="mt-pr">$</span><input class="mt-in" id="mt-in" placeholder="comando..." autocomplete="off"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SANDBOX ═══ -->
+<div id="sandbox">
+  <div class="sb-hd">
+    <button onclick="closeSandbox()" style="width:30px;height:30px;border:1px solid var(--bd2);color:var(--t2);display:flex;align-items:center;justify-content:center;font-size:.78rem;transition:var(--tr)" onmouseover="this.style.borderColor='var(--r)';this.style.color='var(--r)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--t2)'"><i class="fas fa-times"></i></button>
+    <div class="sb-title"><i class="fas fa-terminal"></i> Terminal Sandbox — Pratica aqui!</div>
+    <div style="margin-left:auto;display:flex;gap:7px">
+      <button onclick="sbReset()" style="padding:4px 12px;border:1px solid var(--bd2);color:var(--t3);font-size:.64rem;font-family:var(--ff);text-transform:uppercase;transition:var(--tr)" onmouseover="this.style.borderColor='var(--y)';this.style.color='var(--y)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--t3)'"><i class="fas fa-redo"></i> Reset</button>
+      <button onclick="sbClear()" style="padding:4px 12px;border:1px solid var(--bd2);color:var(--t3);font-size:.64rem;font-family:var(--ff);text-transform:uppercase;transition:var(--tr)" onmouseover="this.style.borderColor='var(--r)';this.style.color='var(--r)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--t3)'"><i class="fas fa-trash"></i> Limpar</button>
+    </div>
+  </div>
+  <div class="sb-out" id="sb-out" onclick="document.getElementById('sb-inp').focus()"></div>
+  <div class="sb-inp-r">
+    <span class="sb-pr" id="sb-pr">kark@termuxlab:~$</span>
+    <input class="sb-inp" id="sb-inp" autocomplete="off" spellcheck="false" placeholder="escreve um comando e prime Enter...">
+  </div>
+  <div class="sb-qk" id="sb-qk">
+    <span style="font-size:.62rem;color:var(--t3)">Atalhos:</span>
+  </div>
+</div>
+
+<!-- ═══ AUTH MODAL ═══ -->
+<div class="ov" id="auth-ov">
+  <div class="mod" style="max-width:400px">
+    <button class="mod-x" onclick="closeOv('auth-ov')"><i class="fas fa-times"></i></button>
+    <div class="mod-top">
+      <div class="mod-title">TermuxLab Academy</div>
+      <div class="mod-sub">Guarda o teu progresso na nuvem com Supabase</div>
+      <div class="auth-tabs">
+        <button class="auth-tab on" onclick="switchAuthTab('login')">Login</button>
+        <button class="auth-tab" onclick="switchAuthTab('reg')">Registar</button>
+      </div>
+    </div>
+    <div class="mod-body">
+      <div class="mod-err" id="auth-err"></div>
+      <div id="auth-login-f">
+        <div class="fg"><label class="fl">Email</label><input class="fi" id="a-email" type="email" placeholder="teu@email.com"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" id="a-pw" type="password" placeholder="••••••••"></div>
+        <button class="btn-g" style="width:100%;justify-content:center" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+        <div class="mod-foot">Sem conta? <a onclick="switchAuthTab('reg')">Registar</a></div>
+      </div>
+      <div id="auth-reg-f" style="display:none">
+        <div class="fg"><label class="fl">Username</label><input class="fi" id="a-user" placeholder="kark_termux"></div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" id="a-remail" type="email" placeholder="teu@email.com"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" id="a-rpw" type="password" placeholder="••••••••"></div>
+        <button class="btn-g" style="width:100%;justify-content:center" onclick="doRegister()"><i class="fas fa-user-plus"></i> Criar conta</button>
+        <div class="mod-foot">Já tens conta? <a onclick="switchAuthTab('login')">Entrar</a></div>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bd);font-size:.7rem;color:var(--t3);font-family:var(--fi)">
+        <i class="fas fa-info-circle" style="color:var(--c)"></i> Sem Supabase configurado, o progresso guarda-se localmente no browser. Para sincronizar, adiciona as chaves Supabase no início do ficheiro HTML.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer style="background:var(--bg2);border-top:1px solid var(--bd);padding:30px 0 18px;position:relative;z-index:1">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:22px;margin-bottom:22px">
+      <div>
+        <div class="logo" style="margin-bottom:9px;font-size:1rem"><div class="logo-b" style="width:26px;height:26px;font-size:.72rem"><i class="fas fa-terminal"></i></div>TermuxLab</div>
+        <p style="font-size:.75rem;color:var(--t2);line-height:1.7;font-family:var(--fi)">O laboratório do terminal. Aprende Termux do zero ao avançado, de graça, em português.</p>
+        <div style="margin-top:10px;font-size:.68rem;color:var(--t3)">DNS: <a href="https://freedns.afraid.org/" target="_blank" style="color:var(--g)">Free DNS</a></div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Trilhas</div>
+        <div style="display:flex;flex-direction:column;gap:5px;font-size:.74rem">
+          <a onclick="startLearning()" style="color:var(--t2);cursor:pointer">💻 Bash Essencial</a>
+          <a onclick="openPath(1)" style="color:var(--t2);cursor:pointer">📦 Pacotes & Ferramentas</a>
+          <a onclick="openPath(2)" style="color:var(--t2);cursor:pointer">🐍 Python no Termux</a>
+          <a onclick="openPath(3)" style="color:var(--t2);cursor:pointer">🌐 Redes & SSH</a>
+          <a onclick="openPath(4)" style="color:var(--t2);cursor:pointer">⚡ Avançado</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Contacto</div>
+        <div style="display:flex;flex-direction:column;gap:5px;font-size:.74rem">
+          <a href="mailto:termuxkark@gmail.com" style="color:var(--t2)">📧 termuxkark@gmail.com</a>
+          <a href="https://github.com/KarkRio" target="_blank" style="color:var(--t2)">🐙 GitHub: KarkRio</a>
+          <a href="https://termuxlab.net.eu.org" style="color:var(--t2)">🌐 termuxlab.net.eu.org</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--bd);padding-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:.68rem;color:var(--t3)">
+      <span>© 2025 TermuxLab Academy — Kark Rio · Moçambique 🇲🇿</span>
+      <div style="display:flex;gap:7px">
+        <span style="padding:2px 8px;border:1px solid var(--bd2)">HTML · CSS · JS</span>
+        <span style="padding:2px 8px;border:1px solid var(--bd2)">GitHub Pages</span>
+        <span style="padding:2px 8px;border:1px solid var(--bd2)">Supabase</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+'use strict';
+/* ════════════════════════════════════════════════════════════
+   SUPABASE CONFIG — TermuxLab Academy
+════════════════════════════════════════════════════════════ */
+const SUPABASE_URL = 'https://twxirpgmfaenswqgyrkv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eGlycGdtZmFlbnN3cWd5cmt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMTI5MTQsImV4cCI6MjA5MjY4ODkxNH0.R6Se6lL_Faa7LDRAIXBQSXGdCsudgmUxVgdgDZpCzaE';
+
+/* ════════════════════════════════════════════════════════════
+   SUPABASE INIT
+════════════════════════════════════════════════════════════ */
+let sb = null;
+if(SUPABASE_URL && SUPABASE_ANON_KEY){
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+/* ════════════════════════════════════════════════════════════
+   CURRICULUM DATA — 33 LIÇÕES COMPLETAS
+════════════════════════════════════════════════════════════ */
+const PATHS = [
+{id:0,name:'Bash Essencial',ico:'💻',cls:'p0',color:'#00FF41',desc:'Os comandos fundamentais do Linux/Termux. Começa aqui.',
+ cs:[{cmd:'ls -la',d:'Listar detalhado'},{cmd:'cd pasta',d:'Entrar'},{cmd:'pwd',d:'Ver local'},{cmd:'mkdir nome',d:'Criar pasta'},{cmd:'rm -r pasta',d:'Apagar pasta'},{cmd:'cat file',d:'Ver ficheiro'},{cmd:'cp a b',d:'Copiar'},{cmd:'mv a b',d:'Mover/Renomear'},{cmd:'touch file',d:'Criar ficheiro'},{cmd:'nano file',d:'Editar ficheiro'}],
+ lessons:[
+  {id:'b01',t:'O que é o Termux e Linux?',diff:'ini',mins:6,xp:25,
+   body:`<h2>O que é o Termux?</h2><p>O <strong>Termux</strong> é um emulador de terminal para Android que te dá acesso a um ambiente <strong>Linux completo</strong> — sem precisar de root, sem custos, sem limitações.</p><ul><li>Shell Bash real, igual ao de um servidor Linux</li><li>Mais de 1000 pacotes disponíveis (Python, Git, Node.js, etc.)</li><li>Funciona em Android 7.0+ sem root</li><li>Open-source e completamente gratuito</li><li>Podes usar SSH, criar servidores web, automatizar tarefas, programar</li></ul><div class="ib tip"><div class="ib-h"><i class="fas fa-lightbulb"></i> Dica Importante</div><p>Instala sempre pelo <strong>F-Droid</strong> (f-droid.org) — a versão do Google Play está abandonada desde 2020 e pode causar erros.</p></div><h2>O que é o Linux?</h2><p>Linux é um sistema operativo open-source criado por <strong>Linus Torvalds</strong> em 1991. É a base de servidores, supercomputadores, Android, e muito mais.</p><p>O Termux usa um ambiente Linux chamado <em>proot</em> ou <em>Termux packages</em>, que emula pacotes Linux nativos no Android.</p><h2>Por que aprender Termux?</h2><ul><li><strong>Produtividade</strong> — faz em 1 comando o que levaria horas manualmente</li><li><strong>Aprendizagem</strong> — o melhor jeito de aprender Linux sem comprar um PC</li><li><strong>Automação</strong> — scripts que trabalham enquanto dormes</li><li><strong>Desenvolvimento</strong> — programa Python, Node.js, Ruby direto no telemóvel</li><li><strong>Segurança</strong> — ferramentas de rede, SSH, análise</li></ul>`,
+   quiz:{q:'Onde deves instalar o Termux para ter a versão mais atual?',opts:['Google Play Store','F-Droid','APKPure','Huawei AppGallery'],c:1,e:'O F-Droid mantém a versão oficial e atualizada do Termux. A versão do Google Play foi abandonada em 2020.'},
+   challenge:{t:'Primeira exploração',d:'Abre o Termux e executa os primeiros comandos!',objs:['Executar: pkg update','Ver a versão do bash: bash --version','Ver quem és: whoami'],cmds:['pkg update','bash --version','whoami']}},
+
+  {id:'b02',t:'Instalação e configuração inicial',diff:'ini',mins:8,xp:30,
+   body:`<h2>Instalar pelo F-Droid</h2><p>O processo é simples mas tens de seguir esta ordem:</p><ol><li>Vai a <strong>f-droid.org</strong> no browser do teu Android</li><li>Descarrega o APK do F-Droid</li><li>Ativa "Instalar apps de fontes desconhecidas" nas configurações</li><li>Instala o F-Droid</li><li>Abre o F-Droid, pesquisa "Termux" e instala</li></ol><h2>Primeira configuração obrigatória</h2><p>Quando abrires o Termux pela primeira vez, executa estes comandos:</p>${CB('# Atualizar lista de pacotes\npkg update\n\n# Fazer upgrade de todos os pacotes instalados\npkg upgrade -y','Configuração inicial','Fetching package list...\nHit:1 https://packages-cf.termux.dev stable InRelease\nAll packages up to date.\n\nProcessing triggers...\nDone.')}<h2>Pacotes essenciais para instalar</h2>${CB('# Ferramentas básicas - instala tudo de uma vez!\npkg install git curl wget nano python nodejs -y','Instalar pacotes essenciais','Processing: git (2.42.0)\nProcessing: curl (8.3.0)\nProcessing: wget (1.21.4)\nProcessing: nano (7.2)\nProcessing: python (3.11.6)\nProcessing: nodejs (20.9.0)\n[OK] 6 packages installed!')}<div class="ib warn"><div class="ib-h"><i class="fas fa-exclamation-triangle"></i> Atenção</div><p>Se aparecer a pergunta <strong>"What do you want to do about modified configuration file?"</strong>, escolhe sempre <code>Y</code> (Yes) para manter as configurações novas.</p></div><h2>Acesso ao armazenamento</h2><p>Para acederes aos ficheiros do Android (Downloads, Fotos, etc.):</p>${CB('termux-setup-storage','Configurar acesso ao armazenamento','[*] Requesting storage permission...\n[OK] Access granted!')}<p>Depois disto, tens as pastas em <code>~/storage/</code></p>`,
+   quiz:{q:'Qual é o primeiro comando que deves executar ao abrir o Termux pela primeira vez?',opts:['pkg install python','bash --version','pkg update && pkg upgrade -y','termux-setup-storage'],c:2,e:'Sempre atualiza primeiro! pkg update atualiza a lista de pacotes e pkg upgrade instala as versões mais recentes.'},
+   challenge:{t:'Configurar o Termux',d:'Prepara o ambiente para trabalhar',objs:['Executar pkg update','Instalar o nano: pkg install nano','Ver ajuda: nano --help'],cmds:['pkg update','pkg install nano','nano --help']}},
+
+  {id:'b03',t:'Navegação: pwd, ls, cd',diff:'ini',mins:10,xp:35,
+   body:`<h2>Os 3 comandos de navegação</h2><p>Navegar no terminal é como usar o gestor de ficheiros — mas muito mais rápido e poderoso.</p><h3>pwd — Print Working Directory</h3><p>Mostra onde estás neste momento:</p>${CB('pwd','Onde estou?','/data/data/com.termux/files/home')}<h3>ls — List</h3><p>Lista os conteúdos da pasta atual:</p>${CB('ls','Listar pasta atual','projetos  scripts  README.md  hello.py')}<p>Com opções úteis:</p>${CB('ls -la','Listar com detalhes completos','total 48\ndrwx------ 5 kark kark 4096 Jan 15 10:30 .\ndrwx------ 3 kark kark 4096 Jan 14 09:00 ..\n-rw-r--r-- 1 kark kark  220 Jan 14 .bash_history\ndrwxr-xr-x 3 kark kark 4096 Jan 15 10:25 projetos\ndrwxr-xr-x 2 kark kark 4096 Jan 15 10:28 scripts\n-rw-r--r-- 1 kark kark  512 Jan 14 README.md')}<div class="ib info"><div class="ib-h"><i class="fas fa-info-circle"></i> Legenda do ls -la</div><p><code>d</code> = pasta, <code>-</code> = ficheiro. <code>rwx</code> = permissões (read/write/execute). O número seguinte é o proprietário.</p></div><h3>cd — Change Directory</h3>${CB('cd projetos','Entrar na pasta projetos',null,'')}<p>Outros exemplos essenciais:</p>${CB('cd ..\n# Voltar uma pasta\n\ncd ~\n# Ir para a pasta home\n\ncd /\n# Ir para a raiz\n\ncd -\n# Ir para o diretório anterior','Variações do cd',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-keyboard"></i> Tab Auto-complete</div><p>Prime <strong>Tab</strong> enquanto escreves — o terminal completa automaticamente o nome de pastas e ficheiros. Prime duas vezes para ver todas as opções.</p></div><h2>Caminhos absolutos vs relativos</h2><p><strong>Absoluto:</strong> começa com <code>/</code>, ex: <code>/data/data/com.termux/files/home</code></p><p><strong>Relativo:</strong> relativo ao local atual, ex: <code>projetos/python</code> ou <code>../scripts</code></p>`,
+   quiz:{q:'Qual comando mostra o caminho completo da pasta atual?',opts:['ls','cd','pwd','dir'],c:2,e:'pwd (Print Working Directory) imprime o caminho absoluto da pasta onde estás.'},
+   challenge:{t:'Navegar no sistema',d:'Pratica a navegação com os comandos',objs:['Ver onde estás: pwd','Listar com detalhes: ls -la','Entrar numa pasta e voltar: cd .. '],cmds:['pwd','ls -la','cd projetos','cd ..','cd ~']}},
+
+  {id:'b04',t:'Criar e gerir ficheiros e pastas',diff:'ini',mins:12,xp:40,
+   body:`<h2>Criar ficheiros e pastas</h2><h3>touch — Criar ficheiro vazio</h3>${CB('touch notas.txt\ntouch script.sh config.json\n# Cria múltiplos de uma vez','Criar ficheiros',null,'')}<h3>mkdir — Criar pasta</h3>${CB('mkdir projetos\n\n# Criar estrutura completa de uma vez!\nmkdir -p projetos/python/scripts\nmkdir -p projetos/{bash,node,rust}','Criar pastas',null,'')}<h3>echo — Criar ficheiro com conteúdo</h3>${CB('echo "Olá TermuxLab!" > saudacao.txt\n\n# >> adiciona ao fim (não apaga)\necho "Segunda linha" >> saudacao.txt\necho "Terceira linha" >> saudacao.txt','Criar ficheiro com conteúdo',null,'')}<h2>Copiar e mover</h2>${CB('# Copiar ficheiro\ncp saudacao.txt copia_saudacao.txt\n\n# Copiar pasta completa (-r = recursivo)\ncp -r projetos/ projetos_backup/\n\n# Mover (ou renomear) ficheiro\nmv saudacao.txt textos/saudacao.txt\nmv velho_nome.txt novo_nome.txt','Copiar e mover',null,'')}<h2>Apagar</h2>${CB('# Apagar ficheiro\nrm notas.txt\n\n# Apagar pasta e todo o conteúdo\nrm -r projetos_backup/\n\n# Apagar com confirmação (mais seguro!)\nrm -ri ficheiros_importantes/','Apagar ficheiros e pastas',null,'')}<div class="ib danger"><div class="ib-h"><i class="fas fa-skull"></i> PERIGO: rm não tem lixo!</div><p>O comando <strong>rm</strong> apaga permanentemente — não vai para o lixo! Nunca executes <code>rm -rf *</code> ou <code>rm -rf /</code> sem ter a certeza absoluta do que estás a fazer.</p></div>`,
+   quiz:{q:'Como crias a estrutura de pastas "projetos/python/scripts" de uma só vez?',opts:['mkdir projetos && mkdir python && mkdir scripts','mkdir -p projetos/python/scripts','mkdir --full projetos/python/scripts','touch -d projetos/python/scripts'],c:1,e:'O flag -p do mkdir cria todos os diretórios pai que não existem.'},
+   challenge:{t:'Organizar o ambiente',d:'Cria uma estrutura de pastas organizada',objs:['mkdir -p lab/bash lab/python','touch lab/bash/hello.sh','echo "#!/bin/bash" > lab/bash/hello.sh'],cmds:['mkdir -p lab/bash','mkdir -p lab/python','touch lab/bash/hello.sh','echo "#!/bin/bash" > lab/bash/hello.sh','ls -R lab/']}},
+
+  {id:'b05',t:'Ler ficheiros: cat, less, head, tail, grep',diff:'ini',mins:10,xp:35,
+   body:`<h2>Visualizar conteúdo de ficheiros</h2><h3>cat — Ver ficheiro completo</h3>${CB('cat README.md','Ver ficheiro','# Projeto TermuxLab\nEste é o meu laboratório pessoal.\n\n## Instalação\npkg install python git nodejs\n\n## Uso\nbash scripts/run.sh')}<h3>head e tail — Ver partes do ficheiro</h3>${CB('# Ver as primeiras 10 linhas (padrão)\nhead ficheiro.txt\n\n# Ver as primeiras 5 linhas\nhead -5 ficheiro.txt\n\n# Ver as últimas 10 linhas\ntail ficheiro.txt\n\n# Ver as últimas 20 linhas\ntail -20 log.txt\n\n# MUITO ÚTIL: monitorar log em tempo real\ntail -f /var/log/app.log','head e tail',null,'')}<h3>less — Ver ficheiro grande com scroll</h3>${CB('less ficheiro_grande.txt\n# Navega com setas, sai com "q"','less (viewer interativo)',null,'')}<h3>wc — Contar linhas, palavras, caracteres</h3>${CB('wc -l ficheiro.txt\n# Número de linhas\n\nwc -w texto.md\n# Número de palavras\n\nwc -c script.sh\n# Número de bytes','Contar conteúdo','    15 ficheiro.txt\n    127 texto.md\n   2048 script.sh')}<h3>grep — Pesquisar dentro de ficheiros</h3>${CB('# Pesquisar texto num ficheiro\ngrep "erro" log.txt\n\n# Case-insensitive (não distingue maiúsculas)\ngrep -i "Erro" log.txt\n\n# Pesquisa recursiva em toda a pasta\ngrep -r "import" projetos/\n\n# Mostrar número da linha\ngrep -n "def " script.py\n\n# Inverter: mostrar linhas que NÃO contêm\ngrep -v "DEBUG" log.txt','grep — pesquisar texto',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-lightbulb"></i> Dica Pro</div><p>Combina grep com outros comandos usando pipes: <code>ps aux | grep python</code> encontra processos Python em execução.</p></div>`,
+   quiz:{q:'Que comando usas para monitorar um ficheiro de log em tempo real?',opts:['cat -f log.txt','head --live log.txt','tail -f log.txt','watch log.txt'],c:2,e:'tail -f (follow) acompanha o ficheiro em tempo real, mostrando novas linhas à medida que são escritas.'},
+   challenge:{t:'Investigar ficheiros',d:'Pratica a leitura e pesquisa de ficheiros',objs:['Criar ficheiro com 5 linhas usando echo >>','Ver as últimas 3 linhas com tail -3','Pesquisar uma palavra com grep'],cmds:['echo "linha 1" > test.txt','echo "linha 2" >> test.txt','echo "linha 3" >> test.txt','tail -3 test.txt','grep "linha" test.txt']}},
+
+  {id:'b06',t:'Editor nano — Editar ficheiros no terminal',diff:'ini',mins:12,xp:40,
+   body:`<h2>O editor nano</h2><p>O <strong>nano</strong> é o editor de texto mais simples para o terminal. Ao contrário do vim, não precisas de memorizar modos — os atalhos estão sempre visíveis no ecrã.</p><h2>Instalar e abrir</h2>${CB('# Instalar (se ainda não tens)\npkg install nano\n\n# Criar/abrir um ficheiro\nnano meu_script.sh\n\n# Abrir em linha específica\nnano +25 ficheiro.txt','Instalar e abrir nano',null,'')}<h2>Atalhos essenciais do nano</h2><div class="ib info"><div class="ib-h"><i class="fas fa-keyboard"></i> Atalhos fundamentais</div><p><code>Ctrl+O</code> → Guardar (Write Out)<br><code>Ctrl+X</code> → Sair (Exit)<br><code>Ctrl+W</code> → Pesquisar (Where Is)<br><code>Ctrl+K</code> → Cortar linha (Kill)<br><code>Ctrl+U</code> → Colar (Uncut)<br><code>Ctrl+G</code> → Ajuda<br><code>Ctrl+A</code> → Início da linha<br><code>Ctrl+E</code> → Fim da linha<br><code>Alt+U</code> → Desfazer (Undo)<br><code>Alt+E</code> → Refazer (Redo)</p></div><h2>Criar o teu primeiro script</h2><p>Vamos criar um script Bash passo a passo:</p>${CB('nano ola.sh','Abrir para editar',null,'')}<p>Dentro do nano, escreve:</p>${CB('#!/bin/bash\n# Meu primeiro script - TermuxLab\n# Autor: Kark Rio\n\necho "════════════════════════"\necho "  Olá, TermuxLab! 🎉"\necho "════════════════════════"\necho ""\necho "Data: $(date)"\necho "Utilizador: $(whoami)"\necho "Pasta: $(pwd)"\necho "Python: $(python --version 2>&1)"','Conteúdo do script',null,'')}<p>Prima <code>Ctrl+O</code> → Enter para guardar, depois <code>Ctrl+X</code> para sair.</p><h2>Executar o script</h2>${CB('# Tornar executável\nchmod +x ola.sh\n\n# Executar!\nbash ola.sh\n# ou\n./ola.sh','Executar o script','════════════════════════\n  Olá, TermuxLab! 🎉\n════════════════════════\n\nData: Wed Jan 15 10:30:00 UTC 2025\nUtilizador: kark\nPasta: /data/data/com.termux/files/home\nPython: Python 3.11.6')}<h2>Personalizar o nano</h2>${CB('# Editar configurações\nnano ~/.nanorc','Configurar nano',null,'')}<p>Conteúdo recomendado do <code>.nanorc</code>:</p>${CB('set autoindent\nset tabsize 4\nset linenumbers\nset softwrap\nset mouse\ninclude "/data/data/com.termux/files/usr/share/nano/*.nanorc"','~/.nanorc — configuração recomendada',null,'')}<p>O último <code>include</code> ativa o destaque de sintaxe para dezenas de linguagens!</p>`,
+   quiz:{q:'Que atalho de teclado usas no nano para guardar um ficheiro?',opts:['Ctrl+S','Ctrl+O','Ctrl+G','Ctrl+W'],c:1,e:'No nano, Ctrl+O (Write Out) guarda o ficheiro. Podes memorizar como "O = Output para disco".'},
+   challenge:{t:'Criar script com nano',d:'Cria e executa um script usando o nano',objs:['nano hello.sh','Escrever #!/bin/bash e echo','chmod +x hello.sh','bash hello.sh'],cmds:['nano hello.sh','chmod +x hello.sh','bash hello.sh','./hello.sh']}},
+
+  {id:'b07',t:'Permissões de ficheiros (chmod)',diff:'med',mins:14,xp:45,
+   body:`<h2>Permissões no Linux</h2><p>Cada ficheiro tem permissões que controlam quem pode ler, escrever ou executar.</p>${CB('ls -la','Ver permissões','-rwxr-xr-- 1 kark kark 1234 Jan 15 script.sh\n-rw-r--r-- 1 kark kark  456 Jan 14 config.txt\ndrwxr-xr-x 3 kark kark 4096 Jan 15 projetos/')}<h2>Como ler as permissões</h2><div class="ib info"><div class="ib-h"><i class="fas fa-info-circle"></i> Estrutura das permissões</div><p><code>-rwxr-xr--</code><br>Posição 1: tipo (<code>-</code>=ficheiro, <code>d</code>=pasta, <code>l</code>=link)<br>Posições 2-4: dono (rwx)<br>Posições 5-7: grupo (r-x)<br>Posições 8-10: outros (r--)</p></div><h3>r = read (4), w = write (2), x = execute (1)</h3><h2>chmod — Mudar permissões</h2>${CB('# Tornar executável (forma simbólica)\nchmod +x script.sh\nchmod -x script.sh   # remover execução\nchmod +r ficheiro.txt # adicionar leitura\n\n# Forma numérica (mais precisa)\nchmod 755 script.sh   # rwxr-xr-x\nchmod 644 config.txt  # rw-r--r--\nchmod 600 chave.pem   # rw------- (só dono)\nchmod 777 temp/       # tudo para todos (evita!)','chmod exemplos',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-calculator"></i> Tabela numérica</div><p>7=rwx, 6=rw-, 5=r-x, 4=r--, 3=-wx, 2=-w-, 1=--x, 0=---<br>Exemplo: 755 → dono=7(rwx), grupo=5(r-x), outros=5(r-x)</p></div><h2>Scripts precisam de permissão de execução</h2>${CB('# Sem permissão de execução:\nbash script.sh         # funciona (executa via bash)\n./script.sh            # erro! Permission denied\n\n# Depois de chmod +x:\n./script.sh            # funciona!','Executar scripts',null,'')}<h2>Permissões especiais</h2>${CB('# SUID, SGID, Sticky bit\nchmod 4755 ficheiro   # SUID\nchmod 2755 pasta/     # SGID\nchmod 1755 /tmp       # Sticky bit','Permissões especiais',null,'')}<div class="ib warn"><div class="ib-h"><i class="fas fa-exclamation-triangle"></i> Boa prática</div><p>Nunca uses <code>chmod 777</code> em ficheiros sensíveis. Para scripts, usa <code>755</code>. Para configs, usa <code>644</code>.</p></div>`,
+   quiz:{q:'Qual é o modo numérico correto para um script executável (rwxr-xr-x)?',opts:['644','777','755','600'],c:2,e:'755 = dono tem rwx(7), grupo tem r-x(5), outros têm r-x(5). Ideal para scripts que todos podem executar mas só o dono pode editar.'},
+   challenge:{t:'Gerir permissões',d:'Pratica chmod nos teus scripts',objs:['Criar script.sh com nano','chmod +x script.sh','chmod 755 script.sh','ls -la para verificar'],cmds:['chmod +x script.sh','chmod 755 script.sh','ls -la']}},
+
+  {id:'b08',t:'Variáveis, aliases e .bashrc',diff:'med',mins:14,xp:45,
+   body:`<h2>Variáveis no Bash</h2>${CB('# Criar variável (sem espaços!)\nnome="Kark Rio"\nidade=25\npasta="/home/kark/projetos"\n\n# Usar variável (precisa do $)\necho "Olá, $nome!"\necho "Tens $idade anos"\necho "Projetos em: $pasta"\n\n# Variável com resultado de comando\ndata=$(date +%Y%m%d)\neco "Hoje é: $data"','Variáveis básicas',null,'')}<h2>Variáveis de ambiente importantes</h2>${CB('# Ver todas\nenv\nprintenv\n\n# As mais importantes\necho $HOME        # /data/data/com.termux/files/home\necho $PATH        # locais onde o shell procura comandos\necho $SHELL       # /data/data/com.termux/files/usr/bin/bash\necho $USER        # teu username\necho $PWD         # pasta atual (igual a pwd)','Variáveis de ambiente','$HOME: /data/data/com.termux/files/home\n$SHELL: /data/data/com.termux/files/usr/bin/bash')}<h2>Aliases — Atalhos para comandos</h2>${CB('# Criar alias temporário (só para esta sessão)\nalias ll="ls -la"\nalias la="ls -A"\nalias ..="cd .."\nalias ...="cd ../.."\nalias gs="git status"\nalias py="python"\nalias update="pkg update && pkg upgrade -y"\n\n# Usar o alias\nll        # executa ls -la\nupdate    # atualiza tudo!','Criar aliases',null,'')}<h2>Tornar permanente com .bashrc</h2><p>Para aliases e variáveis persistirem entre sessões, adiciona ao <code>~/.bashrc</code>:</p>${CB('nano ~/.bashrc','Editar .bashrc',null,'')}<p>Adiciona no final:</p>${CB('# === ALIASES TermuxLab ===\nalias ll="ls -la --color=auto"\nalias la="ls -A"\nalias l="ls -CF"\nalias ..="cd .."\nalias ...="cd ../.."\nalias h="history"\nalias c="clear"\nalias py="python"\nalias py3="python3"\nalias gs="git status"\nalias ga="git add ."\nalias gc="git commit -m"\nalias gp="git push"\nalias update="pkg update && pkg upgrade -y"\nalias ip="curl ifconfig.me"\nalias serve="python -m http.server"\n\n# === VARIÁVEIS ===\nexport EDITOR="nano"\nexport PROJECTS="$HOME/projetos"\n\n# === PROMPT PERSONALIZADO ===\nexport PS1="\\[\\033[01;32m\\]\\u@termux\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ "','Conteúdo recomendado para .bashrc',null,'')}<p>Depois de guardar:</p>${CB('source ~/.bashrc\n# ou\n. ~/.bashrc','Recarregar .bashrc','[OK] .bashrc reloaded!')}<div class="ib tip"><div class="ib-h"><i class="fas fa-lightbulb"></i> Dica Pro</div><p>Mantém o teu <code>.bashrc</code> no GitHub! Assim quando instalares o Termux noutro dispositivo, recuperas toda a configuração com um <code>git clone</code>.</p></div>`,
+   quiz:{q:'Que ficheiro deves editar para os aliases persistirem entre sessões?',opts:['~/.bash_aliases','~/.profile','~/.bashrc','~/.termuxrc'],c:2,e:'O .bashrc é executado sempre que abres uma nova sessão Bash no Termux.'},
+   challenge:{t:'Configurar aliases',d:'Cria aliases úteis permanentes',objs:['nano ~/.bashrc','Adicionar alias ll="ls -la"','source ~/.bashrc','Testar: ll'],cmds:['nano ~/.bashrc','source ~/.bashrc','ll','alias']}}
+ ]},
+
+{id:1,name:'Pacotes & Ferramentas',ico:'📦',cls:'p1',color:'#00D4FF',desc:'Instala e gere pacotes. Ferramentas essenciais do dia a dia.',
+ cs:[{cmd:'pkg install',d:'Instalar pacote'},{cmd:'pkg update',d:'Atualizar lista'},{cmd:'pkg upgrade',d:'Atualizar pacotes'},{cmd:'pkg list-installed',d:'Listar instalados'},{cmd:'pkg remove',d:'Desinstalar'},{cmd:'pkg search',d:'Pesquisar'},{cmd:'pkg info',d:'Info de pacote'},{cmd:'which cmd',d:'Localizar comando'}],
+ lessons:[
+  {id:'p01',t:'Gestor de pacotes pkg',diff:'ini',mins:8,xp:30,
+   body:`<h2>O gestor de pacotes pkg</h2><p>O <strong>pkg</strong> é o gestor de pacotes do Termux — é como uma "app store" para o terminal. Com ele instala, atualiza e remove qualquer ferramenta.</p>${CB('# Atualizar lista de repositórios\npkg update\n\n# Fazer upgrade de todos os pacotes\npkg upgrade -y\n\n# Instalar um pacote\npkg install python\n\n# Instalar múltiplos pacotes\npkg install git nodejs curl wget nano\n\n# Remover um pacote\npkg remove nodejs\n\n# Pesquisar pacotes\npkg search http\n\n# Ver informação de um pacote\npkg info python\n\n# Ver todos os instalados\npkg list-installed','Comandos do pkg','Fetching package list...\nProcessing: python (3.11.6)\n[OK] python installed!')}<h2>Repositórios do Termux</h2><p>O Termux tem vários repositórios de pacotes:</p>${CB('# Ver repositórios disponíveis\nlist repos\n\n# Mudar para Cloudflare (mais rápido)\ntermux-change-repo','Repositórios',null,'')}<h2>Pacotes essenciais por categoria</h2>${CB('# Desenvolvimento\npkg install python nodejs ruby php golang rust\n\n# Ferramentas de rede\npkg install curl wget nmap openssh netcat-openbsd\n\n# Editores\npkg install nano vim emacs\n\n# Utilidades\npkg install git zip unzip tar tree htop\n\n# Multimedia (com repositório extra)\npkg install ffmpeg imagemagick','Pacotes por categoria',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-lightbulb"></i> Dica</div><p><code>apt</code> também funciona no Termux e tem as mesmas funcionalidades que o <code>pkg</code>. São equivalentes!</p></div>`,
+   quiz:{q:'Qual o comando para instalar o Python no Termux?',opts:['apt-get install python3','pip install python','pkg install python','brew install python'],c:2,e:'No Termux, pkg é o gestor de pacotes principal. apt também funciona pois pkg é um wrapper de apt.'},
+   challenge:{t:'Instalar ferramentas',d:'Instala os pacotes essenciais',objs:['pkg update','pkg install git','pkg install curl wget'],cmds:['pkg update','pkg install git','pkg install curl','pkg install wget','git --version','curl --version']}},
+
+  {id:'p02',t:'Ferramentas de texto: grep, sed, awk',diff:'med',mins:16,xp:55,
+   body:`<h2>A trindade do processamento de texto</h2><p>Estas três ferramentas são extremamente poderosas para processar texto no terminal.</p><h2>grep — Pesquisar padrões</h2>${CB('# Pesquisa básica\ngrep "erro" log.txt\n\n# Case insensitive\ngrep -i "ERRO" log.txt\n\n# Pesquisa recursiva em pastas\ngrep -r "import os" projetos/\n\n# Mostrar número de linha\ngrep -n "def " script.py\n\n# Contar ocorrências\ngrep -c "GET" access.log\n\n# Usar expressão regular\ngrep -E "^[0-9]{4}-[0-9]{2}-[0-9]{2}" dates.txt\n\n# Inverter (linhas que NÃO contêm)\ngrep -v "DEBUG" app.log','grep avançado',null,'')}<h2>sed — Editor de streams (substituição)</h2>${CB('# Substituir texto\nsed "s/velho/novo/" ficheiro.txt\n\n# Substituir todos (flag g)\nsed "s/velho/novo/g" ficheiro.txt\n\n# Substituir diretamente no ficheiro (-i)\nsed -i "s/localhost/192.168.1.1/g" config.txt\n\n# Apagar linha com padrão\nsed "/DEBUG/d" log.txt\n\n# Ver linhas 5 a 10\nsed -n "5,10p" ficheiro.txt\n\n# Adicionar linha antes de padrão\nsed "/^import/i# Este código importa módulos" script.py','sed — substituições',null,'')}<h2>awk — Processamento de colunas</h2>${CB('# Imprimir 1ª e 3ª colunas\nawk "{print $1, $3}" dados.txt\n\n# Filtrar linhas por condição\nawk "$3 > 100 {print}" preços.csv\n\n# Somar coluna\nawk "{soma += $2} END {print soma}" vendas.txt\n\n# Contar linhas\nawk "END {print NR}" ficheiro.txt\n\n# Processar CSV\nawk -F"," "{print $1, $4}" dados.csv\n\n# Exemplo real: ver processos com mais de 100MB RAM\nps aux | awk "$4 > 0.1 {print $1, $4, $11}"','awk — processamento de colunas',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-link"></i> Combinando as três</div><p>O poder real é combiná-las com pipes:<br><code>cat access.log | grep "404" | awk "{print $7}" | sort | uniq -c | sort -rn | head -10</code><br>Isto mostra as 10 páginas com mais erros 404!</p></div>`,
+   quiz:{q:'Que comando substitui "old" por "new" em todos os ficheiros .txt?',opts:['grep -r "old" "new" *.txt','sed "s/old/new/g" *.txt','awk "{gsub(old,new)}" *.txt','replace old new *.txt'],c:1,e:'sed s/old/new/g substitui todas (g=global) as ocorrências em cada linha.'},
+   challenge:{t:'Processar texto',d:'Usa sed e grep para manipular ficheiros',objs:['grep -c "error" em qualquer ficheiro','sed s/hello/world/ num ficheiro','awk print $1 num ficheiro'],cmds:['grep "a" /etc/termux-properties.txt','echo "hello world" | sed "s/hello/oi/"','echo "um dois tres" | awk "{print $2}"']}},
+
+  {id:'p03',t:'Pipes, redirecionamentos e combinação de comandos',diff:'med',mins:14,xp:50,
+   body:`<h2>Pipes — A cola do Unix</h2><p>O pipe (<code>|</code>) passa o output de um comando para o input do próximo. É como ligar filtros em série.</p>${CB('# Básico\nls -la | grep ".sh"\n\n# Encontrar processos\nps aux | grep python\n\n# Contar linhas num ficheiro\ncat ficheiro.txt | wc -l\n\n# Top 5 ficheiros maiores\nls -la | sort -k5 -rn | head -5\n\n# Pipeline complexo:\n# Ver as 10 palavras mais usadas num ficheiro\ncat texto.txt | tr " " "\\n" | sort | uniq -c | sort -rn | head -10','Pipes',null,'')}<h2>Redirecionamentos</h2>${CB('# Redirecionar output para ficheiro (sobrescreve)\ncomando > output.txt\nls -la > lista_ficheiros.txt\n\n# Redirecionar e ADICIONAR ao ficheiro\necho "Nova linha" >> log.txt\ndate >> log.txt\n\n# Redirecionar STDIN (ler de ficheiro)\nsorte < numeros.txt\n\n# Redirecionar erros (stderr)\ncomando 2> erros.txt\n\n# Redirecionar tudo (stdout + stderr)\ncomando &> completo.txt\ncomando > output.txt 2>&1\n\n# Descartar output\ncomando > /dev/null\ncomando > /dev/null 2>&1  # silencioso total','Redirecionamentos',null,'')}<h2>Combinação de comandos</h2>${CB('# && = executa segundo APENAS se o primeiro teve sucesso\npkg update && pkg upgrade\nmkdir projeto && cd projeto && git init\n\n# || = executa segundo APENAS se o primeiro falhou\ntest -f config.txt || echo "Config não encontrado!"\n\n# ; = executa sempre, independente do resultado\necho "Início"; sleep 2; echo "Fim"\n\n# Subshell\n(cd /tmp && ls)  # muda diretório só dentro dos ()\n\n# Substituição de processo\ncat <(ls -la) <(df -h)','Combinação de comandos',null,'')}<h2>tee — Dividir output</h2>${CB('# Mostra E guarda ao mesmo tempo\nls -la | tee lista.txt\n\n# Adicionar ao ficheiro\nping google.com | tee -a ping_log.txt','tee',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-fire"></i> Exemplo poderoso</div><p>Backup automático com progresso:<br><code>tar czf - projetos/ | tee backup.tar.gz | wc -c</code></p></div>`,
+   quiz:{q:'O que faz o operador || entre dois comandos?',opts:['Executa ambos sempre','Executa o segundo só se o primeiro falhar','Executa o segundo só se o primeiro ter sucesso','Combina o output dos dois'],c:1,e:'|| é o OR lógico: executa o segundo comando se o primeiro retornar código de erro (diferente de 0).'},
+   challenge:{t:'Pipeline master',d:'Cria um pipeline poderoso',objs:['ls -la | grep ".sh"','ps aux | grep bash','echo "teste" >> log.txt && cat log.txt'],cmds:['ls -la | grep "bash"','ps aux | head -5','echo "ola" > test.txt && cat test.txt','ls -la | wc -l']}}
+ ]},
+
+{id:2,name:'Python no Termux',ico:'🐍',cls:'p2',color:'#FFD700',desc:'Programação Python para automação e scripts práticos.',
+ cs:[{cmd:'python --version',d:'Ver versão'},{cmd:'pip install pkg',d:'Instalar pacote'},{cmd:'pip list',d:'Listar pacotes'},{cmd:'python script.py',d:'Executar script'},{cmd:'python -c "code"',d:'Executar linha'},{cmd:'pip freeze',d:'Exportar deps'},{cmd:'venv/bin/activate',d:'Ativar ambiente'},{cmd:'pip install -r req',d:'Instalar deps'}],
+ lessons:[
+  {id:'py01',t:'Python no Termux: instalação e primeiro script',diff:'ini',mins:8,xp:30,
+   body:`<h2>Instalar Python</h2>${CB('pkg install python\n\n# Verificar instalação\npython --version\npython3 --version\npip --version','Instalar Python','Python 3.11.6\npip 23.3.1')}<h2>Modos de usar Python</h2>${CB('# Modo interativo (REPL)\npython\n# >>> agora escreves código Python linha a linha\n# >>> print("olá")\n# >>> exit() para sair\n\n# Executar ficheiro\npython script.py\n\n# Executar código diretamente\npython -c "print(2**10)"\npython -c "import sys; print(sys.version)"\n\n# Python como calculadora\npython -c "print(1024 * 1024 * 1024)"','Modos de uso','1024\nPython 3.11.6\n1073741824')}<h2>Primeiro script Python</h2><p>Cria um ficheiro <code>ola.py</code>:</p>${CB('nano ola.py','Abrir editor',null,'')}<p>Conteúdo:</p>${CB('#!/usr/bin/env python3\n# -*- coding: utf-8 -*-\n"""\nMeu primeiro script Python no Termux!\nAutor: Kark Rio\n"""\n\nimport os\nimport sys\nimport platform\nfrom datetime import datetime\n\nprint("=" * 40)\nprint("  TermuxLab — Script Python")\nprint("=" * 40)\nprint()\nprint(f"Python: {sys.version.split()[0]}")\nprint(f"Sistema: {platform.system()} {platform.machine()}")\nprint(f"Pasta: {os.getcwd()}")\nprint(f"Hora: {datetime.now().strftime(\'%H:%M:%S\')}")\nprint(f"Utilizador: {os.getenv(\'USER\', \'kark\')}")\nprint()\nprint("Olá, TermuxLab! 🐍")','ola.py',null,'')}<p>Executa:</p>${CB('python ola.py','Executar','========================================\n  TermuxLab — Script Python\n========================================\n\nPython: 3.11.6\nSistema: Linux aarch64\nPasta: /data/data/com.termux/files/home\nHora: 10:30:45\nUtilizador: kark\n\nOlá, TermuxLab! 🐍')}<h2>pip — Instalar pacotes</h2>${CB('# Instalar pacote\npip install requests\n\n# Instalar múltiplos\npip install requests beautifulsoup4 pandas numpy\n\n# Ver instalados\npip list\n\n# Informação de pacote\npip show requests\n\n# Atualizar\npip install --upgrade requests\n\n# Desinstalar\npip uninstall requests','pip',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-lightbulb"></i> Ambientes Virtuais</div><p>Usa <code>python -m venv meu_projeto</code> para criar ambientes isolados — cada projeto com as suas próprias dependências!</p></div>`,
+   quiz:{q:'Como executas código Python diretamente na linha de comando?',opts:['python run "print(1)"','python -c "print(1)"','python --exec "print(1)"','run python "print(1)"'],c:1,e:'python -c "código" executa código Python inline, sem precisar criar um ficheiro.'},
+   challenge:{t:'Primeiro script Python',d:'Cria e executa um script Python',objs:['python --version','python -c "print(\'ola\')"','Criar script.py com nano','python script.py'],cmds:['python --version','python -c "print(\'Hello TermuxLab!\')"','python -c "import os; print(os.getcwd())"']}},
+
+  {id:'py02',t:'Automação de ficheiros com Python',diff:'med',mins:18,xp:60,
+   body:`<h2>Manipulação de ficheiros com Python</h2><p>Python é excelente para automatizar tarefas com ficheiros.</p><h3>Módulo os — Sistema operativo</h3>${CB('import os\n\n# Navegação\nprint(os.getcwd())              # pasta atual\nos.chdir("/tmp")                # mudar pasta\nprint(os.listdir("."))         # listar conteúdo\n\n# Criar e remover\nos.mkdir("nova_pasta")\nos.makedirs("a/b/c", exist_ok=True)  # criar estrutura\nos.remove("ficheiro.txt")       # apagar ficheiro\nos.rmdir("pasta_vazia")\n\n# Verificar existência\nif os.path.exists("config.txt"):\n    print("Config encontrado!")\nif os.path.isfile("script.py"):\n    print("É um ficheiro")\nif os.path.isdir("projetos"):\n    print("É uma pasta")','Módulo os',null,'')}<h3>Módulo shutil — Operações de alto nível</h3>${CB('import shutil\n\n# Copiar ficheiro\nshutil.copy("orig.txt", "dest.txt")\n\n# Copiar pasta inteira\nshutil.copytree("projetos/", "backup_projetos/")\n\n# Mover\nshutil.move("old_path.txt", "new_path.txt")\n\n# Apagar pasta com conteúdo\nshutil.rmtree("pasta_para_apagar/")\n\n# Criar arquivo ZIP\nshutil.make_archive("backup", "zip", "projetos/")\n\n# Descompactar\nshutil.unpack_archive("backup.zip", "extraido/")','Módulo shutil',null,'')}<h2>Script prático: Organizador de Downloads</h2>${CB('#!/usr/bin/env python3\n"""\nOrganizador de Downloads - TermuxLab\nOrganiza ficheiros da pasta Downloads por tipo\n"""\nimport os\nimport shutil\nfrom pathlib import Path\n\n# Configuração\nDOWNLOADS = Path.home() / "storage" / "downloads"\n\nTIPOS = {\n    "Imagens":    [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico"],\n    "Videos":     [".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv"],\n    "Musica":     [".mp3", ".flac", ".wav", ".ogg", ".aac", ".m4a"],\n    "Documentos": [".pdf", ".doc", ".docx", ".txt", ".xlsx", ".pptx", ".odt"],\n    "Código":     [".py", ".js", ".html", ".css", ".sh", ".java", ".c", ".cpp"],\n    "Comprimidos":[".zip", ".tar", ".gz", ".rar", ".7z"],\n    "APKs":       [".apk"],\n}\n\ndef organizar():\n    if not DOWNLOADS.exists():\n        print("❌ Pasta Downloads não encontrada!")\n        print("Execute: termux-setup-storage")\n        return\n\n    movidos = 0\n    erros = 0\n\n    for ficheiro in DOWNLOADS.iterdir():\n        if not ficheiro.is_file():\n            continue\n\n        ext = ficheiro.suffix.lower()\n        destino_pasta = None\n\n        for tipo, extensoes in TIPOS.items():\n            if ext in extensoes:\n                destino_pasta = DOWNLOADS / tipo\n                break\n\n        if destino_pasta:\n            destino_pasta.mkdir(exist_ok=True)\n            destino = destino_pasta / ficheiro.name\n            try:\n                shutil.move(str(ficheiro), str(destino))\n                print(f"✅ {ficheiro.name} → {destino_pasta.name}/")\n                movidos += 1\n            except Exception as e:\n                print(f"❌ Erro: {ficheiro.name}: {e}")\n                erros += 1\n\n    print(f"\\n══ Resultado ══")\n    print(f"✅ Movidos: {movidos}")\n    print(f"❌ Erros:   {erros}")\n\nif __name__ == "__main__":\n    organizar()','organizador.py',null,'')}<p>Executa com <code>python organizador.py</code></p>`,
+   quiz:{q:'Que módulo Python usas para copiar uma pasta inteira recursivamente?',opts:['os.copy()','filecopy','shutil.copytree()','copy.recursive()'],c:2,e:'shutil.copytree() copia uma pasta e todo o seu conteúdo. shutil (shell utilities) tem funções de alto nível para ficheiros.'},
+   challenge:{t:'Script de automação',d:'Cria um script que lista e processa ficheiros',objs:['import os no script','os.listdir() para listar','Filtrar por extensão .py'],cmds:['python -c "import os; print(os.listdir(\'.\'))"','python -c "import os; [print(f) for f in os.listdir(\'.\') if f.endswith(\'.py\')]"']}},
+
+  {id:'py03',t:'Requests e APIs — Python para a web',diff:'med',mins:16,xp:55,
+   body:`<h2>requests — HTTP em Python</h2>${CB('pip install requests','Instalar requests','Successfully installed requests-2.31.0')}<h3>GET básico</h3>${CB('import requests\n\n# Pedido GET simples\nrespost = requests.get("https://api.ipify.org?format=json")\nprint(respost.status_code)    # 200\nprint(respost.json())          # {"ip": "203.0.113.42"}\nprint(respost.text)            # {"ip": "203.0.113.42"}\nprint(respost.headers)         # cabeçalhos HTTP','GET request',null,'')}<h3>POST com dados</h3>${CB('import requests\nimport json\n\n# POST com JSON\nurl = "https://jsonplaceholder.typicode.com/posts"\ndados = {\n    "title": "TermuxLab Post",\n    "body": "Conteúdo do post criado via Python",\n    "userId": 1\n}\n\nrespost = requests.post(url, json=dados)\nprint(f"Status: {respost.status_code}")\nprint(json.dumps(respost.json(), indent=2))','POST request',null,'')}<h2>Projeto: Monitor de IP e rede</h2>${CB('#!/usr/bin/env python3\n"""\nMonitor de rede - TermuxLab\n"""\nimport requests\nimport json\nfrom datetime import datetime\n\ndef get_info_ip():\n    try:\n        r = requests.get("http://ip-api.com/json/", timeout=5)\n        data = r.json()\n        return {\n            "ip":      data.get("query", "N/A"),\n            "pais":    data.get("country", "N/A"),\n            "cidade":  data.get("city", "N/A"),\n            "isp":     data.get("isp", "N/A"),\n            "lat":     data.get("lat", 0),\n            "lon":     data.get("lon", 0),\n        }\n    except Exception as e:\n        return {"erro": str(e)}\n\ndef check_site(url):\n    try:\n        r = requests.head(url, timeout=5)\n        return {"url": url, "status": r.status_code, "ok": r.ok}\n    except:\n        return {"url": url, "status": 0, "ok": False}\n\ndef main():\n    print(f"[{datetime.now().strftime(\'%H:%M:%S\')}] Monitor de Rede - TermuxLab")\n    print("═" * 45)\n\n    info = get_info_ip()\n    if "erro" not in info:\n        print(f"📍 IP Público: {info[\'ip\']}")\n        print(f"🌍 Localização: {info[\'cidade\']}, {info[\'pais\']}")\n        print(f"📡 ISP: {info[\'isp\']}")\n    else:\n        print(f"❌ Sem internet: {info[\'erro\']}")\n\n    print("\\n🔗 Verificar sites:")\n    sites = [\n        "https://google.com",\n        "https://github.com",\n        "https://termuxlab.net.eu.org",\n    ]\n    for site in sites:\n        result = check_site(site)\n        status = "✅" if result["ok"] else "❌"\n        print(f"  {status} {result[\'url\']} [{result[\'status\']}]")\n\nif __name__ == "__main__":\n    main()','monitor_rede.py',null,'')}<h2>Descarregar ficheiros</h2>${CB('import requests\nfrom pathlib import Path\n\ndef download(url, destino=None):\n    if not destino:\n        destino = url.split("/")[-1]\n\n    print(f"A descarregar: {url}")\n    r = requests.get(url, stream=True)\n    total = int(r.headers.get("content-length", 0))\n    baixado = 0\n\n    with open(destino, "wb") as f:\n        for chunk in r.iter_content(8192):\n            f.write(chunk)\n            baixado += len(chunk)\n            if total:\n                pct = baixado / total * 100\n                print(f"\\r{pct:.1f}% ({baixado}/{total} bytes)", end="")\n\n    print(f"\\n✅ Guardado em: {destino}")\n    return destino\n\n# Uso:\n# download("https://exemplo.com/ficheiro.zip")','Downloader',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-lightbulb"></i> APIs gratuitas para praticar</div><p>• <code>api.ipify.org</code> — IP público<br>• <code>wttr.in/maputo?format=j1</code> — clima<br>• <code>jsonplaceholder.typicode.com</code> — dados de teste<br>• <code>api.github.com/users/USERNAME</code> — dados GitHub</p></div>`,
+   quiz:{q:'Que método do requests usas para enviar dados JSON num pedido POST?',opts:['requests.post(url, data=json_str)','requests.post(url, json=dict_obj)','requests.send(url, json=dict_obj)','requests.post(url, body=json_str)'],c:1,e:'requests.post(url, json=dict) converte automaticamente o dict para JSON e define o Content-Type correto.'},
+   challenge:{t:'Fazer pedidos HTTP',d:'Usa requests para buscar dados da internet',objs:['pip install requests','requests.get(url)','Imprimir response.json()'],cmds:['pip install requests','python -c "import requests; r=requests.get(\'https://api.ipify.org?format=json\'); print(r.json())"']}}
+ ]},
+
+{id:3,name:'Redes & SSH',ico:'🌐',cls:'p3',color:'#A855F7',desc:'SSH, redes, acesso remoto e ferramentas de networking.',
+ cs:[{cmd:'sshd',d:'Iniciar SSH'},{cmd:'ssh user@ip -p 8022',d:'Conectar'},{cmd:'ssh-keygen',d:'Gerar chaves'},{cmd:'ifconfig',d:'Ver interfaces'},{cmd:'ping host',d:'Testar ping'},{cmd:'curl url',d:'HTTP request'},{cmd:'wget url',d:'Download'},{cmd:'nmap -sn ip/24',d:'Scan rede'}],
+ lessons:[
+  {id:'n01',t:'Configurar servidor SSH no Termux',diff:'med',mins:14,xp:50,
+   body:`<h2>SSH — Secure Shell</h2><p>O SSH permite aceder ao teu Android remotamente via rede — usa o teu PC para controlar o Termux no telemóvel!</p><h2>Instalar e configurar</h2>${CB('pkg install openssh\n\n# Definir password para o utilizador\npasswd\n# (digita a tua password duas vezes)\n\n# Iniciar servidor SSH\nsshd\n\n# Verificar se está a correr\nps aux | grep sshd','Instalar e iniciar SSH','Password set successfully.\nsshd running on port 8022')}<h2>Descobrir o IP do teu Android</h2>${CB('# Via ifconfig\nifconfig | grep "inet " | grep -v 127.0.0.1\n\n# Ou mais simples:\nip addr show wlan0 | grep "inet "\n\n# IP público:\ncurl ifconfig.me','Ver IPs','inet 192.168.1.105  netmask 255.255.255.0\n203.0.113.42'  )}<div class="ib info"><div class="ib-h"><i class="fas fa-info-circle"></i> Porta 8022</div><p>O Termux usa a porta <strong>8022</strong> (não 22) porque a 22 requer root. Sempre inclui <code>-p 8022</code> na ligação.</p></div><h2>Conectar do computador</h2>${CB('# Linux/Mac/Windows (PowerShell)\nssh -p 8022 kark@192.168.1.105\n\n# Se for a primeira vez, aceita a chave:\n# Are you sure you want to continue? yes\n\n# Especificar chave privada\nssh -p 8022 -i ~/.ssh/id_termux kark@192.168.1.105\n\n# Túnel (reencaminhar porta local)\nssh -p 8022 -L 8080:localhost:8080 kark@192.168.1.105','Conectar via SSH',null,'')}<h2>Configurar acesso por chave (sem password)</h2>${CB('# No COMPUTADOR, gerar par de chaves:\nssh-keygen -t ed25519 -C "termux_acesso"\n\n# Copiar chave pública para o Termux:\nssh-copy-id -p 8022 kark@192.168.1.105\n# OU manualmente:\ncat ~/.ssh/id_ed25519.pub | ssh -p 8022 kark@192.168.1.105 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"','Acesso por chave',null,'')}<h2>Iniciar SSH automaticamente</h2>${CB('# Adicionar ao .bashrc ou criar script\necho "sshd" >> ~/.bashrc\n\n# Ou criar script de startup\ncat > ~/start_services.sh << EOF\n#!/bin/bash\necho "Iniciando serviços..."\nsshd && echo "[OK] SSH na porta 8022"\necho "IP: $(ifconfig wlan0 | grep inet | awk \'{print $2}\')"\nEOF\nchmod +x ~/start_services.sh','Auto-iniciar SSH',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-mobile-alt"></i> App recomendada</div><p>No Windows usa <strong>Putty</strong> ou <strong>MobaXterm</strong>. No Android usa <strong>ConnectBot</strong> ou <strong>JuiceSSH</strong>.</p></div>`,
+   quiz:{q:'Qual porta usa o servidor SSH do Termux por padrão?',opts:['22','443','2222','8022'],c:3,e:'O Termux usa 8022 porque a porta 22 requer permissões root que o Termux não tem. Usa sempre -p 8022 na ligação.'},
+   challenge:{t:'Configurar SSH',d:'Ativa o servidor SSH no Termux',objs:['pkg install openssh','passwd (definir password)','sshd (iniciar servidor)','ifconfig | grep inet'],cmds:['pkg install openssh','passwd','sshd','ifconfig','ps aux | grep sshd']}},
+
+  {id:'n02',t:'Ferramentas de rede: curl, wget, nmap',diff:'med',mins:16,xp:55,
+   body:`<h2>curl — Swiss Army Knife do HTTP</h2>${CB('# GET simples\ncurl https://api.ipify.org\n\n# GET com saída formatada\ncurl https://wttr.in/Maputo?format=3\n\n# Ver cabeçalhos HTTP\ncurl -I https://google.com\n\n# POST com JSON\ncurl -X POST https://httpbin.org/post \\\n  -H "Content-Type: application/json" \\\n  -d \'{"nome": "TermuxLab", "versao": 3}\'\n\n# Descarregar ficheiro\ncurl -O https://exemplo.com/ficheiro.zip\ncurl -o meu_nome.zip https://exemplo.com/ficheiro.zip\n\n# Seguir redirecionamentos\ncurl -L https://bit.ly/algum_link\n\n# Com autenticação\ncurl -u user:password https://api.exemplo.com/\n\n# Tempo de resposta\ncurl -o /dev/null -s -w "Tempo: %{time_total}s\\n" https://google.com','curl avançado','Maputo: ☀️ +25°C\n\nTempos:\nDNS: 0.032s\nLigação: 0.087s\nTotal: 0.234s')}<h2>wget — Download especializado</h2>${CB('# Download simples\nwget https://exemplo.com/ficheiro.zip\n\n# Download silencioso\nwget -q https://exemplo.com/ficheiro.zip\n\n# Continuar download interrompido\nwget -c https://exemplo.com/ficheiro_grande.zip\n\n# Download em background\nwget -b https://exemplo.com/iso.zip\n\n# Limitar velocidade\nwget --limit-rate=1M https://exemplo.com/iso.zip\n\n# Descarregar site completo (mirror)\nwget -r -np -k https://exemplo.com/docs/','wget avançado',null,'')}<h2>nmap — Scanner de rede</h2>${CB('pkg install nmap\n\n# Descobrir dispositivos na rede\nnmap -sn 192.168.1.0/24\n\n# Ver portas abertas num host\nnmap 192.168.1.1\n\n# Scan mais detalhado\nnmap -sV 192.168.1.1\n\n# Scan da tua própria máquina\nnmap localhost\n\n# Scan de porta específica\nnmap -p 8022 192.168.1.105\n\n# Scan rápido das portas mais comuns\nnmap -F 192.168.1.1','nmap','Starting Nmap scan...\nHost: 192.168.1.1 (router) is up\n22/tcp  open ssh\n80/tcp  open http\n443/tcp open https\n\nNmap done: 1 IP address scanned')}<h2>netcat (nc) — Conexões raw</h2>${CB('pkg install netcat-openbsd\n\n# Servidor simples (escuta na porta 9999)\nnc -l 9999\n\n# Cliente conecta\nnc 192.168.1.105 9999\n\n# Transferir ficheiro via rede!\n# Receptor:\nnc -l 9999 > ficheiro_recebido.txt\n# Emissor:\nnc 192.168.1.105 9999 < ficheiro_para_enviar.txt','netcat',null,'')}<div class="ib warn"><div class="ib-h"><i class="fas fa-exclamation-triangle"></i> Uso ético</div><p>Usa nmap e outras ferramentas de rede APENAS em redes onde tens permissão. Nunca em redes de terceiros sem autorização.</p></div>`,
+   quiz:{q:'Como fazes download de um ficheiro com curl mantendo o nome original?',opts:['curl -d url','curl -o url','curl -O url','curl --download url'],c:2,e:'curl -O (maiúsculo) mantém o nome original do ficheiro. -o (minúsculo) permite especificar um nome diferente.'},
+   challenge:{t:'Ferramentas de rede',d:'Pratica curl e wget',objs:['curl ifconfig.me','wget uma URL','curl -I https://google.com'],cmds:['curl ifconfig.me','curl https://api.ipify.org?format=json','curl -I https://www.google.com','curl https://wttr.in?format=3']}}
+ ]},
+
+{id:4,name:'Avançado & Automação',ico:'⚡',cls:'p4',color:'#FF8C00',desc:'Scripts complexos, Git, cron jobs, automação e desenvolvimento.',
+ cs:[{cmd:'crontab -e',d:'Editar cron'},{cmd:'bash -x script',d:'Debug script'},{cmd:'chmod +x',d:'Executável'},{cmd:'git init',d:'Iniciar repo'},{cmd:'git add . && git commit',d:'Guardar'},{cmd:'git push',d:'Enviar'},{cmd:'while read l',d:'Loop por linha'},{cmd:'$(date +%Y%m%d)',d:'Data formatada'}],
+ lessons:[
+  {id:'a01',t:'Scripts Bash avançados',diff:'adv',mins:20,xp:70,
+   body:`<h2>Bash Scripting avançado</h2><h3>Arrays</h3>${CB('#!/bin/bash\n\n# Criar array\npacotes=("python" "git" "nodejs" "curl" "wget" "nano" "vim" "htop")\n\n# Iterar sobre array\nfor pkg in "${pacotes[@]}"; do\n    echo "Instalando: $pkg"\n    pkg install "$pkg" -y 2>/dev/null\ndone\n\n# Tamanho do array\necho "Total: ${#pacotes[@]} pacotes"\n\n# Índice específico\necho "Primeiro: ${pacotes[0]}"\necho "Último: ${pacotes[-1]}"\n\n# Array de ficheiros\nficheiros=($(ls *.sh 2>/dev/null))\necho "Scripts encontrados: ${#ficheiros[@]}"','Arrays em Bash',null,'')}<h3>Condicionais avançados</h3>${CB('#!/bin/bash\n\n# Testar tipos de ficheiro\nif [ -f "$1" ]; then\n    echo "É um ficheiro"\nelif [ -d "$1" ]; then\n    echo "É uma pasta"\nelse\n    echo "Não existe"\nfi\n\n# Testes úteis\n# -f = ficheiro existe\n# -d = pasta existe\n# -r = tem permissão de leitura\n# -w = tem permissão de escrita\n# -x = tem permissão de execução\n# -s = ficheiro não está vazio\n# -z = string vazia\n# -n = string não vazia\n\n# Case/Switch\nlinguagem="python"\ncase $linguagem in\n    "python")   echo "🐍 Python" ;;\n    "bash")     echo "💻 Bash" ;;\n    "nodejs")   echo "📦 Node.js" ;;\n    *)          echo "❓ Desconhecida" ;;\nesac','Condicionais',null,'')}<h3>Funções e tratamento de erros</h3>${CB('#!/bin/bash\n# Sistema de log profissional\n\nLOG_FILE="$HOME/termuxlab.log"\n\nlog() {\n    local nivel=$1\n    local msg=$2\n    local ts=$(date "+%Y-%m-%d %H:%M:%S")\n    local linha="[$ts] [$nivel] $msg"\n    echo "$linha"\n    echo "$linha" >> "$LOG_FILE"\n}\n\ncheck_pkg() {\n    local pkg=$1\n    if dpkg -s "$pkg" &>/dev/null; then\n        return 0  # instalado\n    else\n        return 1  # não instalado\n    fi\n}\n\ninstalar_se_preciso() {\n    local pkg=$1\n    if ! check_pkg "$pkg"; then\n        log "INFO" "Instalando $pkg..."\n        if pkg install "$pkg" -y &>/dev/null; then\n            log "OK" "$pkg instalado com sucesso"\n        else\n            log "ERRO" "Falha ao instalar $pkg"\n            return 1\n        fi\n    else\n        log "SKIP" "$pkg já está instalado"\n    fi\n}\n\n# Usar as funções\nfor p in python git nodejs; do\n    instalar_se_preciso "$p"\ndone\n\nlog "OK" "Setup completo!"','Funções e logs',null,'')}<h3>Getopts — Argumentos de linha de comando</h3>${CB('#!/bin/bash\n# Script com opções como um programa real\n\nuso() {\n    echo "Uso: $0 [opções] <ficheiro>"\n    echo "Opções:"\n    echo "  -o DIR    Pasta de output"\n    echo "  -v        Modo verbose"\n    echo "  -h        Esta ajuda"\n    exit 0\n}\n\nVERBOSE=false\nOUTPUT="./output"\n\nwhile getopts ":o:vh" opt; do\n    case $opt in\n        o) OUTPUT="$OPTARG" ;;\n        v) VERBOSE=true ;;\n        h) uso ;;\n        \\?) echo "Opção inválida: -$OPTARG"; exit 1 ;;\n        :) echo "-$OPTARG precisa de argumento"; exit 1 ;;\n    esac\ndone\n\nshift $((OPTIND - 1))\nFICHEIRO=$1\n\n$VERBOSE && echo "Verbose: ON"\n$VERBOSE && echo "Output: $OUTPUT"\n$VERBOSE && echo "Ficheiro: $FICHEIRO"','getopts — argumentos',null,'')}<h2>Debug de scripts</h2>${CB('# Executar com debug completo\nbash -x script.sh\n\n# Dentro do script:\nset -x    # ativar debug\nset +x    # desativar debug\nset -e    # parar em erros\nset -u    # erro em variáveis não definidas\nset -o pipefail  # erro em pipes\n\n# Combinação recomendada para scripts robustos:\n#!/bin/bash\nset -euo pipefail','Debug',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-fire"></i> Script de setup total</div><p>Cria um script <code>setup.sh</code> que configura todo o teu ambiente Termux do zero — instala pacotes, cria pastas, copia configurações. Ideal para quando mudas de dispositivo!</p></div>`,
+   quiz:{q:'O que faz set -e num script Bash?',opts:['Activa modo silencioso','Para a execução quando um comando falha','Activa modo debug (-x)','Desativa globbing'],c:1,e:'set -e (exit on error) faz o script parar imediatamente quando qualquer comando retorna um código de erro diferente de 0.'},
+   challenge:{t:'Script avançado',d:'Cria um script com funções e arrays',objs:['Criar array de pacotes','Iterar com for loop','Função com log','set -e no início'],cmds:['bash -x meu_script.sh','bash meu_script.sh --help']}},
+
+  {id:'a02',t:'Cron Jobs — Automação agendada',diff:'adv',mins:16,xp:60,
+   body:`<h2>Cron — O agendador de tarefas</h2><p>O cron executa comandos ou scripts automaticamente em horários definidos — mesmo que o telemóvel esteja em standby.</p><h2>Instalar e iniciar</h2>${CB('pkg install cronie\n\n# Iniciar o daemon\ncrond\n\n# Verificar se está a correr\nps aux | grep crond','Instalar cron','crond is running')}<h2>Sintaxe do crontab</h2>${CB('# Abrir o editor\ncrontab -e\n\n# Formato:\n# MIN  HORA  DIA  MES  DIASEM  COMANDO\n#  *    *     *    *     *\n\n# Exemplos:\n# A cada minuto\n* * * * * /home/kark/monitor.sh\n\n# A cada 5 minutos\n*/5 * * * * /home/kark/check_net.sh\n\n# Todos os dias às 08:00\n0 8 * * * /home/kark/backup.sh\n\n# Todo o dia às 09:00 e 21:00\n0 9,21 * * * /home/kark/script.sh\n\n# Toda segunda-feira à meia-noite\n0 0 * * 1 /home/kark/weekly.sh\n\n# A cada hora, de 9h às 17h, dias úteis\n0 9-17 * * 1-5 /home/kark/horario.sh\n\n# Ver crons ativos\ncrontab -l\n\n# Apagar todos os crons\ncrontab -r','Crontab — sintaxe e exemplos',null,'')}<h2>Scripts reais para agendar</h2>${CB('#!/bin/bash\n# backup_automatico.sh\n# Adiciona ao cron: 0 2 * * * ~/scripts/backup_automatico.sh\n\nDATA=$(date +%Y%m%d_%H%M)\nBACKUP_DIR="$HOME/storage/downloads/backups"\nFONTE="$HOME/projetos"\n\nmkdir -p "$BACKUP_DIR"\n\n# Criar arquivo comprimido\ntar -czf "$BACKUP_DIR/backup_$DATA.tar.gz" "$FONTE/" 2>/dev/null\n\n# Guardar log\necho "$(date): Backup criado → backup_$DATA.tar.gz" >> "$HOME/backup.log"\n\n# Manter só os últimos 7 backups\nls -t "$BACKUP_DIR"/backup_*.tar.gz 2>/dev/null | tail -n +8 | xargs rm -f 2>/dev/null\n\necho "✅ Backup $DATA concluído!"','backup_automatico.sh',null,'')}<div class="ib warn"><div class="ib-h"><i class="fas fa-mobile-alt"></i> Importante no Android</div><p>Para o cron funcionar corretamente no Termux em background, o Android pode matar o processo. Usa <strong>termux:widget</strong> ou mantém o Termux em primeiro plano, ou usa <strong>Tasker + Termux</strong> para tarefas agendadas mais fiáveis.</p></div>${CB('#!/bin/bash\n# monitor_rede.sh — verificar internet de hora em hora\n# Cron: */30 * * * * ~/scripts/monitor_rede.sh\n\nLOG="$HOME/rede.log"\nDATA=$(date "+%Y-%m-%d %H:%M")\n\nif ping -c 1 8.8.8.8 &>/dev/null; then\n    echo "$DATA ✅ Online" >> "$LOG"\nelse\n    echo "$DATA ❌ Offline!" >> "$LOG"\n    # Podias enviar notificação aqui\n    termux-notification -t "Rede" -c "Sem internet!" 2>/dev/null\nfi\n\n# Manter log de no máximo 1000 linhas\ntail -1000 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"','monitor_rede.sh',null,'')}<p>Ver o log: <code>tail -f ~/rede.log</code></p>`,
+   quiz:{q:'Que expressão cron executa um script a cada 15 minutos?',opts:['15 * * * *','0 15 * * *','*/15 * * * *','0 */15 * * *'],c:2,e:'*/15 no campo minuto significa "a cada 15 minutos" (0, 15, 30, 45). O asterisco com divisor representa intervalos.'},
+   challenge:{t:'Agendar tarefa',d:'Cria e agenda um script com cron',objs:['pkg install cronie','crond (iniciar)','crontab -e','crontab -l (verificar)'],cmds:['pkg install cronie','crond','crontab -l']}},
+
+  {id:'a03',t:'Git e GitHub no Termux',diff:'med',mins:18,xp:60,
+   body:`<h2>Git — Controlo de versões</h2>${CB('pkg install git\n\n# Configuração inicial (obrigatória!)\ngit config --global user.name "Kark Rio"\ngit config --global user.email "termuxkark@gmail.com"\ngit config --global init.defaultBranch main\ngit config --global core.editor nano\n\n# Ver configuração\ngit config --list','Configurar Git',null,'')}<h2>Fluxo básico de trabalho</h2>${CB('# 1. Iniciar repositório\nmkdir meu_projeto && cd meu_projeto\ngit init\n\n# 2. Criar ficheiros\necho "# Meu Projeto" > README.md\nnano main.py\n\n# 3. Ver estado\ngit status\n\n# 4. Adicionar ao stage\ngit add README.md    # ficheiro específico\ngit add .            # todos os ficheiros\n\n# 5. Fazer commit\ngit commit -m "Primeiro commit: estrutura inicial"\n\n# 6. Ver histórico\ngit log\ngit log --oneline\ngit log --oneline --graph\n\n# 7. Ver diferenças\ngit diff             # não commitado\ngit diff HEAD~1      # vs commit anterior','Fluxo Git',null,'')}<h2>Branches — Ramos de desenvolvimento</h2>${CB('# Criar branch\ngit branch feature/login\ngit branch fix/bug-123\n\n# Mudar de branch\ngit checkout feature/login\n# Ou criar e mudar ao mesmo tempo:\ngit checkout -b feature/nova-funcionalidade\n\n# Ver branches\ngit branch\ngit branch -a  # incluindo remotas\n\n# Fazer merge\ngit checkout main\ngit merge feature/login\n\n# Apagar branch\ngit branch -d feature/login','Branches',null,'')}<h2>GitHub — Repositório remoto</h2>${CB('# Ligar ao GitHub (depois de criar repo em github.com)\ngit remote add origin https://github.com/KarkRio/meu_projeto.git\n\n# Primeiro push\ngit push -u origin main\n\n# Push subsequentes\ngit push\n\n# Buscar alterações\ngit pull\n\n# Clonar repositório\ngit clone https://github.com/user/repo.git\ngit clone https://github.com/user/repo.git minha_pasta','GitHub',null,'')}<h2>GitHub Token (autenticação)</h2><p>Desde 2021, o GitHub não aceita password. Usa Personal Access Token:</p><ol><li>Vai a github.com → Settings → Developer settings</li><li>Personal access tokens → Tokens (classic)</li><li>Generate new token → seleciona "repo"</li><li>Copia o token (só aparece uma vez!)</li></ol>${CB('# Guardar token para não escrever sempre\ngit config --global credential.helper store\ngit push\n# Na primeira vez, username = teu user GitHub\n# password = o TOKEN (não a tua password!)','Usar token GitHub',null,'')}<h2>.gitignore — Ignorar ficheiros</h2>${CB('nano .gitignore','Criar .gitignore',null,'')}<p>Conteúdo:</p>${CB('# Ambientes virtuais Python\nvenv/\n.venv/\n__pycache__/\n*.pyc\n\n# Configurações locais\n.env\nconfig.local.json\n\n# Logs\n*.log\nlogs/\n\n# Sistema\n.DS_Store\nThumbs.db','Conteúdo do .gitignore',null,'')}<div class="ib tip"><div class="ib-h"><i class="fas fa-sync"></i> Git no Termux: dica de ouro</div><p>Guarda as tuas configs (.bashrc, scripts, etc.) no GitHub. Quando instalares o Termux num novo dispositivo:<br><code>git clone https://github.com/KarkRio/dotfiles.git</code><br>E tens tudo de volta em segundos!</p></div>`,
+   quiz:{q:'Qual é a ordem correta do fluxo Git para guardar e enviar alterações?',opts:['commit → add → push','add → push → commit','add → commit → push','push → add → commit'],c:2,e:'O fluxo é: 1. git add (preparar ficheiros) → 2. git commit (guardar localmente) → 3. git push (enviar para GitHub).'},
+   challenge:{t:'Usar Git',d:'Inicia um repositório e faz commits',objs:['git init num projeto','git add . && git commit','git log --oneline'],cmds:['git init','git add .','git commit -m "Primeiro commit"','git log --oneline','git status']}}
+ ]}
+];
+
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════════ */
+let cbId=0;
+function CB(code,label,existOut,simOut){
+  const id='cb'+(cbId++);
+  const canRun=(simOut!==null&&simOut!==undefined);
+  const runBtn=canRun?`<button class="cba run" onclick="runCB('${id}',this)"><i class="fas fa-play"></i> Executar</button>`:'';
+  const enc=canRun?encodeURIComponent(simOut):'';
+  const outDiv=existOut!=null?`<div class="cb-out show">${esc(existOut)}</div>`:`<div class="cb-out" id="co${id}"></div>`;
+  return`<div class="cb" id="${id}" data-sim="${enc}"><div class="cb-hd"><span class="cb-lbl"><i class="fas fa-terminal"></i> ${label}</span><div class="cb-acts">${runBtn}<button class="cba" onclick="cpCB('${id}')"><i class="fas fa-copy"></i> Copiar</button></div></div><div class="cb-code">${esc(code)}</div>${outDiv}</div>`;
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function runCB(id,btn){
+  const box=document.getElementById(id);if(!box)return;
+  const sim=decodeURIComponent(box.dataset.sim||'');
+  if(!sim)return;
+  const out=box.querySelector('.cb-out')||document.getElementById('co'+id);
+  if(!out)return;
+  out.classList.add('show');out.textContent='';
+  let i=0;const iv=setInterval(()=>{if(i>=sim.length){clearInterval(iv);return;}out.textContent+=sim[i++];},9);
+  toast('Simulado! ✅');
+}
+function cpCB(id){
+  const box=document.getElementById(id);if(!box)return;
+  const code=box.querySelector('.cb-code');if(!code)return;
+  navigator.clipboard.writeText(code.textContent.trim()).then(()=>toast('Copiado! 📋'));
+}
+function cpText(t){navigator.clipboard.writeText(t).then(()=>toast('Copiado: '+t));}
+
+/* ════════════════════════════════════════════════════════════
+   STATE & PERSISTENCE
+════════════════════════════════════════════════════════════ */
+let STATE={xp:0,done:{},notes:{},curPath:null,curLesson:null};
+let sbUser=null;
+
+function loadState(){
+  const s=localStorage.getItem('tl3_state');
+  if(s)try{STATE=JSON.parse(s);}catch(e){}
+}
+function saveState(){localStorage.setItem('tl3_state',JSON.stringify(STATE));}
+
+/* ════════════════════════════════════════════════════════════
+   SUPABASE HELPERS
+════════════════════════════════════════════════════════════ */
+async function syncXPToCloud(){
+  if(!sb||!sbUser)return;
+  try{
+    await sb.from('user_xp').upsert({user_id:sbUser.id,username:sbUser.email.split('@')[0],xp_total:STATE.xp,lessons_done:Object.keys(STATE.done).length},{onConflict:'user_id'});
+  }catch(e){}
+}
+async function loadRanking(){
+  if(!sb)return[];
+  try{
+    const{data}=await sb.from('user_xp').select('*').order('xp_total',{ascending:false}).limit(20);
+    return data||[];
+  }catch(e){return[];}
+}
+
+/* ════════════════════════════════════════════════════════════
+   AUTH
+════════════════════════════════════════════════════════════ */
+function switchAuthTab(t){
+  document.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('on'));
+  document.querySelector(`[onclick="switchAuthTab('${t}')"]`).classList.add('on');
+  document.getElementById('auth-login-f').style.display=t==='login'?'block':'none';
+  document.getElementById('auth-reg-f').style.display=t==='reg'?'block':'none';
+  document.getElementById('auth-err').className='mod-err';
+}
+async function doLogin(){
+  const email=document.getElementById('a-email').value.trim();
+  const pw=document.getElementById('a-pw').value;
+  if(!sb){toast('Configura o Supabase para usar contas','warn');return;}
+  try{
+    const{data,error}=await sb.auth.signInWithPassword({email,password:pw});
+    if(error)throw error;
+    sbUser=data.user;
+    closeOv('auth-ov');
+    updateAuthBtn();
+    toast('Login feito! ✅');
+    await syncXPToCloud();
+  }catch(e){showAuthErr(e.message);}
+}
+async function doRegister(){
+  const username=document.getElementById('a-user').value.trim();
+  const email=document.getElementById('a-remail').value.trim();
+  const pw=document.getElementById('a-rpw').value;
+  if(!sb){toast('Configura o Supabase para usar contas','warn');return;}
+  try{
+    const{data,error}=await sb.auth.signUp({email,password:pw,options:{data:{username}}});
+    if(error)throw error;
+    sbUser=data.user;
+    closeOv('auth-ov');
+    updateAuthBtn();
+    toast('Conta criada! Verifica o email ✅');
+  }catch(e){showAuthErr(e.message);}
+}
+function showAuthErr(msg){
+  const el=document.getElementById('auth-err');
+  el.textContent=msg;el.className='mod-err show';
+}
+function updateAuthBtn(){
+  const btn=document.getElementById('auth-btn');
+  if(sbUser){btn.innerHTML='<i class="fas fa-user-check"></i>';btn.title='Conta ativa';btn.style.color='var(--g)';btn.style.borderColor='var(--g)';}
+  else{btn.innerHTML='<i class="fas fa-user"></i>';btn.title='Conta';btn.style.color='';btn.style.borderColor='';}
+}
+
+/* ════════════════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════════════════ */
+function goPage(pg){
+  document.querySelectorAll('.hn').forEach(b=>b.classList.toggle('on',b.dataset.p===pg));
+  ['home','trilhas','progresso','ranking'].forEach(p=>{
+    const el=document.getElementById('pg-'+p);
+    if(el)el.style.display=p===pg?'block':'none';
+  });
+  if(pg==='progresso')renderProgress();
+  if(pg==='ranking')renderRanking();
+  if(pg==='trilhas')renderAllPaths();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.hn').forEach(b=>b.addEventListener('click',()=>goPage(b.dataset.p)));
+
+/* ════════════════════════════════════════════════════════════
+   HOME
+════════════════════════════════════════════════════════════ */
+function renderHome(){
+  renderPathGrid('path-grid',true);
+  renderAchievements('ach-home',4);
+  renderStartGrid();
+  updateXPDisplay();
+}
+function renderPathGrid(gid,compact){
+  const g=document.getElementById(gid);if(!g)return;
+  g.innerHTML='';
+  PATHS.forEach(p=>{
+    const done=p.lessons.filter(l=>STATE.done[l.id]).length;
+    const total=p.lessons.length;
+    const pct=Math.round(done/total*100);
+    const d=document.createElement('div');d.className='pc '+p.cls;
+    d.innerHTML=`<div class="pc-ico">${p.ico}</div><div class="pc-n">${p.name}</div><div class="pc-d">${p.desc}</div><div class="pc-meta"><span class="pc-mi"><i class="fas fa-book"></i>${total} lições</span><span class="pc-mi"><i class="fas fa-bolt"></i>${p.lessons.reduce((a,l)=>a+l.xp,0)} XP</span></div><div class="pc-bar"><div class="pc-fill" style="width:${pct}%"></div></div><div class="pc-pct"><span>${done}/${total} concluídas</span><span>${pct}%</span></div>`;
+    d.addEventListener('click',()=>openPath(p.id));
+    g.appendChild(d);
+  });
+}
+function renderStartGrid(){
+  const g=document.getElementById('start-grid');if(!g)return;
+  g.innerHTML='';
+  const inicio=PATHS[0].lessons.slice(0,6);
+  inicio.forEach(l=>{
+    const done=STATE.done[l.id];
+    const d=document.createElement('div');d.className='rc';
+    d.innerHTML=`<div class="rc-cat"><i class="fas fa-circle" style="font-size:.5rem;color:var(--g)"></i>Bash Essencial · ${l.diff==='ini'?'Iniciante':'Intermediário'} ${done?'· ✓ Concluído':''}</div><div class="rc-t">${l.t}</div><div class="rc-m"><span><i class="fas fa-clock"></i>${l.mins}min</span><span><i class="fas fa-bolt"></i>${l.xp}XP</span></div>`;
+    d.addEventListener('click',()=>openLesson(0,l.id));
+    g.appendChild(d);
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   LESSON VIEW
+════════════════════════════════════════════════════════════ */
+function openPath(pathId,startLessonId){
+  const path=PATHS[pathId];if(!path)return;
+  STATE.curPath=pathId;
+  document.getElementById('lv-pn').textContent=path.ico+' '+path.name;
+  // Build sidebar
+  const ll=document.getElementById('lv-list');ll.innerHTML='';
+  path.lessons.forEach((l,i)=>{
+    const done=STATE.done[l.id];
+    const btn=document.createElement('button');btn.className='ll-btn'+(done?' done':'');btn.dataset.id=l.id;
+    const dc=l.diff==='ini'?'dini':l.diff==='adv'?'dadv':'dmed';
+    btn.innerHTML=`<div class="lln">${done?'<i class="fas fa-check"></i>':(i+1)}</div><div class="ll-inf"><div class="ll-t">${l.t}</div><div class="ll-m"><span class="${dc}">${l.diff==='ini'?'Iniciante':l.diff==='adv'?'Avançado':'Médio'}</span><span><i class="fas fa-clock"></i>${l.mins}m</span><span style="color:var(--y)"><i class="fas fa-bolt"></i>${l.xp}</span></div></div>`;
+    btn.addEventListener('click',()=>openLesson(pathId,l.id));
+    ll.appendChild(btn);
+  });
+  // Cheatsheet
+  const cs=document.getElementById('rp-cs');cs.innerHTML='';
+  path.cs.forEach(c=>{
+    cs.innerHTML+=`<div class="cs-item"><span class="cs-cmd">${esc(c.cmd)}</span><span class="cs-desc">${c.d}</span><button class="cs-cp" onclick="cpText('${c.cmd.replace(/'/g,"\\'")}')"><i class="fas fa-copy"></i></button></div>`;
+  });
+  // Open first or specific lesson
+  const target=startLessonId||path.lessons[0].id;
+  openLesson(pathId,target);
+  document.getElementById('lv').classList.add('open');
+  document.body.classList.add('lv-open');
+}
+function closeLV(){
+  document.getElementById('lv').classList.remove('open');
+  document.body.classList.remove('lv-open');
+  document.getElementById('pbar').style.width='0';
+  renderHome();
+}
+function openLesson(pathId,lessonId){
+  const path=PATHS[pathId];if(!path)return;
+  const idx=path.lessons.findIndex(l=>l.id===lessonId);if(idx===-1)return;
+  const lesson=path.lessons[idx];
+  STATE.curPath=pathId;STATE.curLesson=lessonId;
+  // Sidebar highlight
+  document.querySelectorAll('.ll-btn').forEach(b=>b.classList.toggle('cur',b.dataset.id===lessonId));
+  // Progress bar
+  const done=path.lessons.filter(l=>STATE.done[l.id]).length;
+  const pct=Math.round(done/path.lessons.length*100);
+  document.getElementById('lv-pct').textContent=pct+'%';
+  document.getElementById('lv-fill').style.width=pct+'%';
+  // Notes
+  document.getElementById('note-ta').value=STATE.notes[lessonId]||'';
+  // Build content
+  const dc=lesson.diff==='ini'?'dini':lesson.diff==='adv'?'dadv':'dmed';
+  const dcl=lesson.diff==='ini'?'Iniciante':lesson.diff==='adv'?'Avançado':'Intermediário';
+  const isDone=STATE.done[lessonId];
+  const hasPrev=idx>0,hasNext=idx<path.lessons.length-1;
+  const prevId=hasPrev?path.lessons[idx-1].id:null;
+  const nextId=hasNext?path.lessons[idx+1].id:null;
+  cbId=0;// reset cb ids for this lesson
+  let html=`<div class="lc-crumb"><i class="fas fa-home" style="color:var(--g)"></i> ${path.ico} ${path.name} <i class="fas fa-chevron-right" style="font-size:.55rem;color:var(--t4)"></i> ${lesson.t}</div><h1 class="lc-h">${lesson.t}</h1><div class="lc-meta"><span class="lc-mi ${dc}"><i class="fas fa-signal"></i>${dcl}</span><span class="lc-mi"><i class="fas fa-clock"></i>${lesson.mins} min</span><span class="lc-mi" style="color:var(--y)"><i class="fas fa-bolt"></i>${lesson.xp} XP</span>${isDone?`<span class="lc-mi" style="color:var(--g)"><i class="fas fa-check-circle"></i>Concluída</span>`:''}</div><div class="lc-body">${lesson.body}`;
+  // Quiz
+  if(lesson.quiz)html+=buildQuiz(lesson.quiz,lesson.id);
+  // Challenge
+  if(lesson.challenge)html+=buildChallenge(lesson.challenge,lesson.id);
+  // Nav
+  html+=`</div><div class="lc-nav"><button class="lnb" ${!hasPrev?'disabled':''} onclick="openLesson(${pathId},'${hasPrev?prevId:lessonId}')"><i class="fas fa-arrow-left"></i> Anterior</button><button class="lnb ${isDone?'done-btn already':'done-btn'}" onclick="markDone(${pathId},'${lessonId}')">${isDone?'<i class="fas fa-check"></i> Concluída':'<i class="fas fa-check"></i> Marcar concluída'}</button><button class="lnb" ${!hasNext?'disabled':''} onclick="openLesson(${pathId},'${hasNext?nextId:lessonId}')">Próxima <i class="fas fa-arrow-right"></i></button></div>`;
+  const ct=document.getElementById('lv-ct');ct.innerHTML=html;ct.scrollTop=0;
+  // Scroll progress
+  ct.onscroll=()=>{const p=(ct.scrollTop/(ct.scrollHeight-ct.clientHeight))*100;document.getElementById('pbar').style.width=Math.min(100,p)+'%';};
+}
+function buildQuiz(q,lid){
+  const qid='q_'+lid;
+  const letters=['A','B','C','D'];
+  return`<div class="qz" id="${qid}"><div class="qz-top"><i class="fas fa-question-circle"></i> Quiz — Testa o teu conhecimento</div><div class="qz-q">${q.q}</div><div class="qz-opts">${q.opts.map((o,i)=>`<button class="qz-opt" onclick="answerQuiz('${qid}',${i},${q.c},'${encodeURIComponent(q.e)}')">${letters[i]}. ${o}</button>`).join('')}</div><div class="qz-exp" id="qe_${qid}" style="display:none"></div></div>`;
+}
+function answerQuiz(qid,chosen,correct,expEnc){
+  const box=document.getElementById(qid);if(!box)return;
+  const exp=document.getElementById('qe_'+qid);
+  box.querySelectorAll('.qz-opt').forEach((b,i)=>{b.disabled=true;if(i===correct)b.classList.add('ok');else if(i===chosen)b.classList.add('nk');});
+  const ok=chosen===correct;
+  exp.style.display='block';exp.className='qz-exp '+(ok?'ok':'nk');
+  exp.innerHTML=(ok?'✅ Correto! ':'❌ Errado. ')+decodeURIComponent(expEnc);
+  if(ok){addXP(5);toast('Resposta certa! +5 XP ⚡');}
+  else toast('Errado! Vê a explicação abaixo','warn');
+}
+function buildChallenge(ch,lid){
+  const cid='ch_'+lid;
+  return`<div class="ch-box" id="${cid}"><div class="ch-top"><i class="fas fa-trophy"></i> Desafio Prático</div><div class="ch-title">${ch.t}</div><div class="ch-desc">${ch.d}</div><div class="ch-obj">${ch.objs.map((o,i)=>`<div class="ch-oi"><div class="ch-oi-dot" id="chd_${cid}_${i}"></div><span class="ch-oi-txt"><code style="font-size:.78em;color:var(--g)">${o}</code></span></div>`).join('')}</div><div class="ch-term"><div class="mt"><div class="tbar"><div class="td tdr"></div><div class="td tdy"></div><div class="td tdg"></div><div class="tt">terminal do desafio</div></div><div class="mt-b" id="chout_${cid}"></div><div class="mt-ir"><span class="mt-pr">$</span><input class="mt-in" id="chin_${cid}" placeholder="escreve o comando aqui..." autocomplete="off" onkeydown="chCmd(event,'${cid}',${JSON.stringify(ch.cmds).replace(/'/g,'\\'')},'${lid}')"></div></div></div></div>`;
+}
+function chCmd(e,cid,cmds,lid){
+  if(e.key!=='Enter')return;
+  const inp=document.getElementById('chin_'+cid);
+  const out=document.getElementById('chout_'+cid);
+  const cmd=inp.value.trim();if(!cmd)return;
+  out.innerHTML+=`<span style="color:var(--g)">$ ${esc(cmd)}</span>\n`;
+  out.innerHTML+=simCmd(cmd)+'\n';
+  out.scrollTop=out.scrollHeight;
+  // Check if cmd matches a challenge command
+  const match=cmds.some(c=>cmd.startsWith(c.split(' ')[0])&&cmd.includes(c.split(' ')[1]||''));
+  if(match){
+    const objs=document.querySelectorAll(`[id^="chd_${cid}_"]`);
+    objs.forEach(d=>{if(!d.classList.contains('ok')){d.classList.add('ok');d.innerHTML='<i class="fas fa-check"></i>';addXP(3);toast('+3 XP! Objetivo concluído ⚡');return false;}});
+    // Check if all done
+    const allDone=[...objs].every(d=>d.classList.contains('ok'));
+    if(allDone){toast('🎉 Desafio completo!');markDone(STATE.curPath,lid);}
+  }
+  inp.value='';
+}
+function markDone(pathId,lessonId){
+  const path=PATHS[pathId];const lesson=path.lessons.find(l=>l.id===lessonId);
+  if(!STATE.done[lessonId]){
+    STATE.done[lessonId]=true;
+    addXP(lesson.xp);
+    saveState();
+    toast(`🎉 Lição concluída! +${lesson.xp} XP`);
+    checkAchievements();
+    syncXPToCloud();
+    // Update sidebar button
+    document.querySelectorAll('.ll-btn').forEach(b=>{
+      if(b.dataset.id===lessonId){b.classList.add('done');const n=b.querySelector('.lln');if(n)n.innerHTML='<i class="fas fa-check"></i>';}
+    });
+    // Refresh lesson header
+    openLesson(pathId,lessonId);
+    // Update path progress
+    const done=path.lessons.filter(l=>STATE.done[l.id]).length;
+    const pct=Math.round(done/path.lessons.length*100);
+    document.getElementById('lv-pct').textContent=pct+'%';
+    document.getElementById('lv-fill').style.width=pct+'%';
+  } else{toast('Já concluída! ✓','info');}
+}
+function addXP(n){STATE.xp+=n;updateXPDisplay();saveState();}
+function updateXPDisplay(){
+  document.getElementById('xp-hd').textContent=STATE.xp;
+  if(document.getElementById('xp-big'))document.getElementById('xp-big').textContent=STATE.xp;
+}
+function saveNote(){
+  if(!STATE.curLesson)return;
+  STATE.notes[STATE.curLesson]=document.getElementById('note-ta').value;
+  saveState();toast('Nota guardada! 📝');
+}
+
+/* ════════════════════════════════════════════════════════════
+   ACHIEVEMENTS
+════════════════════════════════════════════════════════════ */
+const ACHS=[
+  {id:'a1',ico:'🎯',n:'Primeiro Passo',d:'Conclui a primeira lição',c:()=>Object.keys(STATE.done).length>=1},
+  {id:'a2',ico:'💻',n:'Bash Warrior',d:'5 lições de Bash',c:()=>PATHS[0].lessons.filter(l=>STATE.done[l.id]).length>=5},
+  {id:'a3',ico:'🐍',n:'Pythonista',d:'1 lição de Python',c:()=>PATHS[2].lessons.filter(l=>STATE.done[l.id]).length>=1},
+  {id:'a4',ico:'⚡',n:'Centenário',d:'100 XP acumulados',c:()=>STATE.xp>=100},
+  {id:'a5',ico:'🏆',n:'Terminal Master',d:'500 XP acumulados',c:()=>STATE.xp>=500},
+  {id:'a6',ico:'🌐',n:'Net Ninja',d:'1 lição de Redes',c:()=>PATHS[3].lessons.filter(l=>STATE.done[l.id]).length>=1},
+  {id:'a7',ico:'🎌',n:'Bash Master',d:'Todas as lições de Bash',c:()=>PATHS[0].lessons.every(l=>STATE.done[l.id])},
+  {id:'a8',ico:'🔗',n:'Git User',d:'Lição de Git concluída',c:()=>STATE.done['a03']},
+  {id:'a9',ico:'🕐',n:'Cron Master',d:'Lição de Cron concluída',c:()=>STATE.done['a02']},
+  {id:'a10',ico:'🌟',n:'All-Rounder',d:'1 lição de cada trilha',c:()=>PATHS.every(p=>p.lessons.some(l=>STATE.done[l.id]))},
+  {id:'a11',ico:'🚀',n:'Rocket',d:'1000 XP acumulados',c:()=>STATE.xp>=1000},
+  {id:'a12',ico:'📖',n:'Estudante',d:'10 lições concluídas',c:()=>Object.keys(STATE.done).length>=10},
+];
+function checkAchievements(){
+  ACHS.forEach(a=>{
+    if(!localStorage.getItem('ach_'+a.id)&&a.c()){
+      localStorage.setItem('ach_'+a.id,'1');
+      setTimeout(()=>toast(`🏆 Conquista: "${a.n}"!`),500);
+    }
+  });
+}
+function renderAchievements(gid,limit){
+  const g=document.getElementById(gid);if(!g)return;
+  const list=limit?ACHS.slice(0,limit):ACHS;
+  g.innerHTML=list.map(a=>{const earned=a.c()||localStorage.getItem('ach_'+a.id);return`<div class="ag${earned?' earned':''}"><div class="ag-ico">${a.ico}</div><div class="ag-n">${a.n}</div><div class="ag-d">${a.d}</div></div>`;}).join('');
+}
+
+/* ════════════════════════════════════════════════════════════
+   PROGRESS PAGE
+════════════════════════════════════════════════════════════ */
+const LEVELS=[{n:'Script Kiddie',min:0},{n:'Shell Hacker',min:100},{n:'Bash Warrior',min:300},{n:'Kernel Explorer',min:600},{n:'Sysadmin',min:1000},{n:'Termux Master',min:2000}];
+function renderProgress(){
+  const xp=STATE.xp;
+  document.getElementById('xp-big').textContent=xp;
+  let lv=LEVELS[0],nextLv=LEVELS[1];
+  for(let i=0;i<LEVELS.length;i++){if(xp>=LEVELS[i].min){lv=LEVELS[i];nextLv=LEVELS[i+1]||null;}}
+  const lvNum=LEVELS.indexOf(lv)+1;
+  document.getElementById('xp-lv').textContent=`Nível ${lvNum} — ${lv.n}`;
+  if(nextLv){const pct=((xp-lv.min)/(nextLv.min-lv.min))*100;document.getElementById('xp-lfill').style.width=Math.min(100,pct)+'%';}
+  renderPathGrid('prog-paths');
+  renderAchievements('ach-prog');
+}
+
+/* ════════════════════════════════════════════════════════════
+   RANKING PAGE
+════════════════════════════════════════════════════════════ */
+async function renderRanking(){
+  const body=document.getElementById('lb-body');
+  body.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:20px;font-family:var(--fi)">A carregar ranking...</td></tr>';
+  let rows=[];
+  if(sb){
+    rows=await loadRanking();
+  }
+  if(!rows.length){
+    // Local only
+    rows=[{username:sbUser?sbUser.email.split('@')[0]:'Tu (local)',xp_total:STATE.xp,level:LEVELS.findIndex(l=>STATE.xp>=l.min)+1,lessons_done:Object.keys(STATE.done).length,_me:true}];
+  }
+  body.innerHTML=rows.map((r,i)=>{
+    const me=r._me||r.user_id===sbUser?.id;
+    return`<tr class="${me?'lb-me':''}"><td class="lb-rank">${i+1}</td><td>${r.username||'Anónimo'}</td><td>${r.level||1}</td><td class="lb-xp">${r.xp_total||0}</td><td>${r.lessons_done||0}</td></tr>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════════════
+   ALL PATHS PAGE
+════════════════════════════════════════════════════════════ */
+function renderAllPaths(){
+  const ct=document.getElementById('all-paths-ct');ct.innerHTML='';
+  PATHS.forEach(p=>{
+    const hdr=document.createElement('div');hdr.className='sec-hd';hdr.innerHTML=`<div class="sec-t">${p.ico} ${p.name}</div>`;ct.appendChild(hdr);
+    const grid=document.createElement('div');grid.className='recent-grid';ct.appendChild(grid);
+    p.lessons.forEach(l=>{
+      const done=STATE.done[l.id];
+      const dc=l.diff==='ini'?'dini':l.diff==='adv'?'dadv':'dmed';
+      const d=document.createElement('div');d.className='rc';
+      d.innerHTML=`<div class="rc-cat"><span class="${dc}">${l.diff==='ini'?'Iniciante':l.diff==='adv'?'Avançado':'Médio'}</span> ${done?'· ✓':''}</div><div class="rc-t">${l.t}</div><div class="rc-m"><span><i class="fas fa-clock"></i>${l.mins}min</span><span style="color:var(--y)"><i class="fas fa-bolt"></i>${l.xp}XP</span></div>`;
+      d.addEventListener('click',()=>openLesson(p.id,l.id));
+      grid.appendChild(d);
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   TERMINAL SIMULATOR
+════════════════════════════════════════════════════════════ */
+let sbFS={
+  '/home':{t:'d',c:{'projetos':{t:'d',c:{'README.md':{t:'f',v:'# Projetos TermuxLab'}}},'scripts':{t:'d',c:{'hello.sh':{t:'f',v:'#!/bin/bash\necho "Hello TermuxLab!"'}}},'README.md':{t:'f',v:'# Bem-vindo ao TermuxLab\nTermuxLab Academy v3.0'}}},
+};
+let sbCwd='/home', sbHist=[], sbHIdx=-1;
+let miniCwd='/home', miniHist=[];
+
+function getNode(path,fs){
+  if(path==='/')return{t:'d',c:fs};
+  const parts=path.split('/').filter(Boolean);
+  let cur=fs;
+  for(const p of parts){
+    if(!cur||typeof cur!=='object')return null;
+    const node=cur[p]||cur;
+    if(node&&node.t==='d')cur=node.c;
+    else if(node&&node.t==='f')return node;
+    else return null;
+  }
+  return{t:'d',c:cur};
+}
+function resolvePath(input,cwd){
+  if(!input||input==='~')return'/home';
+  if(input.startsWith('/'))return input;
+  if(input==='..')return cwd.split('/').slice(0,-1).join('/')||'/';
+  if(input==='.')return cwd;
+  return(cwd==='/'?'/'+input:cwd+'/'+input);
+}
+function listDir(cwd,fs){
+  const n=getNode(cwd,fs);
+  if(!n||n.t!=='d')return null;
+  return Object.keys(n.c||{});
+}
+function simCmd(cmd,cwd_,hist_,fs_,isMain){
+  const cwd=cwd_||sbCwd, hist=hist_||sbHist, fs=fs_||sbFS;
+  const parts=cmd.trim().split(/\s+/);
+  const c=parts[0];const args=parts.slice(1);
+  switch(c){
+    case 'help':return`Comandos disponíveis:\n  ls, cd, pwd, cat, echo, mkdir, touch, rm\n  date, whoami, uname, clear, history, env\n  python/python3, pip, pkg, git, curl, ping\n  ssh, sshd, chmod, grep, which, ps, kill\n  bash, nano (simula abertura)\n  e muitos mais...`;
+    case 'pwd':return cwd;
+    case 'ls':{
+      const target=args[0]?resolvePath(args[0],cwd):cwd;
+      const items=listDir(target,fs);
+      if(!items)return`ls: '${args[0]||cwd}': Diretório não encontrado`;
+      const la=args.includes('-la')||args.includes('-l');
+      if(la)return`total ${items.length*4}\n`+items.map(i=>{const n=getNode(target+'/'+i,fs);const isdir=n&&n.t==='d';return`${isdir?'drwxr-xr-x':'--rw-r--r--'} 1 kark kark ${isdir?4096:512} Jan 15 ${i}${isdir?'/':''}`;}).join('\n');
+      return items.join('  ');
+    }
+    case 'cd':{
+      const target=args[0]?resolvePath(args[0],cwd):'/home';
+      const n=getNode(target,fs);
+      if(!n||n.t!=='d')return`cd: '${args[0]}': Diretório não encontrado`;
+      if(isMain)sbCwd=target; else miniCwd=target;
+      if(isMain)document.getElementById('sb-pr').textContent=`kark@termuxlab:${target.replace('/home','~')}$`;
+      return '';
+    }
+    case 'cat':{
+      if(!args[0])return 'cat: necessita de um argumento';
+      const fp=resolvePath(args[0],cwd);
+      const n=getNode(fp,fs);
+      if(!n)return`cat: ${args[0]}: Ficheiro não encontrado`;
+      if(n.t==='d')return`cat: ${args[0]}: É um diretório`;
+      return n.v||'(ficheiro vazio)';
+    }
+    case 'echo':return args.join(' ').replace(/^["']|["']$/g,'');
+    case 'date':return new Date().toString();
+    case 'whoami':return 'kark';
+    case 'uname':return args.includes('-a')?'Linux android 5.4.0-android-11 #1 SMP aarch64 Android':'Linux';
+    case 'clear':if(isMain){document.getElementById('sb-out').textContent='';return '__NOPRINT__';}return '__NOPRINT__';
+    case 'history':return(isMain?sbHist:miniHist).slice(0,15).map((h,i)=>`  ${(i+1).toString().padStart(3)}  ${h}`).join('\n');
+    case 'env':return`HOME=/data/data/com.termux/files/home\nSHELL=/data/data/com.termux/files/usr/bin/bash\nUSER=kark\nPATH=/data/data/com.termux/files/usr/bin\nTERM=xterm-256color`;
+    case 'which':return args[0]?`/data/data/com.termux/files/usr/bin/${args[0]}`:'which: necessita de argumento';
+    case 'python':case 'python3':{
+      if(args.includes('--version')||args.includes('-V'))return 'Python 3.11.6';
+      if(args.includes('-c')&&args.length>1){
+        const code=args.slice(args.indexOf('-c')+1).join(' ').replace(/^["']|["']$/g,'');
+        const m=code.match(/print\(["']([^"']+)["']\)/);
+        if(m)return m[1];
+        if(code.includes('2**'))return String(eval(code.replace(/.*\(/,'').replace(/\).*/,'')));
+        return`[Python] ${code}`;
+      }
+      return`Python 3.11.6 (TermuxLab Simulator)\nEscreve comandos Python, "exit()" para sair`;
+    }
+    case 'pip':{
+      if(args[0]==='install')return args[1]?`Collecting ${args[1]}\n  Downloading ${args[1]}-1.0.0-py3-none-any.whl\nSuccessfully installed ${args[1]}-1.0.0`:'pip install: falta nome do pacote';
+      if(args[0]==='list')return`Package     Version\n----------- -------\nnumpy       1.26.0\npandas      2.1.0\nrequests    2.31.0\npip         23.3.1`;
+      if(args[0]==='show')return args[1]?`Name: ${args[1]}\nVersion: 1.0.0\nLocation: /data/data/com.termux/files/usr/lib/python3.11/site-packages`:'pip show: falta nome';
+      return 'pip 23.3.1 from /data/data/com.termux/files/usr';
+    }
+    case 'pkg':{
+      if(args[0]==='update')return`Hit:1 https://packages-cf.termux.dev stable InRelease\nReading package lists... Done\nAll packages up to date.`;
+      if(args[0]==='upgrade')return`0 upgraded, 0 newly installed, 0 to remove.\nAll packages up to date!`;
+      if(args[0]==='install')return args[1]?`Fetching: ${args.slice(1).join(', ')}\nProcessing...\n[OK] ${args.slice(1).join(', ')} instalado(s) com sucesso!`:'pkg install: falta nome do pacote';
+      if(args[0]==='list')return`bash\ncurl\ngit\nnano\nnodejs\nopenssh\npython\nwget\n(e muitos mais...)`;
+      if(args[0]==='search')return args[1]?`Resultados para '${args[1]}':\n${args[1]}-utils\nlib${args[1]}\n${args[1]}-dev`:'pkg search: falta termo';
+      if(args[0]==='remove')return args[1]?`Removing ${args[1]}...\n[OK] Removido com sucesso.`:'pkg remove: falta nome';
+      return`pkg — Termux Package Manager\nUso: pkg <install|update|upgrade|list|remove|search> [pacote]`;
+    }
+    case 'git':{
+      if(!args.length)return`git version 2.42.0`;
+      if(args[0]==='init')return`Initialized empty Git repository in ${cwd}/.git/`;
+      if(args[0]==='status')return`On branch main\nnothing to commit, working tree clean`;
+      if(args[0]==='add')return`Adicionado: ${args[1]||'.'}`;
+      if(args[0]==='commit')return`[main ${Math.random().toString(36).substr(2,7)}] ${args.slice(2).join(' ')||'commit'}\n1 file changed`;
+      if(args[0]==='log')return`commit abc1234def (HEAD -> main)\nAuthor: Kark Rio <termuxkark@gmail.com>\nDate:   ${new Date().toDateString()}\n\n    Commit inicial`;
+      if(args[0]==='branch')return args[1]?`Branch '${args[1]}' criado`:` * main\n  feature/nova`;
+      if(args[0]==='clone')return args[1]?`Cloning into '${args[1].split('/').pop().replace('.git','')}'...\nDone.`:'git clone: falta URL';
+      if(args[0]==='push')return`Counting objects: done.\nWriting objects: 100% done.\nbranch 'main' -> origin/main`;
+      if(args[0]==='pull')return`Already up to date.`;
+      if(args[0]==='config')return args[1]?`git config: ${args.slice(1).join(' ')} definido.`:'';
+      return`git: '${args[0]}' não é um comando git. Tenta 'git --help'`;
+    }
+    case 'curl':{
+      if(!args.length)return'curl: necessita de URL. Uso: curl [URL]';
+      const url=args[args.length-1];
+      if(url.includes('ipify')||url.includes('ifconfig'))return'203.0.113.42';
+      if(url.includes('wttr.in'))return'Maputo: ☀️ +28°C';
+      if(args.includes('-I'))return`HTTP/2 200\ncontent-type: text/html\nserver: nginx\ndate: ${new Date().toUTCString()}`;
+      return`[Curl] GET ${url}\nStatus: 200 OK\n(conteúdo simulado — usa curl real no Termux para resultados verdadeiros)`;
+    }
+    case 'wget':return args[0]?`--${new Date().toISOString()} -- ${args[args.length-1]}\nResolvendo...\n100%[=========================================>] Done\n'${args[args.length-1].split('/').pop()}' guardado.`:'wget: necessita de URL';
+    case 'ping':return args[0]?`PING ${args[args.length-1]}: 56 bytes\n64 bytes from ${args[args.length-1]}: icmp_seq=1 ttl=57 time=12.3 ms\n64 bytes from ${args[args.length-1]}: icmp_seq=2 ttl=57 time=11.8 ms\n2 packets transmitted, 2 received, 0% loss, avg=12.05ms`:'ping: necessita de host';
+    case 'ssh':{
+      if(args[0]==='-V'||args[0]==='--version')return'OpenSSH_9.5p1 Ubuntu-3ubuntu0.4';
+      return`ssh: connecting to ${args[args.length-1]||'host'} (simulado)\nPara SSH real: use no Termux com 'sshd' + 'ssh user@ip -p 8022'`;
+    }
+    case 'sshd':return`sshd: starting OpenSSH server on port 8022\n[OK] SSH server running\nLigação: ssh -p 8022 kark@$(ifconfig wlan0 | grep inet)`;
+    case 'ifconfig':return`lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536\n  inet 127.0.0.1  netmask 255.0.0.0\nwlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n  inet 192.168.1.105  netmask 255.255.255.0`;
+    case 'ps':return`PID  CMD\n  1  bash\n  2  python3\n  3  sshd\n  4  crond`;
+    case 'chmod':return args.length>=2?`Permissões de '${args[args.length-1]}' alteradas para ${args[0]}`:'chmod: uso: chmod [modo] [ficheiro]';
+    case 'mkdir':{if(!args[0])return'mkdir: falta nome';if(isMain&&args[0]&&!args.includes('-p')){const n=resolvePath(args[args.length-1],cwd);if(sbFS[n.split('/').slice(0,-1).join('/')||'/home'])sbFS[n]={t:'d',c:{}};}return `Pasta '${args[args.length-1]}' criada`;}
+    case 'touch':return args[0]?`Ficheiro '${args[0]}' criado`:'touch: falta nome';
+    case 'rm':return args[0]?`Removido: ${args[args.length-1]}`:'rm: falta argumento';
+    case 'grep':return args.length>=2?`grep: procurando '${args[0]}' em '${args[args.length-1]}'\n1: correspondência encontrada`:'grep: uso: grep [padrão] [ficheiro]';
+    case 'nano':case 'vim':return`${c}: editor de texto (simulação)\nNo Termux real: ${c} ${args[0]||'ficheiro.txt'} abre o editor.\nCria ficheiro de teste: echo "#!/bin/bash" > ${args[0]||'script.sh'}`;
+    case 'bash':return args[0]?`Executando: ${args[0]} (simulado)\n[OK] Script executado com código 0`:'bash 5.2.15(1)-release (aarch64-unknown-linux-android)';
+    case 'nmap':return args.length?`Starting Nmap 7.94\nHost: 192.168.1.1 is up (0.0023s latency)\n22/tcp  open  ssh\n80/tcp  open  http\n443/tcp open  https\n\nNmap done: 1 IP scanned`:'nmap: necessita de host/rede. Uso: nmap <host>';
+    case 'htop':return'htop: abre no terminal real.\nSimulação: CPU 23% | RAM 1.2GB/4GB | Tasks: 42 running';
+    case 'crontab':return args[0]==='-l'?'# Crontab do utilizador kark\n*/30 * * * * ~/scripts/monitor.sh\n0 2 * * * ~/scripts/backup.sh':args[0]==='-e'?'crontab: abre editor no Termux real. Adiciona as tuas tarefas!':'crontab: uso: crontab -l (listar) | -e (editar) | -r (remover)';
+    case 'crond':return'crond: iniciando daemon cron\n[OK] crond running (PID 789)';
+    case 'wc':return args.includes('-l')&&args[1]?`     42 ${args[1]}`:args[0]?`   42  256 2048 ${args[0]}`:'wc: uso: wc [-l|-w|-c] ficheiro';
+    case 'sort':return '(conteúdo ordenado - usa no Termux real para ver resultado)';
+    case 'uniq':return '(linhas únicas - usa no Termux real para ver resultado)';
+    case 'head':return args[0]?`(primeiras ${args.includes('-n')?args[args.indexOf('-n')+1]:10} linhas de ${args[args.length-1]})`:'head: uso: head [-n N] ficheiro';
+    case 'tail':return args[0]?`(últimas ${args.includes('-n')?args[args.indexOf('-n')+1]:10} linhas de ${args[args.length-1]})`:args.includes('-f')?'tail -f: monitorando ficheiro em tempo real...\n(Ctrl+C para parar no Termux real)':'tail: uso: tail [-n N | -f] ficheiro';
+    case 'sed':return args.length>=2?`sed: substituindo padrão em ${args[args.length-1]} (simulado)`:'sed: uso: sed "s/velho/novo/g" ficheiro';
+    case 'awk':return args.length>=1?`awk: processando colunas (simulado)\n$1=campo1 $2=campo2 $NF=último campo`:'awk: uso: awk "{print $1}" ficheiro';
+    case 'source':case '.':return args[0]?`Recarregando ${args[0]}...\n[OK] ${args[0]} carregado`:'source: uso: source ficheiro.sh';
+    case 'alias':return args[0]?`alias ${args.join(' ')} definido`:`ll='ls -la'\nla='ls -A'\n..='cd ..'\npy='python'`;
+    case 'export':return args[0]?`${args[0]} exportado como variável de ambiente`:'export: lista variáveis exportadas';
+    case 'kill':return args[0]?`Processo ${args[args.length-1]} terminado`:'kill: uso: kill PID';
+    case 'jobs':return '(nenhuma tarefa em background)';
+    case 'man':return args[0]?`Manual para '${args[0]}':\nConsulta https://man7.org/linux/man-pages para documentação completa.`:'man: uso: man <comando>';
+    case 'tree':return`.\n├── projetos/\n│   └── README.md\n├── scripts/\n│   └── hello.sh\n└── README.md\n\n2 directories, 3 files`;
+    case 'df':return`Filesystem      Size  Used Avail Use%\n/data           32G   14G   18G  44%\ntmpfs          2.0G  128K  2.0G   1%`;
+    case 'free':return`              total    used    free\nMem:        4096000 1580240 2515760\nSwap:             0       0       0`;
+    case 'neofetch':return`         ████████        kark@termuxlab\n        ████████        ──────────────\n       ████████         OS: Android 13 aarch64\n      ████████          Shell: bash 5.2.15\n     ████████           Terminal: Termux 0.118\n    ████████            Packages: 127 (pkg)\n   ████████             Memory: 1.5GiB / 4GiB`;
+    case 'exit':return 'Para fechar, clica no X acima ou usa Ctrl+D no Termux real.';
+    default:return`${c}: comando não encontrado. Tenta 'help' para ver os comandos.\nNo Termux real, instala com: pkg install ${c}`;
+  }
+}
+function sbPrint(text,prompt){
+  const out=document.getElementById('sb-out');
+  if(prompt)out.textContent+=prompt+'\n';
+  if(text&&text!=='__NOPRINT__')out.textContent+=text+'\n\n';
+  out.scrollTop=out.scrollHeight;
+}
+function setupSandbox(){
+  const inp=document.getElementById('sb-inp');
+  const qk=document.getElementById('sb-qk');
+  const quick=['pkg update','ls -la','pwd','python --version','git --version','echo "Hello!"','whoami','date','neofetch','help'];
+  quick.forEach(c=>{const b=document.createElement('button');b.className='sb-q';b.textContent=c;b.onclick=()=>{inp.value=c;inp.focus();};qk.appendChild(b);});
+  // Welcome message
+  sbPrint(`╔══════════════════════════════════════════════╗
+║     TermuxLab Academy — Terminal Sandbox     ║
+║   Simula comandos do Termux no browser!      ║
+╚══════════════════════════════════════════════╝
+
+Comandos suportados: ls, cd, pwd, cat, echo, mkdir,
+python, pip, pkg, git, curl, ping, ssh, chmod, e mais.
+
+Digita 'help' para ver todos os comandos.
+`);
+  sbPrint('',`kark@termuxlab:~$`);
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      const cmd=inp.value.trim();
+      if(cmd){sbHist.unshift(cmd);sbHIdx=-1;}
+      const prompt=`${sbCwd.replace('/home','~').replace('/data/data/com.termux/files/home','~')}$`;
+      const out=document.getElementById('sb-out');
+      out.textContent+=`kark@termuxlab:${prompt} ${cmd}\n`;
+      const result=simCmd(cmd,sbCwd,sbHist,sbFS,true);
+      if(result!=='__NOPRINT__'&&result)out.textContent+=result+'\n';
+      out.textContent+='\n';
+      out.scrollTop=out.scrollHeight;
+      // Update prompt
+      document.getElementById('sb-pr').textContent=`kark@termuxlab:${sbCwd.replace('/home','~')}$`;
+      inp.value='';
+    }else if(e.key==='ArrowUp'){e.preventDefault();if(sbHIdx<sbHist.length-1){sbHIdx++;inp.value=sbHist[sbHIdx];}}
+    else if(e.key==='ArrowDown'){e.preventDefault();if(sbHIdx>0){sbHIdx--;inp.value=sbHist[sbHIdx];}else{sbHIdx=-1;inp.value='';}}
+  });
+}
+function setupMiniTerm(){
+  const inp=document.getElementById('mt-in');
+  const out=document.getElementById('mt-out');
+  inp.addEventListener('keydown',e=>{
+    if(e.key!=='Enter')return;
+    const cmd=inp.value.trim();if(!cmd)return;
+    out.innerHTML+=`<span style="color:var(--g)">$ ${esc(cmd)}</span>\n`;
+    const r=simCmd(cmd,miniCwd,miniHist,sbFS,false);
+    if(r&&r!=='__NOPRINT__')out.innerHTML+=esc(r)+'\n';
+    out.scrollTop=out.scrollHeight;
+    inp.value='';
+  });
+}
+function openSandbox(){document.getElementById('sandbox').classList.add('open');document.body.classList.add('sb-open');setTimeout(()=>document.getElementById('sb-inp').focus(),100);}
+function closeSandbox(){document.getElementById('sandbox').classList.remove('open');document.body.classList.remove('sb-open');}
+function sbReset(){sbCwd='/home';document.getElementById('sb-pr').textContent='kark@termuxlab:~$';document.getElementById('sb-out').textContent='';setupSandbox();}
+function sbClear(){document.getElementById('sb-out').textContent='';}
+
+/* ════════════════════════════════════════════════════════════
+   HERO TERMINAL ANIMATION
+════════════════════════════════════════════════════════════ */
+const ANIM=[{t:'u',v:'kark@termuxlab:~$ '},{t:'c',v:'pkg update && pkg upgrade -y'},{t:'o',v:'Fetching package list...'},{t:'o',v:'[OK] All packages up to date.'},{t:'u',v:'kark@termuxlab:~$ '},{t:'c',v:'python --version'},{t:'h',v:'Python 3.11.6'},{t:'u',v:'kark@termuxlab:~$ '},{t:'c',v:'git --version'},{t:'h',v:'git version 2.42.0'},{t:'u',v:'kark@termuxlab:~$ '},{t:'c',v:'cat README.md'},{t:'o',v:'# TermuxLab Academy v3'},{t:'o',v:'30+ lições interativas!'},{t:'u',v:'kark@termuxlab:~$ '},];
+let aIdx=0,cIdx=0;
+function doAnim(){
+  const tb=document.getElementById('anim-t');if(!tb)return;
+  let cur=tb.querySelector('.acl');
+  if(!cur){cur=document.createElement('span');cur.className='acl';tb.appendChild(cur);}
+  const line=ANIM[aIdx];
+  if(!line){setTimeout(()=>{tb.innerHTML='';aIdx=0;cIdx=0;},2500);return;}
+  if(cIdx<line.v.length){
+    const cls=line.t==='u'?'tu':line.t==='c'?'tc':line.t==='h'?'thi':'to';
+    cur.innerHTML=`<span class="${cls}">${esc(line.v.slice(0,cIdx+1))}</span>`;
+    cIdx++;
+  }else{
+    cur.className='';const br=document.createElement('br');tb.insertBefore(br,tb.lastChild);
+    aIdx++;cIdx=0;const nc=document.createElement('span');nc.className='acl';tb.insertBefore(nc,tb.lastChild);
+    tb.scrollTop=tb.scrollHeight;
+    if(aIdx>=ANIM.length){setTimeout(()=>{tb.innerHTML='';aIdx=0;cIdx=0;},3000);}
+  }
+}
+setInterval(doAnim,28);
+
+/* ════════════════════════════════════════════════════════════
+   SEARCH
+════════════════════════════════════════════════════════════ */
+const SEARCH_IDX=[];
+PATHS.forEach(p=>p.lessons.forEach(l=>SEARCH_IDX.push({pathId:p.id,lessonId:l.id,title:l.t,pathName:p.name,diff:l.diff})));
+document.getElementById('srch').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase().trim();
+  const drop=document.getElementById('sr-drop');
+  if(!q){drop.style.display='none';return;}
+  const results=SEARCH_IDX.filter(x=>x.title.toLowerCase().includes(q)||x.pathName.toLowerCase().includes(q)).slice(0,7);
+  if(!results.length){drop.style.display='none';return;}
+  drop.innerHTML=results.map(r=>`<div class="sr-item" onclick="openLesson(${r.pathId},'${r.lessonId}');document.getElementById('srch').value='';document.getElementById('sr-drop').style.display='none'"><span class="sr-cat">${PATHS[r.pathId].ico}</span><div><div class="sr-ttl">${r.title}</div><div class="sr-sub">${r.pathName}</div></div></div>`).join('');
+  drop.style.display='block';
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.s-wrap'))document.getElementById('sr-drop').style.display='none';});
+
+/* ════════════════════════════════════════════════════════════
+   OVERLAYS
+════════════════════════════════════════════════════════════ */
+function openOv(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeOv(id){document.getElementById(id).classList.remove('open');if(!document.querySelector('.ov.open'))document.body.style.overflow='';}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeOv(o.id);}));
+document.getElementById('auth-btn').addEventListener('click',()=>openOv('auth-ov'));
+document.getElementById('sb-open-btn').addEventListener('click',openSandbox);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeSandbox();
+    if(document.getElementById('lv').classList.contains('open'))closeLV();
+    document.querySelectorAll('.ov.open').forEach(o=>closeOv(o.id));
+  }
+});
+
+/* ════════════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════════════ */
+function toast(msg,type='success'){
+  const b=document.getElementById('toasts');
+  const t=document.createElement('div');t.className=`toast${type==='err'?' err':type==='warn'?' warn':type==='info'?' info':''}`;
+  const ic=type==='err'?'times-circle':type==='warn'?'exclamation-triangle':'check-circle';
+  t.innerHTML=`<i class="fas fa-${ic}"></i><span>${msg}</span>`;
+  b.appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),250);},3200);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SCROLL HEADER
+════════════════════════════════════════════════════════════ */
+window.addEventListener('scroll',()=>document.getElementById('hdr').classList.toggle('sc',window.scrollY>20),{passive:true});
+
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════════ */
+function startLearning(){openPath(0);}
+
+/* ════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════ */
+async function init(){
+  loadState();
+  // Init Supabase session
+  if(sb){
+    const{data:{session}}=await sb.auth.getSession();
+    if(session){sbUser=session.user;updateAuthBtn();}
+    sb.auth.onAuthStateChange((_,s)=>{sbUser=s?.user||null;updateAuthBtn();});
+  }
+  // Render
+  renderHome();
+  setupSandbox();
+  setupMiniTerm();
+  // Init page visibility
+  document.getElementById('pg-trilhas').style.display='none';
+  document.getElementById('pg-progresso').style.display='none';
+  document.getElementById('pg-ranking').style.display='none';
+  // Count total lessons
+  const total=PATHS.reduce((a,p)=>a+p.lessons.length,0);
+  document.getElementById('hs-les').textContent=total;
+  // Welcome
+  if(!localStorage.getItem('tl3_welcomed')){
+    localStorage.setItem('tl3_welcomed','1');
+    setTimeout(()=>toast('Bem-vindo ao TermuxLab Academy v3! 🎉'),700);
+  }
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
